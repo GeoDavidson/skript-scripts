@@ -5,26 +5,41 @@ on join:
         set title of player's scoreboard to "<##FFD700><bold>R<##FFBC00><bold>o<##FFA100><bold>o <##FF8600><bold>E<##FF6C00><bold>v<##FF5100><bold>e<##FF3600><bold>n<##FF1B00><bold>t<##FF0000><bold>s"
         set line 1 of player's scoreboard to "<light green>Not In Combat"
         set line 2 of player's scoreboard to ""
-        set line 3 of player's scoreboard to "Kill Streak: 0"
+        set line 3 of player's scoreboard to ""
         set line 4 of player's scoreboard to ""
-        set line 5 of player's scoreboard to "Player 3 - 0"
-        set line 6 of player's scoreboard to "Player 2 - 0"
-        set line 7 of player's scoreboard to "Player 1 - 0"
+        set line 5 of player's scoreboard to ""
+        set line 6 of player's scoreboard to ""
+        set line 7 of player's scoreboard to ""
         set line 8 of player's scoreboard to ""
-        set line 9 of player's scoreboard to "&6&m                          "
+        set line 9 of player's scoreboard to ""
+        set line 10 of player's scoreboard to "&6&m                          "
         set {-status_timer::%player%} to 0
         set {-player_kills::%player%} to 0
         while player is online:
             if player is in world "lobby":
                 loop all players:
-                    if loop-player is in world "lobby":
-                        add {-player_kills::%loop-player%} to {_kills::*}
-                loop {_kills::*}:
-                    send loop-index to player
+                    add {-player_kills::%loop-player%} to {_kills::*}
+                    add loop-player to {_names::*}
+                loop 3 times:
+                    set {_max} to 0
+                    set {_name} to "None"
+                    loop {_kills::*}:
+                        if {_kills::%loop-index%} is greater than {_max}:
+                            set {_max} to {_kills::%loop-index%}
+                            set {_name} to {_names::%loop-index%}
+                    remove {_max} from {_kills::*}
+                    remove {_name} from {_names::*}
+                    add {_max} to {_final_kills::*}
+                    add {_name} to {_final_names::*}
                 set line 3 of player's scoreboard to "Kill Streak: %{-player_kills::%player%}%"
-                set line 5 of player's scoreboard to "Player 3 - 0"
-                set line 6 of player's scoreboard to "Player 2 - 0"
-                set line 7 of player's scoreboard to "Player 1 - 0"
+                set line 5 of player's scoreboard to "%{_final_names::3}% - %{_final_kills::3}%"
+                set line 6 of player's scoreboard to "%{_final_names::2}% - %{_final_kills::2}%"
+                set line 7 of player's scoreboard to "%{_final_names::1}% - %{_final_kills::1}%"
+                set line 8 of player's scoreboard to "&cKill Streaks"
+                delete {_kills::*}
+                delete {_final_kills::*}
+                delete {_names::*}
+                delete {_final_names::*}
                 if {-status_timer::%player%} is greater than 0:
                     set line 1 of player's scoreboard to "&cIn Combat <gold>(%{-status_timer::%player%}%)"
                 else:
