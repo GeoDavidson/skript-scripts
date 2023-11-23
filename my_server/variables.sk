@@ -1,0 +1,4 @@
+variables:
+    {kills::%player%} = 0
+    {gold::%player%} = 0
+    {status_timer::%player%} = 0

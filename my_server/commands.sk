@@ -1,0 +1,34 @@
+command /broadcast <text>:
+    permission: op
+    description: Broadcasts a message to everybody.
+    trigger:
+        broadcast "<orange>[<red>Broadcasts<orange>]<reset> %arg-text%"
+
+command /lobby:
+    description: Teleports player back to main lobby.
+    executable by: players
+    trigger:
+        remove all items from player's inventory
+        remove swiftness from the player
+        heal player
+        teleport player to location at 0.5, -60, 0.5 in world "main"
+        
+command /spawn:
+    description: Teleports player back to spawn.
+    executable by: players
+    trigger:
+        if player is in world "main":
+            teleport player to location 0.5, -60, 0.5
+        else if player is in world "pvp":
+            heal player
+            teleport player to location 0.5, -43, 0.5
+
+command /fighting:
+    executable by: players
+    trigger:
+        set {status_timer::%player%} to 0
+
+command /idle:
+    executable by: players
+    trigger:
+        set {status_timer::%player%} to 5

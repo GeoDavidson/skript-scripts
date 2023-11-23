@@ -1,0 +1,82 @@
+on join:
+    if player is in world "lobby":
+        send title "<##FFD700><bold>R<##FFBC00><bold>o<##FFA100><bold>o <##FF8600><bold>E<##FF6C00><bold>v<##FF5100><bold>e<##FF3600><bold>n<##FF1B00><bold>t<##FF0000><bold>s" with subtitle "<light green><bold>Welcome %player%" to player for 4 seconds
+        set the join message to "<light cyan>%player% joined! :)"
+        set title of player's scoreboard to "<##FFD700><bold>R<##FFBC00><bold>o<##FFA100><bold>o <##FF8600><bold>E<##FF6C00><bold>v<##FF5100><bold>e<##FF3600><bold>n<##FF1B00><bold>t<##FF0000><bold>s"
+        set line 1 of player's scoreboard to "<light green>Not In Combat"
+        set line 2 of player's scoreboard to ""
+        set line 3 of player's scoreboard to "Kill Streak: 0"
+        set line 4 of player's scoreboard to ""
+        set line 5 of player's scoreboard to "Player 3 - 0"
+        set line 6 of player's scoreboard to "Player 2 - 0"
+        set line 7 of player's scoreboard to "Player 1 - 0"
+        set line 8 of player's scoreboard to ""
+        set line 9 of player's scoreboard to "&6&m                          "
+        set {-status_timer::%player%} to 0
+        set {-player_kills::%player%} to 0
+        while player is online:
+            if player is in world "lobby":
+                loop all players:
+                    if loop-player is in world "lobby":
+                        add {-player_kills::%loop-player%} to {_kills::*}
+                loop {_kills::*}:
+                    send loop-index to player
+                set line 3 of player's scoreboard to "Kill Streak: %{-player_kills::%player%}%"
+                set line 5 of player's scoreboard to "Player 3 - 0"
+                set line 6 of player's scoreboard to "Player 2 - 0"
+                set line 7 of player's scoreboard to "Player 1 - 0"
+                if {-status_timer::%player%} is greater than 0:
+                    set line 1 of player's scoreboard to "&cIn Combat <gold>(%{-status_timer::%player%}%)"
+                else:
+                    set line 1 of player's scoreboard to "<light green>Not In Combat"
+            wait 1 second
+
+on quit:
+    if player is in world "lobby":
+        set {-status_timer::%player%} to 0
+        set the quit message to "<light cyan>%player% left! :("
+
+on region enter:
+    if "%region%" is "pvp_arena in world lobby":
+        set slot 40 of player to unbreakable shield
+        set slot 0 of player to unbreakable iron sword
+        set slot 1 of player to unbreakable diamond axe
+        set slot 2 of player to 64 cooked beef
+        set helmet of player to unbreakable diamond helmet
+        set chestplate of player to unbreakable diamond chestplate
+        set leggings of player to unbreakable diamond leggings
+        set boots of player to unbreakable diamond boots
+        heal player
+        feed player
+    if "%region%" is "test in world lobby":
+        if {-status_timer::%player%} is greater than 0:
+            send "<red><bold>You can't go up whlie in combat!!!" to player
+            cancel event
+
+on region exit:
+    if "%region%" is "pvp_arena in world lobby":
+        remove all items from player's inventory
+        heal player
+        feed player
+
+on damage:
+    if victim is in world "lobby":
+        set {-status_timer::%victim%} to 10
+        set {-status_timer::%attacker%} to 10
+
+on death:
+    if victim is in world "lobby":
+        execute console command "/minecraft:clear %victim%"
+        make 1000 of item particle using redstone at location of victim
+        play sound "entity.dragon_fireball.explode" at volume 1 at pitch 2 to attacker
+        set {-status_timer::%victim%} to 0
+        set {-player_kills::%victim%} to 0
+        add 1 to {-player_kills::%attacker%}
+        heal attacker
+        feed attacker
+
+
+every 1 second:
+    loop all players:
+        if loop-player is in world "lobby":
+            subtract 1 from {-status_timer::%loop-player%}
