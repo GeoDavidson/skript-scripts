@@ -1,0 +1,62 @@
+on chat with priority highest:
+    if {chatfilter::banwords} is true:
+        loop {chatfilter::bannedwords::*}:
+            if message contains loop-value:
+                cancel event
+                message "&cYour message contained a banned word!"
+    if {chatfilter::cooldown} is true:
+        if {chatfilter::cooldownplayers::*} does not contain player's uuid:
+            add player's uuid to {chatfilter::cooldownplayers::*}
+            wait {chatfilter::cooldowntime}
+            remove player's uuid from {chatfilter::cooldownplayers::*}
+        else:
+            cancel event
+            message "&cYou must wait before chatting again!"
+
+command /bannedwords <string> [<string>]:
+    permission: op
+    trigger:
+        if arg-1 is "add":
+            if arg-2 is set:
+                add arg-2 to {chatfilter::bannedwords::*}
+                message "&aYou added &c&l%arg-2% &ato the list of banned words."
+            else:
+                message "&cTo add a banned word you must provide the word you want to ban."
+        else if arg-1 is "remove":
+            if arg-2 is set:
+                if {chatfilter::bannedwords::*} contains arg-2:
+                    remove arg-2 from {chatfilter::bannedwords::*}
+                    message "&aYou removed &c&l%arg-2% &afrom the list of banned words."
+                else:
+                    message "&cThe word &c&l%arg-2% &r&cis not on the list of baned words."
+            else:
+                message "&cTo remove a banned word from the list you must provide the word you want to remove."
+        else if arg-1 is "list":
+            message "&8----------------------------------------"
+            loop {chatfilter::bannedwords::*}:
+                message "&f- &c%loop-value%"
+            message "&8----------------------------------------"
+        else if arg-1 is "on":
+            set {chatfilter::banwords} to true
+            message "&aYou turned &a&lon &r&athe chatfilter."
+        else if arg-1 is "off":
+            set {chatfilter::banwords} to false
+            message "&aYou turned &c&loff &athe chatfilter."
+        else:
+            message "&cThe first sub-command must be &aadd&c, &aremove&c, or &alist&c."
+
+command /chatcooldown <string> [<timespan>]:
+    permission: op
+    trigger:
+        if arg-1 is "set":
+            if arg-2 is set:
+                set {chatfilter::cooldowntime} to arg-2
+                message "&aYou set the cooldown length to &b%arg-2%&a."
+            else:
+                message "&cTo set the cooldown length you must provide a time."
+        else if arg-1 is "on":
+            set {chatfilter::cooldown} to true
+            message "&aYou turned &a&lon &r&athe chat cooldown."
+        else if arg-1 is "off":
+            set {chatfilter::cooldown} to false
+            message "&aYou turned &c&loff &athe chat cooldown."
