@@ -1,45 +1,31 @@
-# fix gold transfers from "pvp" world to "main"
+# fix board transfers from "pvp" world to "main"
+# add join title and sub
 
-on death:
-    if victim is a player:
-        add 1 to {kills::%attacker%}
-        add 3 to {gold::%attacker%}
-        set {status_timer::%victim%} to 0
+on first join:
+    set {gold::%player%} to 0
 
 on join:
     teleport player to location 0.5, -60, 0.5 in world "main"
     set the join message to "<light cyan>%player% joined! :)"
-    set title of player's scoreboard to "<orange>Testing Server"
-    set line 1 of player's scoreboard to ""
-    set line 2 of player's scoreboard to ""
-    set line 3 of player's scoreboard to ""
-    set line 4 of player's scoreboard to ""
-    set line 5 of player's scoreboard to "<green>%player%"
-    set line 6 of player's scoreboard to ""
+    set {-kills::%player%} to 0
+    set {-status_timer::%player%} to 0
     while player is online:
         if player is in world "pvp":
-            set line 3 of player's scoreboard to "Gold: <gold>%{gold::%player%}%g"
-            if {status_timer::%player%} is greater than 0:
-                set line 1 of player's scoreboard to "Status: <red>Fighting"
+            set title of player's scoreboard to "<orange>Testing Server"
+            set line 2 of player's scoreboard to ""
+            set line 3 of player's scoreboard to "Kills: %{-kills::%player%}%"
+            set line 4 of player's scoreboard to "Gold: <gold>%{gold::%player%}%g"
+            set line 5 of player's scoreboard to ""
+            if {-status_timer::%player%} is greater than 0:
+                set line 1 of player's scoreboard to "&cIn Combat <gold>(%{-status_timer::%player%}%)"
             else:
-                set line 1 of player's scoreboard to "Status: <light green>Idle"
+                set line 1 of player's scoreboard to "<light green>Not In Combat"
         wait 1 second
 
 on quit:
     set the quit message to "<light cyan>%player% left! :("
-
-# removes hunger
-on food bar change:
-    cancel event
-
-# stop player from dropping items
-on drop:
-    cancel event
-
-# can't break blocks in survival
-on break:
-    if gamemode of player is survival:
-        cancel event
+    delete {-kills::%player%}
+    delete {-status_timer::%player%}
 
 on damage:
     if victim is in world "main":
@@ -48,21 +34,16 @@ on damage:
         if y coordinate of victim is above -44:
             cancel event
         else:
-            set {status_timer::%victim%} to 5
-            set {status_timer::%attacker%} to 5
+            set {-status_timer::%victim%} to 5
+            set {-status_timer::%attacker%} to 5
 
-# stops player from shooting bows in lobby of "pvp"
-on shoot:
-    if projectile is an arrow:
-        if y coordinate of projectile is above -44:
-            cancel event
-
-# so /spawn command works correctly
-on respawn:
-    if player is in world "main":
-        set respawn location to location at 0.5, -60, 0.5
-    else if player is in world "pvp":
-        set respawn location to location at 0.5, -43, 0.5
+on death:
+    if victim is a player:
+        add 1 to {-kills::%attacker%}
+        add 3 to {gold::%attacker%}
+        set {-kills::%victim%} to 0
+        set {-status_timer::%victim%} to 0
+        execute console command "/minecraft:clear %victim%"
 
 on rightclick on sign:
     # lobby
@@ -73,7 +54,7 @@ on rightclick on sign:
         send "Parkour Comming Soon..." to player
     else if line 2 of block is "CTF":
         send "CTF Comming Soon..." to player
-    # the pit
+    # pvp arena
     else if line 2 of block is "Lobby":
         teleport player to location 0.5, -60, 0.5 in world "main"
     else if line 2 of block is "Knight":
@@ -114,15 +95,40 @@ on rightclick on sign:
         heal player
         send "<light green>Archer Kit Equipped!"
 
+# stops player from shooting bows in lobby of "pvp"
+on shoot:
+    if shooter is in world "pvp":
+        if projectile is an arrow:
+            if y coordinate of projectile is above -44:
+                cancel event
+
+# so /spawn command works correctly
+on respawn:
+    if player is in world "main":
+        set respawn location to location at 0.5, -60, 0.5
+    else if player is in world "pvp":
+        set respawn location to location at 0.5, -43, 0.5
+
 # clears player inventory when switching from "pvp" to "main" world
 on player world change:
     if player is in world "main":
         remove all items from player's inventory
         remove swiftness from the player
-        set line 1 of player's scoreboard to ""
-        set line 2 of player's scoreboard to ""
         heal player
+
+# removes hunger
+on food bar change:
+    cancel event
+
+# stop player from dropping items
+on drop:
+    cancel event
+
+# can't break blocks in survival
+on break:
+    if gamemode of player is survival:
+        cancel event
 
 every 1 second:
     loop all players:
-        subtract 1 from {status_timer::%loop-player%}        
+        subtract 1 from {-status_timer::%loop-player%}     
