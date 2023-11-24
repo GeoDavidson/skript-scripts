@@ -67,17 +67,11 @@ on join:
 
 on quit:
     if player is in world "lobby":
-        if {-status_timer::%player%} is greater than 0:
-            add 1 to {-player_kills::%{-last_attacker}%}
-            add 1 to {-player_kills::%{-last_victim}%}
-            kill player
         set {-status_timer::%player%} to 0
         set {-player_kills::%player%} to 0
 
 on damage:
     if victim is in world "lobby":
-        set {-last_attacker} to attacker
-        set {-last_victim} to victim
         set {-status_timer::%victim%} to 10
         set {-status_timer::%attacker%} to 10
 
