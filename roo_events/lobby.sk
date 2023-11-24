@@ -60,6 +60,7 @@ on join:
                 set {_has_entered} to false
                 if {_has_exited} is false:
                     remove all items from player's inventory
+                    set {-player_kills::%player%} to 0
                     heal player
                     feed player
                     set {_has_exited} to true
@@ -78,8 +79,8 @@ on damage:
     if victim is in world "lobby":
         set {-last_attacker} to attacker
         set {-last_victim} to victim
-        set {-status_timer::%victim%} to 10
-        set {-status_timer::%attacker%} to 10
+        set {-status_timer::%victim%} to 6
+        set {-status_timer::%attacker%} to 6
 
 on death:
     if victim is in world "lobby":
