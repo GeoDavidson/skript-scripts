@@ -1,0 +1,22 @@
+command /wallsdown:
+    permission: op
+    trigger:
+        # cherry
+        execute player command "/minecraft:fill 55 56 -589 49 58 -595 minecraft:air"
+        # jungle
+        execute player command "/minecraft:fill 562 40 459 556 42 465 minecraft:air"
+        # desert
+        execute player command "/minecraft:fill -482 40 446 -476 38 452 minecraft:air"
+
+command /wallsup:
+    permission: op
+    trigger:
+        # cherry
+        execute player command "/minecraft:fill 55 56 -589 49 58 -595 minecraft:pink_stained_glass"
+        execute player command "/minecraft:fill 50 56 -594 54 58 -590 minecraft:air"
+        # jungle
+        execute player command "/minecraft:fill 562 40 459 556 42 465 minecraft:green_stained_glass"
+        execute player command "/minecraft:fill 561 40 460 557 42 464 minecraft:air"
+        # desert
+        execute player command "/minecraft:fill -482 40 446 -476 38 452 minecraft:orange_stained_glass"
+        execute player command "/minecraft:fill -477 40 447 -481 38 451 minecraft:air"

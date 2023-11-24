@@ -1,55 +1,75 @@
 on join:
     if player is in world "lobby":
         send title "<##FFD700><bold>R<##FFBC00><bold>o<##FFA100><bold>o <##FF8600><bold>E<##FF6C00><bold>v<##FF5100><bold>e<##FF3600><bold>n<##FF1B00><bold>t<##FF0000><bold>s" with subtitle "<light green><bold>Welcome %player%" to player for 4 seconds
-        set the join message to "<light cyan>%player% joined! :)"
-        set title of player's scoreboard to "<##FFD700><bold>R<##FFBC00><bold>o<##FFA100><bold>o <##FF8600><bold>E<##FF6C00><bold>v<##FF5100><bold>e<##FF3600><bold>n<##FF1B00><bold>t<##FF0000><bold>s"
-        set line 1 of player's scoreboard to "<light green>Not In Combat"
-        set line 2 of player's scoreboard to ""
-        set line 3 of player's scoreboard to ""
-        set line 4 of player's scoreboard to ""
-        set line 5 of player's scoreboard to ""
-        set line 6 of player's scoreboard to ""
-        set line 7 of player's scoreboard to ""
-        set line 8 of player's scoreboard to ""
-        set line 9 of player's scoreboard to ""
-        set line 10 of player's scoreboard to "&6&m                          "
-        set {-status_timer::%player%} to 0
-        set {-player_kills::%player%} to 0
-        while player is online:
-            if player is in world "lobby":
-                loop all players:
-                    add {-player_kills::%loop-player%} to {_kills::*}
-                    add loop-player to {_names::*}
-                loop 3 times:
-                    set {_max} to 0
-                    set {_name} to "None"
-                    loop {_kills::*}:
-                        if {_kills::%loop-index%} is greater than {_max}:
-                            set {_max} to {_kills::%loop-index%}
-                            set {_name} to {_names::%loop-index%}
-                    remove {_max} from {_kills::*}
-                    remove {_name} from {_names::*}
-                    add {_max} to {_final_kills::*}
-                    add {_name} to {_final_names::*}
-                set line 3 of player's scoreboard to "Kill Streak: %{-player_kills::%player%}%"
-                set line 5 of player's scoreboard to "%{_final_names::3}% - %{_final_kills::3}%"
-                set line 6 of player's scoreboard to "%{_final_names::2}% - %{_final_kills::2}%"
-                set line 7 of player's scoreboard to "%{_final_names::1}% - %{_final_kills::1}%"
-                set line 8 of player's scoreboard to "&cKill Streaks"
-                delete {_kills::*}
-                delete {_final_kills::*}
-                delete {_names::*}
-                delete {_final_names::*}
-                if {-status_timer::%player%} is greater than 0:
-                    set line 1 of player's scoreboard to "&cIn Combat <gold>(%{-status_timer::%player%}%)"
-                else:
-                    set line 1 of player's scoreboard to "<light green>Not In Combat"
-            wait 1 second
+    while player is online:
+        if player is in world "lobby":
+            loop all players in world "lobby":
+                add {-player_kills::%loop-player%} to {_kills::*}
+                add loop-player to {_names::*}
+            loop 3 times:
+                set {_max} to 0
+                set {_name} to "None"
+                loop {_kills::*}:
+                    if {_kills::%loop-index%} is greater than {_max}:
+                        set {_max} to {_kills::%loop-index%}
+                        set {_name} to {_names::%loop-index%}
+                remove {_max} from {_kills::*}
+                remove {_name} from {_names::*}
+                add {_max} to {_final_kills::*}
+                add {_name} to {_final_names::*}
+            if {-status_timer::%player%} is greater than 0:
+                set line 1 of player's scoreboard to "&cIn Combat <gold>(%{-status_timer::%player%}%)"
+            else:
+                set line 1 of player's scoreboard to "<light green>Not In Combat"
+            set line 2 of player's scoreboard to ""
+            set line 3 of player's scoreboard to "Your Kills: %{-player_kills::%player%}%"
+            set line 4 of player's scoreboard to ""
+            set line 5 of player's scoreboard to "%{_final_names::3}% - %{_final_kills::3}%"
+            set line 6 of player's scoreboard to "%{_final_names::2}% - %{_final_kills::2}%"
+            set line 7 of player's scoreboard to "%{_final_names::1}% - %{_final_kills::1}%"
+            set line 8 of player's scoreboard to "&c&lLeaderboard"
+            set line 9 of player's scoreboard to ""
+            set line 10 of player's scoreboard to "&6&m                          "
+            set title of player's scoreboard to "<##FFD700><bold>R<##FFBC00><bold>o<##FFA100><bold>o <##FF8600><bold>E<##FF6C00><bold>v<##FF5100><bold>e<##FF3600><bold>n<##FF1B00><bold>t<##FF0000><bold>s"
+            delete {_kills::*}
+            delete {_final_kills::*}
+            delete {_names::*}
+            delete {_final_names::*}
+        else:
+            set line 1 of player's scoreboard to ""
+            set line 2 of player's scoreboard to ""
+            set line 3 of player's scoreboard to ""
+            set line 4 of player's scoreboard to ""
+            set line 5 of player's scoreboard to ""
+            set line 6 of player's scoreboard to ""
+            set line 7 of player's scoreboard to ""
+            set line 8 of player's scoreboard to ""
+            set line 9 of player's scoreboard to ""
+            set line 10 of player's scoreboard to ""
+            set title of player's scoreboard to ""
+        wait 1 second
 
 on quit:
     if player is in world "lobby":
         set {-status_timer::%player%} to 0
+        set {-player_kills::%player%} to 0
         set the quit message to "<light cyan>%player% left! :("
+
+on damage:
+    if victim is in world "lobby":
+        set {-status_timer::%victim%} to 10
+        set {-status_timer::%attacker%} to 10
+
+on death:
+    if victim is in world "lobby":
+        execute console command "/minecraft:clear %victim%"
+        make 1000 of item particle using redstone at location of victim
+        play sound "entity.dragon_fireball.explode" at volume 1 at pitch 2 to attacker
+        set {-status_timer::%victim%} to 0
+        set {-player_kills::%victim%} to 0
+        add 1 to {-player_kills::%attacker%}
+        heal attacker
+        feed attacker
 
 on region enter:
     if "%region%" is "pvp_arena in world lobby":
@@ -73,22 +93,6 @@ on region exit:
         remove all items from player's inventory
         heal player
         feed player
-
-on damage:
-    if victim is in world "lobby":
-        set {-status_timer::%victim%} to 10
-        set {-status_timer::%attacker%} to 10
-
-on death:
-    if victim is in world "lobby":
-        execute console command "/minecraft:clear %victim%"
-        make 1000 of item particle using redstone at location of victim
-        play sound "entity.dragon_fireball.explode" at volume 1 at pitch 2 to attacker
-        set {-status_timer::%victim%} to 0
-        set {-player_kills::%victim%} to 0
-        add 1 to {-player_kills::%attacker%}
-        heal attacker
-        feed attacker
 
 
 every 1 second:
