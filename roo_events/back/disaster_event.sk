@@ -154,12 +154,12 @@ on damage of player:
                 if {event::red::players::*} contains victim's uuid:
                     cancel event
                     set victim's gamemode to spectator
-                    heal victim   #Heal the player just in case they need to be revived
+                    heal victim   # heal the player just in case they need to be revived
                     feed victim
                     set {_p} to victim
                     drop all items in {_p}'s inventory
-                    execute console command "/minecraft:clear %victim%"   #No duping
-                    make an explosion effect at location of victim
+                    execute console command "/minecraft:clear %victim%"   # no duping
+                    # make an explosion effect at location of victim
                     if attacker is a player:
                         if {event::red::players::*} contains attacker's uuid:
                             broadcast "&6%victim% &rwas killed by &6%attacker%&r!"
@@ -511,28 +511,29 @@ command /fix:
                 if {event::blue::players::*} contains loop-player's uuid:
                     add loop-player's uuid to {event::blue::aaoplayers::*}
 
-#Scoreboard stuff
+#scoreboard
 on join:
     while player is online:
-        set title of player's scoreboard to " "
-        set line 15 of player's scoreboard to "&x&f&f&2&6&2&6&lR&x&f&f&3&a&2&1&lo&x&f&f&4&e&1&6&lo &x&f&f&6&2&1&8&lE&x&f&f&7&7&1&3&lv&x&f&f&8&b&0&e&le&x&f&f&9&f&0&a&ln&x&f&f&b&3&0&5&lt&x&f&f&c&7&0&0&ls"
-        set line 14 of player's scoreboard to "&6&m                              "
-        if {event::red::players::*} contains player's uuid:
-            set line 13 of player's scoreboard to "&fTeam: &6&lDesert"
-        else if {event::blue::players::*} contains player's uuid:
-            set line 13 of player's scoreboard to "&fTeam: &b&lSnow"
-        else if {event::green::players::*} contains player's uuid:
-            set line 13 of player's scoreboard to "&fTeam: &a&lPlains"
-        else:
-            set line 13 of player's scoreboard to "&fTeam: &7&lNone"
-        set line 8 of player's scoreboard to " "
-        set line 7 of player's scoreboard to "&6&lDesert &7Alive: &f%size of {event::red::aaoplayers::*}%"
-        set line 6 of player's scoreboard to "&b&lSnow &7Alive: &f%size of {event::blue::aaoplayers::*}%"
-        set line 5 of player's scoreboard to "&a&lPlains &7Alive: &f%size of {event::green::aaoplayers::*}%"
-        set line 4 of player's scoreboard to "&6&m                              "
-        set line 3 of player's scoreboard to colored {event::phase}
-        set line 2 of player's scoreboard to "Time: %gettimer()%"
-        set line 1 of player's scoreboard to "&6&m                              "
+        if player is in world "event":
+            set title of player's scoreboard to " "
+            set line 15 of player's scoreboard to "&x&f&f&2&6&2&6&lR&x&f&f&3&a&2&1&lo&x&f&f&4&e&1&6&lo &x&f&f&6&2&1&8&lE&x&f&f&7&7&1&3&lv&x&f&f&8&b&0&e&le&x&f&f&9&f&0&a&ln&x&f&f&b&3&0&5&lt&x&f&f&c&7&0&0&ls"
+            set line 14 of player's scoreboard to "&6&m                              "
+            if {event::red::players::*} contains player's uuid:
+                set line 13 of player's scoreboard to "&fTeam: &6&lDesert"
+            else if {event::blue::players::*} contains player's uuid:
+                set line 13 of player's scoreboard to "&fTeam: &b&lSnow"
+            else if {event::green::players::*} contains player's uuid:
+                set line 13 of player's scoreboard to "&fTeam: &a&lPlains"
+            else:
+                set line 13 of player's scoreboard to "&fTeam: &7&lNone"
+            set line 8 of player's scoreboard to " "
+            set line 7 of player's scoreboard to "&6&lDesert &7Alive: &f%size of {event::red::aaoplayers::*}%"
+            set line 6 of player's scoreboard to "&b&lSnow &7Alive: &f%size of {event::blue::aaoplayers::*}%"
+            set line 5 of player's scoreboard to "&a&lPlains &7Alive: &f%size of {event::green::aaoplayers::*}%"
+            set line 4 of player's scoreboard to "&6&m                              "
+            set line 3 of player's scoreboard to colored {event::phase}
+            set line 2 of player's scoreboard to "Time: %gettimer()%"
+            set line 1 of player's scoreboard to "&6&m                              "
         wait 1 second
 
 command /setphase <string>:
