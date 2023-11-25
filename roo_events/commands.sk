@@ -1,4 +1,18 @@
-command /wallsdown:
+command /eventclose:
+    permission: op
+    trigger:
+        make player execute command "/execute in minecraft:overworld run forceload add 33 18 31 16"
+        make player execute command "/execute in minecraft:overworld run fill 33 -29 18 31 -29 16 minecraft:light_blue_stained_glass"
+        make player execute command "/execute in minecraft:overworld run forceload remove 33 18 31 16"
+
+command /eventopen:
+    permission: op
+    trigger:
+        make player execute command "/execute in minecraft:overworld run forceload add 33 18 31 16"
+        make player execute command "/execute in minecraft:overworld run fill 33 -29 18 31 -29 16 minecraft:air"
+        make player execute command "/execute in minecraft:overworld run forceload remove 33 18 31 16"
+
+command /boxopen:
     permission: op
     trigger:
         # cherry
@@ -14,7 +28,7 @@ command /wallsdown:
         make player execute command "/execute in minecraft:event run fill -482 40 446 -476 38 452 minecraft:air"
         make player execute command "/execute in minecraft:event run forceload remove -482 446 -476 452"
 
-command /wallsup:
+command /boxclose:
     permission: op
     trigger:
         # cherry
@@ -33,16 +47,51 @@ command /wallsup:
         make player execute command "/execute in minecraft:event run fill -477 40 447 -481 38 451 minecraft:air"
         make player execute command "/execute in minecraft:event run forceload remove -482 446 -476 452"
 
-command /eventopen:
+command /wallsdown:
     permission: op
     trigger:
-        make player execute command "/execute in minecraft:overworld run forceload add 33 18 31 16"
-        make player execute command "/execute in minecraft:overworld run fill 33 -29 18 31 -29 16 minecraft:air"
-        make player execute command "/execute in minecraft:overworld run forceload remove 33 18 31 16"
+        # long
+        make player execute command "/execute in minecraft:event run forceload add 640 -130 -641 -130"
+        make player execute command "/execute in minecraft:event run fill 640 34 -130 -641 32 -130 minecraft:air"
+        make player execute command "/execute in minecraft:event run forceload remove 640 -130 -641 -130"
+        # right short
+        make player execute command "/execute in minecraft:event run forceload add 126 123 126 -129"
+        make player execute command "/execute in minecraft:event run fill 126 32 123 126 34 -129 minecraft:air"
+        make player execute command "/execute in minecraft:event run forceload remove 126 123 126 -129"
+        # left short
+        make player execute command "/execute in minecraft:event run forceload add -128 123 -128 -129"
+        make player execute command "/execute in minecraft:event run fill -128 32 123 -128 34 -129 minecraft:air"
+        make player execute command "/execute in minecraft:event run forceload remove -128 123 -128 -129"
+        # short
+        make player execute command "/execute in minecraft:event run forceload add -127 123 125 123"
+        make player execute command "/execute in minecraft:event run fill -127 34 123 125 32 123 minecraft:air"
+        make player execute command "/execute in minecraft:event run forceload remove -127 123 125 123"
+        # center
+        make player execute command "/execute in minecraft:event run forceload add -1 124 -1 640"
+        make player execute command "/execute in minecraft:event run fill -1 34 124 -1 32 640 minecraft:air"
+        make player execute command "/execute in minecraft:event run forceload remove -1 124 -1 640"
 
-command /eventclose:
+command /wallsup:
     permission: op
     trigger:
-        make player execute command "/execute in minecraft:overworld run forceload add 33 18 31 16"
-        make player execute command "/execute in minecraft:overworld run fill 33 -29 18 31 -29 16 minecraft:light_blue_stained_glass"
-        make player execute command "/execute in minecraft:overworld run forceload remove 33 18 31 16"
+        # long
+        make player execute command "/execute in minecraft:event run forceload add 640 -130 -641 -130"
+        make player execute command "/execute in minecraft:event run fill 640 34 -130 -641 32 -130 minecraft:red_stained_glass"
+        make player execute command "/execute in minecraft:event run forceload remove 640 -130 -641 -130"
+        # right short
+        make player execute command "/execute in minecraft:event run forceload add 126 123 126 -129"
+        make player execute command "/execute in minecraft:event run fill 126 32 123 126 34 -129 minecraft:red_stained_glass"
+        make player execute command "/execute in minecraft:event run forceload remove 126 123 126 -129"
+        # left short
+        make player execute command "/execute in minecraft:event run forceload add -128 123 -128 -129"
+        make player execute command "/execute in minecraft:event run fill -128 32 123 -128 34 -129 minecraft:red_stained_glass"
+        make player execute command "/execute in minecraft:event run forceload remove -128 123 -128 -129"
+        # short
+        make player execute command "/execute in minecraft:event run forceload add -127 123 125 123"
+        make player execute command "/execute in minecraft:event run fill -127 34 123 125 32 123 minecraft:red_stained_glass"
+        make player execute command "/execute in minecraft:event run forceload remove -127 123 125 123"
+        # center
+        make player execute command "/execute in minecraft:event run forceload add -1 124 -1 640"
+        make player execute command "/execute in minecraft:event run fill -1 34 124 -1 32 640 minecraft:red_stained_glass"
+        make player execute command "/execute in minecraft:event run forceload remove -1 124 -1 640"
+
