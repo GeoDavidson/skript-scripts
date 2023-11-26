@@ -1,0 +1,3 @@
+on break of red stained glass:
+    if player is not op:
+        cancel event
