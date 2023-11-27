@@ -1,3 +1,7 @@
+variables:
+    {-status_timer::%player%} = 0
+    {-player_kills::%player%} = 0
+
 on join:
     if player is in world "lobby":
         send title "<##FFD700><bold>R<##FFBC00><bold>o<##FFA100><bold>o <##FF8600><bold>E<##FF6C00><bold>v<##FF5100><bold>e<##FF3600><bold>n<##FF1B00><bold>t<##FF0000><bold>s" with subtitle "<light green><bold>Welcome %player%" to player for 4 seconds
@@ -44,27 +48,8 @@ on join:
             delete {_final_kills::*}
             delete {_names::*}
             delete {_final_names::*}
-            if y coordinate of player is below -30:
-                set {_has_exited} to false
-                if {_has_entered} is false:
-                    set slot 40 of player to unbreakable shield
-                    set slot 0 of player to unbreakable diamond sword
-                    set slot 1 of player to unbreakable diamond axe
-                    set slot 2 of player to 64 cooked beef
-                    set helmet of player to unbreakable diamond helmet
-                    set chestplate of player to unbreakable diamond chestplate
-                    set leggings of player to unbreakable diamond leggings
-                    set boots of player to unbreakable diamond boots
-                    set {_has_entered} to true
-            else:
-                set {_has_entered} to false
-                if {_has_exited} is false:
-                    remove all items from player's inventory
-                    set {-player_kills::%player%} to 0
-                    heal player
-                    feed player
-                    set {_has_exited} to true
-        wait 0.1 second
+            subtract 1 from {-status_timer::%player%}
+        wait 1 second
 
 on quit:
     if player is in world "lobby":
@@ -72,8 +57,8 @@ on quit:
             add 1 to {-player_kills::%{-last_attacker}%}
             add 1 to {-player_kills::%{-last_victim}%}
             kill player
-        set {-status_timer::%player%} to 0
-        set {-player_kills::%player%} to 0
+    delete {-status_timer::%player%}
+    delete {-player_kills::%player%}
 
 on damage:
     if victim is in world "lobby":
@@ -86,7 +71,8 @@ on death:
     if victim is in world "lobby":
         execute console command "/minecraft:clear %victim%"
         make 1000 of item particle using redstone at location of victim
-        play sound "entity.dragon_fireball.explode" at volume 1 at pitch 2 to attacker
+        # play sound "entity.dragon_fireball.explode" at volume 1 at pitch 2 to attacker
+        make an explosion effect at location of victim
         add 1 to {-player_kills::%attacker%}
         set {-status_timer::%victim%} to 0 
         set {-player_kills::%victim%} to 0
@@ -98,25 +84,23 @@ on region enter:
         if {-status_timer::%player%} is greater than 0:
             send "&c<bold>You can't go up whlie in combat!!!" to player
             cancel event
+    if "%region%" is "pvp in world lobby":
+        set slot 40 of player to unbreakable shield
+        set slot 0 of player to unbreakable diamond sword
+        set slot 1 of player to unbreakable diamond axe
+        set slot 2 of player to 64 cooked beef
+        set helmet of player to unbreakable diamond helmet
+        set chestplate of player to unbreakable diamond chestplate
+        set leggings of player to unbreakable diamond leggings
+        set boots of player to unbreakable diamond boots
 
-on world change:
-    set line 1 of player's scoreboard to ""
-    set line 2 of player's scoreboard to ""
-    set line 3 of player's scoreboard to ""
-    set line 4 of player's scoreboard to ""
-    set line 5 of player's scoreboard to ""
-    set line 6 of player's scoreboard to ""
-    set line 7 of player's scoreboard to ""
-    set line 8 of player's scoreboard to ""
-    set line 9 of player's scoreboard to ""
-    set line 10 of player's scoreboard to ""
-    set title of player's scoreboard to ""
+on region exit:
+    if "%region%" is "pvp in world lobby":
+        remove all items from player's inventory
+        set {-player_kills::%player%} to 0
+        heal player
+        feed player
 
 on drop:
     if player is in world "lobby":
         cancel event
-
-every 1 second:
-    loop all players:
-        if loop-player is in world "lobby":
-            subtract 1 from {-status_timer::%loop-player%}

@@ -55,16 +55,9 @@ on join:
             set title of player's scoreboard to "<##FFD700><bold>R<##FFBC00><bold>o<##FFA100><bold>o <##FF8600><bold>E<##FF6C00><bold>v<##FF5100><bold>e<##FF3600><bold>n<##FF1B00><bold>t<##FF0000><bold>s"
         wait 1 second
 
-command /clearteams:
+command /tc:
     permission: op
     trigger:
         delete {desert::team::*}
         delete {cherry::team::*}
         delete {jungle::team::*}
-
-command /listteams:
-    permission: op
-    trigger:
-        send "%size of {desert::team::*}%" to player
-        send "%size of {cherry::team::*}%" to player
-        send "%size of {jungle::team::*}%" to player

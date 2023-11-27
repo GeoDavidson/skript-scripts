@@ -1,0 +1,120 @@
+on join:
+    while player is online:
+        if player is in world "ctf":
+            set line 1 of player's scoreboard to "&l&6Yellow: %size of {yellow::team::*}%"
+            set line 2 of player's scoreboard to "&l&1Blue: %size of {blue::team::*}%"
+            set line 3 of player's scoreboard to "&l&2Green: %size of {green::team::*}%"
+            set line 4 of player's scoreboard to "&l&4Red: %size of {red::team::*}%"
+            set line 5 of player's scoreboard to "&lTeams Size:"
+            set line 6 of player's scoreboard to ""
+            set line 7 of player's scoreboard to "&l&6Yellow: 0"
+            set line 8 of player's scoreboard to "&l&1Blue: 0"
+            set line 9 of player's scoreboard to "&l&2Green: 0"
+            set line 10 of player's scoreboard to "&l&4Red: 0"
+            set line 11 of player's scoreboard to "&lFlags Captured:"
+            set line 12 of player's scoreboard to ""
+            set line 13 of player's scoreboard to "&lGame Time: 00:00"
+            set line 14 of player's scoreboard to ""
+            set line 15 of player's scoreboard to "&6&m                              "
+            set title of player's scoreboard to "<##FFD700><bold>R<##FFBC00><bold>o<##FFA100><bold>o <##FF8600><bold>E<##FF6C00><bold>v<##FF5100><bold>e<##FF3600><bold>n<##FF1B00><bold>t<##FF0000><bold>s"
+        wait 1 second
+
+on quit:
+    remove player from {red::team::*}
+    remove player from {green::team::*}
+    remove player from {blue::team::*}
+    remove player from {yellow::team::*}
+
+on region enter:
+    set {_temp::list::*} to size of {red::team::*}, size of {green::team::*}, size of {blue::team::*} and size of {yellow::team::*}
+    set {_temp::list::*} to sorted {_temp::list::*}
+    set {max::team::size} to {_temp::list::4}
+    if {_temp::list::1} is {max::team::size}:
+        if {_temp::list::2} is {max::team::size}:
+            if {_temp::list::3} is {max::team::size}:
+                if {_temp::list::4} is {max::team::size}:
+                    add 1 to {max::team::size}
+    if "%region%" is "ctf_red_test in world ctf":
+        if size of {red::team::*} is less than {max::team::size}:
+            message "You joined the Red Team!"
+            teleport player to location(8, -53, 8, world "ctf", 135, 0)
+            remove player from {red::team::*}
+            remove player from {green::team::*}
+            remove player from {blue::team::*}
+            remove player from {yellow::team::*}
+            add player to {red::team::*}
+        else:
+            message "Team Full"
+            teleport player to location(0.5, -54, -20.5, world "ctf")
+    else if "%region%" is "ctf_green_test in world ctf":
+        if size of {green::team::*} is less than {max::team::size}:
+            message "You joined the Green Team!"
+            teleport player to location(-8, -53, 8, world "ctf", -135, 0)
+            remove player from {red::team::*}
+            remove player from {green::team::*}
+            remove player from {blue::team::*}
+            remove player from {yellow::team::*}
+            add player to {green::team::*}
+        else:
+            message "Team Full"
+            teleport player to location(0.5, -54, -20.5, world "ctf")
+    else if "%region%" is "ctf_blue_test in world ctf":
+        if size of {blue::team::*} is less than {max::team::size}:
+            message "You joined the Blue Team!"
+            teleport player to location(-8, -53, -8, world "ctf", -45, 0)
+            remove player from {red::team::*}
+            remove player from {green::team::*}
+            remove player from {blue::team::*}
+            remove player from {yellow::team::*}
+            add player to {blue::team::*}
+        else:
+            message "Team Full"
+            teleport player to location(0.5, -54, -20.5, world "ctf")
+    else if "%region%" is "ctf_yellow_test in world ctf":
+        if size of {yellow::team::*} is less than {max::team::size}:
+            message "You joined the Green Team!"
+            teleport player to location(8, -53, -8, world "ctf", 45, 0)
+            remove player from {red::team::*}
+            remove player from {green::team::*}
+            remove player from {blue::team::*}
+            remove player from {yellow::team::*}
+            add player to {yellow::team::*}
+        else:
+            message "Team Full"
+            teleport player to location(0.5, -54, -20.5, world "ctf")
+
+command /drop:
+    permission: op
+    trigger:
+        # red
+        fill(player, "ctf", "10", "-51", "10", "6", "-54", "6", "air")
+        # green
+        fill(player, "ctf", "-10", "-51", "10", "-6", "-54", "6", "air")
+        # blue
+        fill(player, "ctf", "-6", "-54", "-6", "-10", "-51", "-10", "air")
+        # yellow
+        fill(player, "ctf", "10", "-51", "-10", "6", "-54", "-6", "air")
+
+command /close:
+    permission: op
+    trigger:
+        # red
+        fill(player, "ctf", "10", "-51", "10", "6", "-54", "6", "red_stained_glass")
+        fill(player, "ctf", "9", "-51", "9", "7", "-53", "7", "air")
+        # green
+        fill(player, "ctf", "-10", "-51", "10", "-6", "-54", "6", "green_stained_glass")
+        fill(player, "ctf", "-9", "-51", "9", "-7", "-53", "7", "air")
+        # blue
+        fill(player, "ctf", "-6", "-54", "-6", "-10", "-51", "-10", "blue_stained_glass")
+        fill(player, "ctf", "-9", "-51", "-9", "-7", "-53", "-7", "air")
+        # yellow
+        fill(player, "ctf", "10", "-51", "-10", "6", "-54", "-6", "yellow_stained_glass")
+        fill(player, "ctf", "7", "-53", "-7", "9", "-51", "-9", "air")
+
+command /closeteams:
+    permission: op
+    trigger:
+        delete {red::team::*}
+        delete {green::team::*}
+        delete {blue::team::*}
+        delete {yellow::team::*}
