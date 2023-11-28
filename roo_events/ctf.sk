@@ -1,3 +1,6 @@
+variables:
+    {max::team::size} = 0
+
 on join:
     while player is online:
         if player is in world "ctf":
@@ -29,15 +32,15 @@ on region enter:
     set {_temp::list::*} to size of {red::team::*}, size of {green::team::*}, size of {blue::team::*} and size of {yellow::team::*}
     set {_temp::list::*} to sorted {_temp::list::*}
     set {max::team::size} to {_temp::list::4}
-    if {_temp::list::1} is {max::team::size}:
-        if {_temp::list::2} is {max::team::size}:
-            if {_temp::list::3} is {max::team::size}:
-                if {_temp::list::4} is {max::team::size}:
+    if {_temp::list::1} >= {max::team::size} - 1:
+        if {_temp::list::2} >= {max::team::size} - 1:
+            if {_temp::list::3} >= {max::team::size} - 1:
+                if {_temp::list::4} >= {max::team::size} - 1:
                     add 1 to {max::team::size}
     if "%region%" is "ctf_red_test in world ctf":
         if size of {red::team::*} is less than {max::team::size}:
             message "You joined the Red Team!"
-            teleport player to location(8, -53, 8, world "ctf", 135, 0)
+            teleport player to location(12, -56, 12, world "ctf", 135, 0)
             remove player from {red::team::*}
             remove player from {green::team::*}
             remove player from {blue::team::*}
@@ -49,7 +52,7 @@ on region enter:
     else if "%region%" is "ctf_green_test in world ctf":
         if size of {green::team::*} is less than {max::team::size}:
             message "You joined the Green Team!"
-            teleport player to location(-8, -53, 8, world "ctf", -135, 0)
+            teleport player to location(-12, -56, 12, world "ctf", -135, 0)
             remove player from {red::team::*}
             remove player from {green::team::*}
             remove player from {blue::team::*}
@@ -61,7 +64,7 @@ on region enter:
     else if "%region%" is "ctf_blue_test in world ctf":
         if size of {blue::team::*} is less than {max::team::size}:
             message "You joined the Blue Team!"
-            teleport player to location(-8, -53, -8, world "ctf", -45, 0)
+            teleport player to location(-12, -56, -12, world "ctf", -45, 0)
             remove player from {red::team::*}
             remove player from {green::team::*}
             remove player from {blue::team::*}
@@ -73,7 +76,7 @@ on region enter:
     else if "%region%" is "ctf_yellow_test in world ctf":
         if size of {yellow::team::*} is less than {max::team::size}:
             message "You joined the Green Team!"
-            teleport player to location(8, -53, -8, world "ctf", 45, 0)
+            teleport player to location(12, -56, -12, world "ctf", 45, 0)
             remove player from {red::team::*}
             remove player from {green::team::*}
             remove player from {blue::team::*}
@@ -83,35 +86,49 @@ on region enter:
             message "Team Full"
             teleport player to location(0.5, -54, -20.5, world "ctf")
 
+on damage of player with priority highest:
+    if {red::team::*} contains attacker:
+        if {red::team::*} contains victim:
+            cancel event
+    else if {green::team::*} contain attacker:
+        if {green::team::*} contain victim:
+            cancel event
+    else if {blue::team::*} contain attacker:
+        if {blue::team::*} contain victim:
+            cancel event
+    else if {yellow::team::*} contain attacker:
+        if {yellow::team::*} contain victim:
+            cancel event
+
 command /drop:
     permission: op
     trigger:
         # red
-        fill(player, "ctf", "10", "-51", "10", "6", "-54", "6", "air")
+        fill(player, "ctf", "14", "-54", "14", "10", "-57", "10", "air")
         # green
-        fill(player, "ctf", "-10", "-51", "10", "-6", "-54", "6", "air")
+        fill(player, "ctf", "-14", "-54", "14", "-10", "-57", "10", "air")
         # blue
-        fill(player, "ctf", "-6", "-54", "-6", "-10", "-51", "-10", "air")
+        fill(player, "ctf", "-10", "-57", "-10", "-14", "-54", "-14", "air")
         # yellow
-        fill(player, "ctf", "10", "-51", "-10", "6", "-54", "-6", "air")
+        fill(player, "ctf", "14", "-54", "-14", "10", "-57", "-10", "air")
 
 command /close:
     permission: op
     trigger:
         # red
-        fill(player, "ctf", "10", "-51", "10", "6", "-54", "6", "red_stained_glass")
-        fill(player, "ctf", "9", "-51", "9", "7", "-53", "7", "air")
+        fill(player, "ctf", "14", "-54", "14", "10", "-57", "10", "red_stained_glass")
+        fill(player, "ctf", "13", "-54", "13", "11", "-56", "11", "air")
         # green
-        fill(player, "ctf", "-10", "-51", "10", "-6", "-54", "6", "green_stained_glass")
-        fill(player, "ctf", "-9", "-51", "9", "-7", "-53", "7", "air")
+        fill(player, "ctf", "-14", "-54", "14", "-10", "-57", "10", "green_stained_glass")
+        fill(player, "ctf", "-13", "-54", "13", "-11", "-56", "11", "air")
         # blue
-        fill(player, "ctf", "-6", "-54", "-6", "-10", "-51", "-10", "blue_stained_glass")
-        fill(player, "ctf", "-9", "-51", "-9", "-7", "-53", "-7", "air")
+        fill(player, "ctf", "-10", "-57", "-10", "-14", "-54", "-14", "blue_stained_glass")
+        fill(player, "ctf", "-13", "-54", "-13", "-11", "-56", "-11", "air")
         # yellow
-        fill(player, "ctf", "10", "-51", "-10", "6", "-54", "-6", "yellow_stained_glass")
-        fill(player, "ctf", "7", "-53", "-7", "9", "-51", "-9", "air")
+        fill(player, "ctf", "14", "-54", "-14", "10", "-57", "-10", "yellow_stained_glass")
+        fill(player, "ctf", "11", "-56", "-11", "13", "-54", "-13", "air")
 
-command /closeteams:
+command /clearteams:
     permission: op
     trigger:
         delete {red::team::*}
