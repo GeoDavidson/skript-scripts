@@ -8,7 +8,7 @@ on join:
         # execute console command "/scoreboard players add %player% PlayerTopKills 0"
     while player is online:
         if player is in world "lobby":
-            if {status_timer::%player%} is greater than 0:
+            if {status_timer::%player%} > 0:
                 set line 1 of player's scoreboard to "&cIn Combat <gold>(%{status_timer::%player%}%)"
             else:
                 set line 1 of player's scoreboard to "<light green>Not In Combat"
@@ -23,7 +23,7 @@ on join:
 on quit:
     # execute console command "/scoreboard players reset %player%"
     if player is in world "lobby":
-        if {status_timer::%player%} is greater than 0:
+        if {status_timer::%player%} > 0:
             add 1 to {player_kills::%{last_attacker}%}
             add 1 to {player_kills::%{last_victim}%}
             kill player
@@ -52,7 +52,7 @@ on death:
 
 on region enter:
     if "%region%" is "up in world lobby":
-        if {status_timer::%player%} is greater than 0:
+        if {status_timer::%player%} > 0:
             send "&c<bold>You can't go up whlie in combat!!!" to player
             cancel event
     if "%region%" is "pvp in world lobby":

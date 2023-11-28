@@ -1,5 +1,25 @@
+# check if flag is already taken
+# make it so players can take multiple flags (kinda already have)
+# score board stuff
+# sound effects
+# text display
+
 variables:
     {max::team::size} = 0
+    {red::flag::taker} = ""
+    {green:flag::taker} = ""
+    {blue:flag::taker} = ""
+    {yellow:flag::taker} = ""
+    {red::points} = 0
+    {green::points} = 0
+    {blue::points} = 0
+    {yellow::points} = 0
+
+function remove_player(p: player):
+    remove {_p} from {red::team::*}
+    remove {_p} from {green::team::*}
+    remove {_p} from {blue::team::*}
+    remove {_p} from {yellow::team::*}
 
 on join:
     while player is online:
@@ -10,10 +30,10 @@ on join:
             set line 4 of player's scoreboard to "&l&4Red: %size of {red::team::*}%"
             set line 5 of player's scoreboard to "&lTeams Size:"
             set line 6 of player's scoreboard to ""
-            set line 7 of player's scoreboard to "&l&6Yellow: 0"
-            set line 8 of player's scoreboard to "&l&1Blue: 0"
-            set line 9 of player's scoreboard to "&l&2Green: 0"
-            set line 10 of player's scoreboard to "&l&4Red: 0"
+            set line 7 of player's scoreboard to "&l&6Yellow: %{yellow::points}%"
+            set line 8 of player's scoreboard to "&l&1Blue: %{blue::points}%"
+            set line 9 of player's scoreboard to "&l&2Green: %{green::points}%"
+            set line 10 of player's scoreboard to "&l&4Red: %{red::points}%"
             set line 11 of player's scoreboard to "&lFlags Captured:"
             set line 12 of player's scoreboard to ""
             set line 13 of player's scoreboard to "&lGame Time: 00:00"
@@ -23,10 +43,20 @@ on join:
         wait 1 second
 
 on quit:
-    remove player from {red::team::*}
-    remove player from {green::team::*}
-    remove player from {blue::team::*}
-    remove player from {yellow::team::*}
+    remove_player(player)
+    if player is {red::flag::taker}:
+        set {red::flag::taker} to ""
+        execute console command "/effect clear %player%"
+    else if player is {green::flag::taker}:
+        set {green::flag::taker} to ""
+        execute console command "/effect clear %player%"
+    else if player is {blue::flag::taker}:
+        set {blue::flag::taker} to ""
+        execute console command "/effect clear %player%"
+    else if player is {yellow::flag::taker}:
+        set {yellow::flag::taker} to ""
+        execute console command "/effect clear %player%"
+
 
 on region enter:
     set {_temp::list::*} to size of {red::team::*}, size of {green::team::*}, size of {blue::team::*} and size of {yellow::team::*}
@@ -38,53 +68,127 @@ on region enter:
                 if {_temp::list::4} >= {max::team::size} - 1:
                     add 1 to {max::team::size}
     if "%region%" is "ctf_red_test in world ctf":
-        if size of {red::team::*} is less than {max::team::size}:
+        if {red::team::*} contains player:
+            teleport player to location(12, -56, 12, world "ctf", 135, 0)
+        else if size of {red::team::*} < {max::team::size}:
             message "You joined the Red Team!"
             teleport player to location(12, -56, 12, world "ctf", 135, 0)
-            remove player from {red::team::*}
-            remove player from {green::team::*}
-            remove player from {blue::team::*}
-            remove player from {yellow::team::*}
+            remove_player(player)
             add player to {red::team::*}
         else:
             message "Team Full"
             teleport player to location(0.5, -54, -20.5, world "ctf")
     else if "%region%" is "ctf_green_test in world ctf":
-        if size of {green::team::*} is less than {max::team::size}:
+        if {green::team::*} contains player:
+            teleport player to location(-12, -56, 12, world "ctf", -135, 0)
+        else if size of {green::team::*} < {max::team::size}:
             message "You joined the Green Team!"
             teleport player to location(-12, -56, 12, world "ctf", -135, 0)
-            remove player from {red::team::*}
-            remove player from {green::team::*}
-            remove player from {blue::team::*}
-            remove player from {yellow::team::*}
+            remove_player(player)
             add player to {green::team::*}
         else:
             message "Team Full"
             teleport player to location(0.5, -54, -20.5, world "ctf")
     else if "%region%" is "ctf_blue_test in world ctf":
-        if size of {blue::team::*} is less than {max::team::size}:
+        if {blue::team::*} contains player:
+            teleport player to location(-12, -56, -12, world "ctf", -45, 0)
+        else if size of {blue::team::*} < {max::team::size}:
             message "You joined the Blue Team!"
             teleport player to location(-12, -56, -12, world "ctf", -45, 0)
-            remove player from {red::team::*}
-            remove player from {green::team::*}
-            remove player from {blue::team::*}
-            remove player from {yellow::team::*}
+            remove_player(player)
             add player to {blue::team::*}
         else:
             message "Team Full"
             teleport player to location(0.5, -54, -20.5, world "ctf")
     else if "%region%" is "ctf_yellow_test in world ctf":
-        if size of {yellow::team::*} is less than {max::team::size}:
+        if {yellow::team::*} contains player:
+            teleport player to location(12, -56, -12, world "ctf", 45, 0)
+        else if size of {yellow::team::*} < {max::team::size}:
             message "You joined the Green Team!"
             teleport player to location(12, -56, -12, world "ctf", 45, 0)
-            remove player from {red::team::*}
-            remove player from {green::team::*}
-            remove player from {blue::team::*}
-            remove player from {yellow::team::*}
+            remove_player(player)
             add player to {yellow::team::*}
         else:
             message "Team Full"
             teleport player to location(0.5, -54, -20.5, world "ctf")
+    else if "%region%" is "red_flag_test in world ctf":
+        if {red::team::*} does not contain player:
+            set {red::flag::taker} to player
+            execute console command "/effect give %player% minecraft:glowing infinite 1 true"
+        else:
+            if player is {green::flag::taker}:
+                add 1 to {red::points}
+                set {green::flag::taker} to ""
+                execute console command "/effect clear %player%"
+            else if player is {blue::flag::taker}:
+                add 1 to {red::points}
+                set {blue::flag::taker} to ""
+                execute console command "/effect clear %player%"
+            else if player is {yellow::flag::taker}:
+                add 1 to {red::points}
+                set {yellow::flag::taker} to ""
+                execute console command "/effect clear %player%"
+    else if "%region%" is "green_flag_test in world ctf":
+        if {green::team::*} does not contain player:
+            set {green::flag::taker} to player
+            execute console command "/effect give %player% minecraft:glowing infinite 1 true"
+        else:
+            if player is {red::flag::taker}:
+                add 1 to {green::points}
+                set {red::flag::taker} to ""
+                execute console command "/effect clear %player%"
+            else if player is {blue::flag::taker}:
+                add 1 to {green::points}
+                set {blue::flag::taker} to ""
+                execute console command "/effect clear %player%"
+            else if player is {yellow::flag::taker}:
+                add 1 to {green::points}
+                set {yellow::flag::taker} to ""
+                execute console command "/effect clear %player%"
+    else if "%region%" is "blue_flag_test in world ctf":
+        if {blue::team::*} does not contain player:
+            set {blue::flag::taker} to player
+            execute console command "/effect give %player% minecraft:glowing infinite 1 true"
+        else:
+            if player is {red::flag::taker}:
+                add 1 to {blue::points}
+                set {red::flag::taker} to ""
+                execute console command "/effect clear %player%"
+            else if player is {green::flag::taker}:
+                add 1 to {blue::points}
+                set {green::flag::taker} to ""
+                execute console command "/effect clear %player%"
+            else if player is {yellow::flag::taker}:
+                add 1 to {blue::points}
+                set {yellow::flag::taker} to ""
+                execute console command "/effect clear %player%"
+    else if "%region%" is "yellow_flag_test in world ctf":
+        if {yellow::team::*} does not contain player:
+            set {yellow::flag::taker} to player
+            execute console command "/effect give %player% minecraft:glowing infinite 1 true"
+        else:
+            if player is {red::flag::taker}:
+                add 1 to {yellow::points}
+                set {red::flag::taker} to ""
+                execute console command "/effect clear %player%"
+            else if player is {green::flag::taker}:
+                add 1 to {yellow::points}
+                set {green::flag::taker} to ""
+                execute console command "/effect clear %player%"
+            else if player is {blue::flag::taker}:
+                add 1 to {yellow::points}
+                set {blue::flag::taker} to ""
+                execute console command "/effect clear %player%"
+
+on death:
+    if victim is {red::flag::taker}:
+        set {red::flag::taker} to ""
+    else if victim is {green::flag::taker}:
+        set {green::flag::taker} to ""
+    else if victim is {blue::flag::taker}:
+        set {blue::flag::taker} to ""
+    else if victim is {yellow::flag::taker}:
+        set {yellow::flag::taker} to ""
 
 on damage of player with priority highest:
     if {red::team::*} contains attacker:
@@ -135,3 +239,11 @@ command /clearteams:
         delete {green::team::*}
         delete {blue::team::*}
         delete {yellow::team::*}
+
+command /clearpoints:
+    permission: op
+    trigger:
+        set {red::points} to 0
+        set {green::points} to 0
+        set {blue::points} to 0
+        set {yellow::points} to 0
