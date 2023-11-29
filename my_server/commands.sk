@@ -5,30 +5,16 @@ command /broadcast <text>:
         broadcast "<orange>[<red>Broadcasts<orange>]<reset> %arg-text%"
 
 command /lobby:
-    description: Teleports player back to main lobby.
-    executable by: players
     trigger:
-        remove all items from player's inventory
-        remove swiftness from the player
-        heal player
-        teleport player to location at 0.5, -60, 0.5 in world "main"
+        if {status::timer::%player%} < 0:
+            teleport player to location(0.5, -60, 0.5, world "main")
+            heal player
         
 command /spawn:
-    description: Teleports player back to spawn.
-    executable by: players
     trigger:
         if player is in world "main":
-            teleport player to location 0.5, -60, 0.5
+            teleport player to location(0.5, -60, 0.5, world "main")
         else if player is in world "pvp":
-            heal player
-            teleport player to location 0.5, -43, 0.5
-
-command /fighting:
-    executable by: players
-    trigger:
-        set {status_timer::%player%} to 0
-
-command /idle:
-    executable by: players
-    trigger:
-        set {status_timer::%player%} to 5
+            if {status::timer::%player%} < 0:
+                teleport player to location(0.5, -43, 0.5, world "pvp")
+                heal player

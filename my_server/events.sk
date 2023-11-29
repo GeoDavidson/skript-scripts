@@ -1,31 +1,65 @@
-# fix board transfers from "pvp" world to "main"
-# add join title and sub
+variables:
+    {gold::%player%} = 0
+    {kills::%player%} = 0
+    {status::timer::%player%} = 0
 
-on first join:
-    set {gold::%player%} to 0
+function clear(p: player):
+    execute console command "/minecraft:clear %{_p}%"
+    execute console command "/minecraft:effect clear %{_p}%"
+
+function kit_1(p: player):
+    clear({_p})
+    set slot 40 of {_p} to unbreakable shield
+    set slot 0 of {_p} to unbreakable iron sword
+    set slot 1 of {_p} to unbreakable iron axe
+    set helmet of {_p} to unbreakable iron helmet
+    set chestplate of {_p} to unbreakable iron chestplate
+    set leggings of {_p} to unbreakable iron leggings
+    set boots of {_p} to unbreakable iron boots
+    heal {_p}
+
+function kit_2(p: player):
+    clear({_p})
+    execute console command "/effect give %{_p}% minecraft:speed infinite 1 false"
+    set slot 40 of {_p} to unbreakable shield
+    set slot 0 of {_p} to unbreakable diamond sword
+    set helmet of {_p} to unbreakable leather helmet
+    set chestplate of {_p} to unbreakable iron chestplate
+    set leggings of {_p} to unbreakable leather leggings
+    set boots of {_p} to unbreakable leather boots
+    heal {_p}
+
+function kit_3(p: player):
+    clear({_p})
+    set slot 40 of {_p} to unbreakable shield
+    set slot 0 of {_p} to unbreakable iron sword
+    set slot 1 of {_p} to unbreakable bow
+    set slot 2 of {_p} to 24 arrows
+    set helmet of {_p} to unbreakable iron helmet
+    set chestplate of {_p} to unbreakable iron chestplate
+    set leggings of {_p} to unbreakable iron leggings
+    set boots of {_p} to unbreakable iron boots
+    heal {_p}
 
 on join:
-    teleport player to location 0.5, -60, 0.5 in world "main"
-    set the join message to "<light cyan>%player% joined! :)"
-    set {-kills::%player%} to 0
-    set {-status_timer::%player%} to 0
+    teleport player to location(0.5, -60, 0.5, world "main")
     while player is online:
         if player is in world "pvp":
-            set title of player's scoreboard to "<orange>Testing Server"
-            set line 2 of player's scoreboard to ""
-            set line 3 of player's scoreboard to "Kills: %{-kills::%player%}%"
-            set line 4 of player's scoreboard to "Gold: <gold>%{gold::%player%}%g"
-            set line 5 of player's scoreboard to ""
-            if {-status_timer::%player%} is greater than 0:
-                set line 1 of player's scoreboard to "&cIn Combat <gold>(%{-status_timer::%player%}%)"
+            if {status::timer::%player%} > 0:
+                set line 1 of player's scoreboard to "&cIn Combat <gold>(%{status::timer::%player%}%)"
             else:
                 set line 1 of player's scoreboard to "<light green>Not In Combat"
+            set line 2 of player's scoreboard to ""
+            set line 3 of player's scoreboard to "Kill Streak: %{kills::%player%}%"
+            set line 4 of player's scoreboard to "Gold: <gold>%{gold::%player%}%g"
+            set line 5 of player's scoreboard to ""
+            set title of player's scoreboard to "<orange>Testing Server"
+        subtract 1 from {status::timer::%player%}
         wait 1 second
 
 on quit:
-    set the quit message to "<light cyan>%player% left! :("
-    delete {-kills::%player%}
-    delete {-status_timer::%player%}
+    delete {kills::%player%}
+    delete {status::timer::%player%}
 
 on damage:
     if victim is in world "main":
@@ -34,21 +68,21 @@ on damage:
         if y coordinate of victim is above -44:
             cancel event
         else:
-            set {-status_timer::%victim%} to 5
-            set {-status_timer::%attacker%} to 5
+            set {status::timer::%victim%} to 5
+            set {status::timer::%attacker%} to 5
 
 on death:
     if victim is a player:
-        add 1 to {-kills::%attacker%}
+        add 1 to {kills::%attacker%}
         add 3 to {gold::%attacker%}
-        set {-kills::%victim%} to 0
-        set {-status_timer::%victim%} to 0
-        execute console command "/minecraft:clear %victim%"
+        set {kills::%victim%} to 0
+        set {status::timer::%victim%} to 0
+        clear(victim)
 
 on rightclick on sign:
     # lobby
     if line 2 of block is "PvP Arena":
-        teleport player to location at 0.5, -43, 0.5 in world "pvp"
+        teleport player to location(0.5, -43, 0.5, world "pvp")
         send "<light green>Welcome to The PVP Arena" to player
     else if line 2 of block is "Parkour":
         send "Parkour Comming Soon..." to player
@@ -56,44 +90,13 @@ on rightclick on sign:
         send "CTF Comming Soon..." to player
     # pvp arena
     else if line 2 of block is "Lobby":
-        teleport player to location 0.5, -60, 0.5 in world "main"
+        teleport player to location(0.5, -60, 0.5, world "main")
     else if line 2 of block is "Knight":
-        remove all items from player's inventory
-        remove swiftness from the player
-        set slot 40 of player to unbreakable shield
-        set slot 0 of player to unbreakable iron sword
-        set slot 1 of player to unbreakable iron axe
-        set helmet of player to unbreakable iron helmet
-        set chestplate of player to unbreakable iron chestplate
-        set leggings of player to unbreakable iron leggings
-        set boots of player to unbreakable iron boots
-        heal player
-        send "<light green>Knight Kit Equipped!"
+        kit_1(player)
     else if line 2 of block is "Ninja":
-        remove all items from player's inventory
-        remove swiftness from the player
-        apply swiftness 2 to the player for 1 day
-        set slot 40 of player to unbreakable shield
-        set slot 0 of player to unbreakable diamond sword
-        set helmet of player to unbreakable leather helmet
-        set chestplate of player to unbreakable iron chestplate
-        set leggings of player to unbreakable leather leggings
-        set boots of player to unbreakable leather boots
-        heal player
-        send "<light green>Ninja Kit Equipped!"
+        kit_2(player)
     else if line 2 of block is "Archer":
-        remove all items from player's inventory
-        remove swiftness from the player
-        set slot 40 of player to unbreakable shield
-        set slot 0 of player to unbreakable iron sword
-        set slot 1 of player to unbreakable bow
-        set slot 2 of player to 24 arrows
-        set helmet of player to unbreakable iron helmet
-        set chestplate of player to unbreakable iron chestplate
-        set leggings of player to unbreakable iron leggings
-        set boots of player to unbreakable iron boots
-        heal player
-        send "<light green>Archer Kit Equipped!"
+        kit_3(player)
 
 # stops player from shooting bows in lobby of "pvp"
 on shoot:
@@ -102,19 +105,12 @@ on shoot:
             if y coordinate of projectile is above -44:
                 cancel event
 
-# so /spawn command works correctly
+# set respawn location to the right world
 on respawn:
     if player is in world "main":
-        set respawn location to location at 0.5, -60, 0.5
+        set respawn location to location(0.5, -60, 0.5, world "main")
     else if player is in world "pvp":
-        set respawn location to location at 0.5, -43, 0.5
-
-# clears player inventory when switching from "pvp" to "main" world
-on player world change:
-    if player is in world "main":
-        remove all items from player's inventory
-        remove swiftness from the player
-        heal player
+        set respawn location to location(0.5, -43, 0.5, world "pvp")
 
 # removes hunger
 on food bar change:
@@ -127,8 +123,4 @@ on drop:
 # can't break blocks in survival
 on break:
     if gamemode of player is survival:
-        cancel event
-
-every 1 second:
-    loop all players:
-        subtract 1 from {-status_timer::%loop-player%}     
+        cancel event     

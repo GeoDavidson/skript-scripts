@@ -5,7 +5,6 @@ variables:
 on join:
     if player is in world "lobby":
         send title "<##FFD700><bold>R<##FFBC00><bold>o<##FFA100><bold>o <##FF8600><bold>E<##FF6C00><bold>v<##FF5100><bold>e<##FF3600><bold>n<##FF1B00><bold>t<##FF0000><bold>s" with subtitle "<light green><bold>Welcome %player%" to player for 4 seconds
-        # execute console command "/scoreboard players add %player% PlayerTopKills 0"
     while player is online:
         if player is in world "lobby":
             if {status_timer::%player%} > 0:
@@ -21,7 +20,6 @@ on join:
         wait 1 second
 
 on quit:
-    # execute console command "/scoreboard players reset %player%"
     if player is in world "lobby":
         if {status_timer::%player%} > 0:
             add 1 to {player_kills::%{last_attacker}%}
@@ -44,7 +42,6 @@ on death:
         execute console command "/minecraft:clear %victim%"
         execute console command "/execute at %victim% run particle item minecraft:redstone ~ ~1 ~ 0 0 0 0.4 500 normal"
         execute console command "/execute at %victim% run playsound minecraft:entity.dragon_fireball.explode player @a ~ ~ ~ 0.5 2"
-        # execute console command "/scoreboard players reset %victim%"
         add 1 to {player_kills::%attacker%}
         set {status_timer::%victim%} to 0 
         set {player_kills::%victim%} to 0

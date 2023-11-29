@@ -57,7 +57,6 @@ on quit:
         set {yellow::flag::taker} to ""
         execute console command "/effect clear %player%"
 
-
 on region enter:
     set {_temp::list::*} to size of {red::team::*}, size of {green::team::*}, size of {blue::team::*} and size of {yellow::team::*}
     set {_temp::list::*} to sorted {_temp::list::*}
