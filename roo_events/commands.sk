@@ -1,4 +1,4 @@
-function fill(p: player, w: text, 1x: text, 1y: text, 1z: text, 2x: text, 2y: text, 2z: text, b: text):
+function fill(w: text, 1x: text, 1y: text, 1z: text, 2x: text, 2y: text, 2z: text, b: text):
     execute console command "/execute in minecraft:%{_w}% run forceload add %{_1x}% %{_1z}% %{_2x}% %{_2z}%"
     execute console command "/execute in minecraft:%{_w}% run fill %{_1x}% %{_1y}% %{_1z}% %{_2x}% %{_2y}% %{_2z}% minecraft:%{_b}%"
     execute console command "/execute in minecraft:%{_w}% run forceload remove %{_1x}% %{_1z}% %{_2x}% %{_2z}%"
@@ -6,60 +6,60 @@ function fill(p: player, w: text, 1x: text, 1y: text, 1z: text, 2x: text, 2y: te
 command /eventclose:
     permission: op
     trigger:
-        fill(player, "overworld", "33", "-29", "18", "31", "-29", "16", "light_blue_stained_glass")
+        fill("overworld", "33", "-29", "18", "31", "-29", "16", "light_blue_stained_glass")
 
 command /eventopen:
     permission: op
     trigger:
-        fill(player, "overworld", "33", "-29", "18", "31", "-29", "16", "air")
+        fill("overworld", "33", "-29", "18", "31", "-29", "16", "air")
 
 command /boxopen:
     permission: op
     trigger:
         # cherry
-        fill(player, "event", "55", "56", "-589", "49", "58", "-595", "air")
+        fill("ac", "-422", "70", "451", "-416", "69", "457", "air")
         # jungle
-        fill(player, "event", "562", "40", "459", "556", "42", "465", "air")
+        fill("ac", "556", "34", "403", "550", "33", "397", "air")
         # desert
-        fill(player, "event", "-482", "40", "446", "-476", "38", "452", "air")
+        fill("ac", "-90", "46", "-503", "-84", "45", "-497", "air")
 
 command /boxclose:
     permission: op
     trigger:
         # cherry
-        fill(player, "event", "55", "56", "-589", "49", "58", "-595", "pink_stained_glass")
-        fill(player, "event", "50", "56", "-594", "54", "58", "-590", "air")
+        fill("ac", "-422", "70", "451", "-416", "69", "457", "green_stained_glass")
+        fill("ac", "-417", "70", "456", "-421", "69", "452", "air")
         # jungle
-        fill(player, "event", "562", "40", "459", "556", "42", "465", "green_stained_glass")
-        fill(player, "event", "561", "40", "460", "557", "42", "464", "air")
+        fill("ac", "556", "34", "403", "550", "33", "397", "light_blue_stained_glass")
+        fill("ac", "551", "34", "398", "555", "33", "402", "air")
         # desert
-        fill(player, "event", "-482", "40", "446", "-476", "38", "452", "orange_stained_glass")
-        fill(player, "event", "-477", "40", "447", "-481", "38", "451", "air")
+        fill("ac", "-90", "46", "-503", "-84", "45", "-497", "orange_stained_glass")
+        fill("ac", "-89", "45", "-498", "-85", "46", "-502", "air")
 
-command /wallsdown:
-    permission: op
-    trigger:
-        # long
-        fill(player, "event", "640", "34", "-130", "-641", "32", "-130", "air")
-        # right short
-        fill(player, "event", "126", "32", "123", "126", "34", "-129", "air")
-        # left short
-        fill(player, "event", "-128", "32", "123", "-128", "34", "-129", "air")
-        # short
-        fill(player, "event", "-127", "34", "123", "125", "32", "123", "air")
-        # center
-        fill(player, "event", "-1", "34", "124", "-1", "32", "640", "air")
+# command /wallsdown:
+#     permission: op
+#     trigger:
+#         # long
+#         fill("ac", "640", "34", "-130", "-641", "32", "-130", "air")
+#         # right short
+#         fill("ac", "126", "32", "123", "126", "34", "-129", "air")
+#         # left short
+#         fill("ac", "-128", "32", "123", "-128", "34", "-129", "air")
+#         # short
+#         fill("ac", "-127", "34", "123", "125", "32", "123", "air")
+#         # center
+#         fill("ac", "-1", "34", "124", "-1", "32", "640", "air")
 
-command /wallsup:
-    permission: op
-    trigger:
-        # long
-        fill(player, "event", "640", "34", "-130", "-641", "32", "-130", "red_stained_glass")
-        # right short
-        fill(player, "event", "126", "32", "123", "126", "34", "-129", "red_stained_glass")
-        # left short
-        fill(player, "event", "-128", "32", "123", "-128", "34", "-129", "red_stained_glass")
-        # short
-        fill(player, "event", "-127", "34", "123", "125", "32", "123", "red_stained_glass")
-        # center
-        fill(player, "event", "-1", "34", "124", "-1", "32", "640", "red_stained_glass")
+# command /wallsup:
+#     permission: op
+#     trigger:
+#         # long
+#         fill("ac", "640", "34", "-130", "-641", "32", "-130", "red_stained_glass")
+#         # right short
+#         fill("ac", "126", "32", "123", "126", "34", "-129", "red_stained_glass")
+#         # left short
+#         fill("ac", "-128", "32", "123", "-128", "34", "-129", "red_stained_glass")
+#         # short
+#         fill("ac", "-127", "34", "123", "125", "32", "123", "red_stained_glass")
+#         # center
+#         fill("ac", "-1", "34", "124", "-1", "32", "640", "red_stained_glass")
