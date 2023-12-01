@@ -1,4 +1,5 @@
-# modify the flag spawn only in one locaton
+# To Do:
+# func or var for flag loc (1 modif, NOT 3) | Type = Reformat (not ness)
 
 variables:
     # state variables (don't modify)
