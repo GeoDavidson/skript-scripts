@@ -1,5 +1,7 @@
 # To Do:
-# func or var for flag loc (1 modif, NOT 3) | Type = Reformat (not ness)
+# 1. func or var for flag loc (1 modif, NOT 3) | Type = Reformat (not ness)
+# 2. text & sounds (boring stuff) | Type = Enhancement (ness)
+# 3. flag drop on death, quit, kick, other (talk to e first) | Type = Feature (maby)
 
 variables:
     # state variables (don't modify)
@@ -51,15 +53,15 @@ function reset_flag(p: player):
         set {red::flag::taker} to ""
         clear_effect({_p})
         set_block_flag("8", "-57", "8", "red_banner", "6")
-    else if {_p} is {green::flag::taker}:
+    if {_p} is {green::flag::taker}:
         set {green::flag::taker} to ""
         clear_effect({_p})
         set_block_flag("-8", "-57", "8", "green_banner", "10")
-    else if {_p} is {blue::flag::taker}:
+    if {_p} is {blue::flag::taker}:
         set {blue::flag::taker} to ""
         clear_effect({_p})
         set_block_flag("-8", "-57", "-8", "blue_banner", "14")
-    else if {_p} is {yellow::flag::taker}:
+    if {_p} is {yellow::flag::taker}:
         set {yellow::flag::taker} to ""
         clear_effect({_p})
         set_block_flag("8", "-57", "-8", "yellow_banner", "2")
