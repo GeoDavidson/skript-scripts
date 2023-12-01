@@ -1,7 +1,7 @@
 # To Do:
-# 1. func or var for flag loc (1 modif, NOT 3) | Type = Reformat (not ness)
-# 2. text & sounds (boring stuff) | Type = Enhancement (ness)
-# 3. flag drop on death, quit, kick, other (talk to e first) | Type = Feature (maby)
+# 1. func or var for flag loc (yes but not ness)
+# 2. text & sounds (yes)
+# 3. flag drop on death, quit, kick, other (maby)
 
 variables:
     # state variables (don't modify)
@@ -47,6 +47,17 @@ function remove_player_from_team(p: player):
     remove {_p} from {green::team::*}
     remove {_p} from {blue::team::*}
     remove {_p} from {yellow::team::*}
+
+function is_on_team(p: player) :: boolean:
+    if {red::team::*} contains {_p}:
+        return true
+    else if {green::team::*} contains {_p}:
+        return true
+    else if {blue::team::*} contains {_p}:
+        return true
+    else if {yellow::team::*} contains {_p}:
+        return true
+    return false
 
 function reset_flag(p: player):
     if {_p} is {red::flag::taker}:
@@ -164,36 +175,42 @@ on region enter:
             add player to {yellow::team::*}
         else:
             teleport player to team_choosing_spawn()
-    else if "%region%" is "red_flag_test in world ctf":
+
+on region enter:
+    if "%region%" is "red_flag_test in world ctf":
         if {red::team::*} does not contain player:
             if {red::flag::taker} is "":
-                set {red::flag::taker} to player
-                apply_effect(player)
-                set_block_air("8", "-57", "8")
+                if is_on_team(player) is true:
+                    set {red::flag::taker} to player
+                    apply_effect(player)
+                    set_block_air("8", "-57", "8")
         else:
             add flag_captures(player) to {red::points}
     else if "%region%" is "green_flag_test in world ctf":
         if {green::team::*} does not contain player:
             if {green::flag::taker} is "":
-                set {green::flag::taker} to player
-                apply_effect(player)
-                set_block_air("-8", "-57", "8")
+                if is_on_team(player) is true:
+                    set {green::flag::taker} to player
+                    apply_effect(player)
+                    set_block_air("-8", "-57", "8")
         else:
             add flag_captures(player) to {green::points}
     else if "%region%" is "blue_flag_test in world ctf":
         if {blue::team::*} does not contain player:
             if {blue::flag::taker} is "":
-                set {blue::flag::taker} to player
-                apply_effect(player)
-                set_block_air("-8", "-57", "-8")
+                if is_on_team(player) is true:
+                    set {blue::flag::taker} to player
+                    apply_effect(player)
+                    set_block_air("-8", "-57", "-8")
         else:
             add flag_captures(player) to {blue::points}
     else if "%region%" is "yellow_flag_test in world ctf":
         if {yellow::team::*} does not contain player:
             if {yellow::flag::taker} is "":
-                set {yellow::flag::taker} to player
-                apply_effect(player)
-                set_block_air("8", "-57", "-8")
+                if is_on_team(player) is true:
+                    set {yellow::flag::taker} to player
+                    apply_effect(player)
+                    set_block_air("8", "-57", "-8")
         else:
             add flag_captures(player) to {yellow::points}
 
