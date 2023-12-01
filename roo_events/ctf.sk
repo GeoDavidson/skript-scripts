@@ -1,10 +1,7 @@
-# check if flag is already taken
-# make it so players can take multiple flags (kinda already have)
-# score board stuff
-# sound effects
-# text display
+# modify the flag spawn only in one locaton
 
 variables:
+    # state variables (don't modify)
     {max::team::size} = 0
     {red::flag::taker} = ""
     {green:flag::taker} = ""
@@ -15,29 +12,80 @@ variables:
     {blue::points} = 0
     {yellow::points} = 0
 
-function remove_player_team(p: player):
+function team_choosing_spawn() :: object:
+    return location(0.5, -54, -20.5, world "ctf")
+
+function red_spawn() :: object:
+    return location(12, -56, 12, world "ctf", 135, 0)
+
+function green_spawn() :: object:
+    return location(-12, -56, 12, world "ctf", -135, 0)
+
+function blue_spawn() :: object:
+    return location(-12, -56, -12, world "ctf", -45, 0)
+
+function yellow_spawn() :: object:
+    return location(12, -56, -12, world "ctf", 45, 0)
+
+function apply_effect(p: player):
+    execute console command "/effect give %{_p}% minecraft:glowing infinite 1 true"
+
+function clear_effect(p: player):
+    execute console command "/effect clear %{_p}%"
+
+function set_block_air(x: text, y: text, z: text):
+    execute console command "/execute in minecraft:ctf run setblock %{_x}% %{_y}% %{_z}% minecraft:air replace"
+
+function set_block_flag(x: text, y: text, z: text, flag: text, r: text):
+    execute console command "/execute in minecraft:ctf run setblock %{_x}% %{_y}% %{_z}% minecraft:%{_flag}%[rotation=%{_r}%] replace"
+
+function remove_player_from_team(p: player):
     remove {_p} from {red::team::*}
     remove {_p} from {green::team::*}
     remove {_p} from {blue::team::*}
     remove {_p} from {yellow::team::*}
 
-function reset_flag_taker(p: player):
+function reset_flag(p: player):
     if {_p} is {red::flag::taker}:
         set {red::flag::taker} to ""
-        execute console command "/effect clear %{_p}%"
+        clear_effect({_p})
+        set_block_flag("8", "-57", "8", "red_banner", "6")
     else if {_p} is {green::flag::taker}:
         set {green::flag::taker} to ""
-        execute console command "/effect clear %{_p}%"
+        clear_effect({_p})
+        set_block_flag("-8", "-57", "8", "green_banner", "10")
     else if {_p} is {blue::flag::taker}:
         set {blue::flag::taker} to ""
-        execute console command "/effect clear %{_p}%"
+        clear_effect({_p})
+        set_block_flag("-8", "-57", "-8", "blue_banner", "14")
     else if {_p} is {yellow::flag::taker}:
         set {yellow::flag::taker} to ""
-        execute console command "/effect clear %{_p}%"
+        clear_effect({_p})
+        set_block_flag("8", "-57", "-8", "yellow_banner", "2")
 
-# function set_flag()
-
-# function remove_flag()
+function flag_captures(p: player) :: number:
+    set {_flag::captures} to 0
+    if {_p} is {red::flag::taker}:
+        set {red::flag::taker} to ""
+        clear_effect({_p})
+        set_block_flag("8", "-57", "8", "red_banner", "6")
+        add 1 to {_flag::captures}
+    if {_p} is {green::flag::taker}:
+        set {green::flag::taker} to ""
+        clear_effect({_p})
+        set_block_flag("-8", "-57", "8", "green_banner", "10")
+        add 1 to {_flag::captures}
+    if {_p} is {blue::flag::taker}:
+        set {blue::flag::taker} to ""
+        clear_effect({_p})
+        set_block_flag("-8", "-57", "-8", "blue_banner", "14")
+        add 1 to {_flag::captures}
+    if {_p} is {yellow::flag::taker}:
+        set {yellow::flag::taker} to ""
+        clear_effect({_p})
+        set_block_flag("8", "-57", "-8", "yellow_banner", "2")
+        add 1 to {_flag::captures}
+    return {_flag::captures}
 
 on join:
     while player is online:
@@ -61,8 +109,8 @@ on join:
         wait 1 second
 
 on quit:
-    remove_player_team(player)
-    reset_flag_taker(player)
+    remove_player_from_team(player)
+    reset_flag(player)
 
 on region enter:
     set {_temp::list::*} to size of {red::team::*}, size of {green::team::*}, size of {blue::team::*} and size of {yellow::team::*}
@@ -75,128 +123,107 @@ on region enter:
                     add 1 to {max::team::size}
     if "%region%" is "ctf_red_test in world ctf":
         if {red::team::*} contains player:
-            teleport player to location(12, -56, 12, world "ctf", 135, 0)
+            teleport player to red_spawn()
         else if size of {red::team::*} < {max::team::size}:
-            teleport player to location(12, -56, 12, world "ctf", 135, 0)
-            remove_player_team(player)
+            teleport player to red_spawn()
+            remove_player_from_team(player)
+            reset_flag(player)
             add player to {red::team::*}
         else:
-            teleport player to location(0.5, -54, -20.5, world "ctf")
+            teleport player to team_choosing_spawn()
     else if "%region%" is "ctf_green_test in world ctf":
         if {green::team::*} contains player:
-            teleport player to location(-12, -56, 12, world "ctf", -135, 0)
+            teleport player to green_spawn()
         else if size of {green::team::*} < {max::team::size}:
-            teleport player to location(-12, -56, 12, world "ctf", -135, 0)
-            remove_player_team(player)
+            teleport player to green_spawn()
+            remove_player_from_team(player)
+            reset_flag(player)
             add player to {green::team::*}
         else:
-            teleport player to location(0.5, -54, -20.5, world "ctf")
+            teleport player to team_choosing_spawn()
     else if "%region%" is "ctf_blue_test in world ctf":
         if {blue::team::*} contains player:
-            teleport player to location(-12, -56, -12, world "ctf", -45, 0)
+            teleport player to blue_spawn()
         else if size of {blue::team::*} < {max::team::size}:
-            teleport player to location(-12, -56, -12, world "ctf", -45, 0)
-            remove_player_team(player)
+            teleport player to blue_spawn()
+            remove_player_from_team(player)
+            reset_flag(player)
             add player to {blue::team::*}
         else:
-            teleport player to location(0.5, -54, -20.5, world "ctf")
+            teleport player to team_choosing_spawn()
     else if "%region%" is "ctf_yellow_test in world ctf":
         if {yellow::team::*} contains player:
-            teleport player to location(12, -56, -12, world "ctf", 45, 0)
+            teleport player to yellow_spawn()
         else if size of {yellow::team::*} < {max::team::size}:
-            teleport player to location(12, -56, -12, world "ctf", 45, 0)
-            remove_player_team(player)
+            teleport player to yellow_spawn()
+            remove_player_from_team(player)
+            reset_flag(player)
             add player to {yellow::team::*}
         else:
-            teleport player to location(0.5, -54, -20.5, world "ctf")
+            teleport player to team_choosing_spawn()
     else if "%region%" is "red_flag_test in world ctf":
         if {red::team::*} does not contain player:
             if {red::flag::taker} is "":
                 set {red::flag::taker} to player
-                execute console command "/effect give %player% minecraft:glowing infinite 1 true"
-        else if player is {green::flag::taker}:
-            add 1 to {red::points}
-            set {green::flag::taker} to ""
-            execute console command "/effect clear %player%"
-        else if player is {blue::flag::taker}:
-            add 1 to {red::points}
-            set {blue::flag::taker} to ""
-            execute console command "/effect clear %player%"
-        else if player is {yellow::flag::taker}:
-            add 1 to {red::points}
-            set {yellow::flag::taker} to ""
-            execute console command "/effect clear %player%"
+                apply_effect(player)
+                set_block_air("8", "-57", "8")
+        else:
+            add flag_captures(player) to {red::points}
     else if "%region%" is "green_flag_test in world ctf":
         if {green::team::*} does not contain player:
             if {green::flag::taker} is "":
                 set {green::flag::taker} to player
-                execute console command "/effect give %player% minecraft:glowing infinite 1 true"
-        else if player is {red::flag::taker}:
-            add 1 to {green::points}
-            set {red::flag::taker} to ""
-            execute console command "/effect clear %player%"
-        else if player is {blue::flag::taker}:
-            add 1 to {green::points}
-            set {blue::flag::taker} to ""
-            execute console command "/effect clear %player%"
-        else if player is {yellow::flag::taker}:
-            add 1 to {green::points}
-            set {yellow::flag::taker} to ""
-            execute console command "/effect clear %player%"
+                apply_effect(player)
+                set_block_air("-8", "-57", "8")
+        else:
+            add flag_captures(player) to {green::points}
     else if "%region%" is "blue_flag_test in world ctf":
         if {blue::team::*} does not contain player:
             if {blue::flag::taker} is "":
                 set {blue::flag::taker} to player
-                execute console command "/effect give %player% minecraft:glowing infinite 1 true"
-        else if player is {red::flag::taker}:
-            add 1 to {blue::points}
-            set {red::flag::taker} to ""
-            execute console command "/effect clear %player%"
-        else if player is {green::flag::taker}:
-            add 1 to {blue::points}
-            set {green::flag::taker} to ""
-            execute console command "/effect clear %player%"
-        else if player is {yellow::flag::taker}:
-            add 1 to {blue::points}
-            set {yellow::flag::taker} to ""
-            execute console command "/effect clear %player%"
+                apply_effect(player)
+                set_block_air("-8", "-57", "-8")
+        else:
+            add flag_captures(player) to {blue::points}
     else if "%region%" is "yellow_flag_test in world ctf":
         if {yellow::team::*} does not contain player:
             if {yellow::flag::taker} is "":
                 set {yellow::flag::taker} to player
-                execute console command "/effect give %player% minecraft:glowing infinite 1 true"
-        else if player is {red::flag::taker}:
-            add 1 to {yellow::points}
-            set {red::flag::taker} to ""
-            execute console command "/effect clear %player%"
-        else if player is {green::flag::taker}:
-            add 1 to {yellow::points}
-            set {green::flag::taker} to ""
-            execute console command "/effect clear %player%"
-        else if player is {blue::flag::taker}:
-            add 1 to {yellow::points}
-            set {blue::flag::taker} to ""
-            execute console command "/effect clear %player%"
-
-on death:
-    reset_flag_taker(victim)
+                apply_effect(player)
+                set_block_air("8", "-57", "-8")
+        else:
+            add flag_captures(player) to {yellow::points}
 
 on damage of player with priority highest:
     if {red::team::*} contains attacker:
         if {red::team::*} contains victim:
             cancel event
-    else if {green::team::*} contain attacker:
-        if {green::team::*} contain victim:
+    else if {green::team::*} contains attacker:
+        if {green::team::*} contains victim:
             cancel event
-    else if {blue::team::*} contain attacker:
-        if {blue::team::*} contain victim:
+    else if {blue::team::*} contains attacker:
+        if {blue::team::*} contains victim:
             cancel event
-    else if {yellow::team::*} contain attacker:
-        if {yellow::team::*} contain victim:
+    else if {yellow::team::*} contains attacker:
+        if {yellow::team::*} contains victim:
             cancel event
 
+on death:
+    reset_flag(victim)
+
 on world change:
-    reset_flag_taker(player)
+    reset_flag(player)
+
+on respawn:
+    if player is in world "ctf":
+        if {red::team::*} contains player:
+            set respawn location to red_spawn()
+        else if {green::team::*} contains player:
+            set respawn location to green_spawn()
+        else if {blue::team::*} contains player:
+            set respawn location to blue_spawn()
+        else if {yellow::team::*} contains player:
+            set respawn location to yellow_spawn()
 
 command /drop:
     permission: op
@@ -245,6 +272,22 @@ command /ctfresetpoints:
 command /ctfresetflags:
     permission: op
     trigger:
+        set {red::flag::taker} to ""
+        set {green::flag::taker} to ""
+        set {blue::flag::taker} to ""
+        set {yellow::flag::taker} to ""
+
+command /ctfresetall:
+    permission: op
+    trigger:
+        delete {red::team::*}
+        delete {green::team::*}
+        delete {blue::team::*}
+        delete {yellow::team::*}
+        set {red::points} to 0
+        set {green::points} to 0
+        set {blue::points} to 0
+        set {yellow::points} to 0
         set {red::flag::taker} to ""
         set {green::flag::taker} to ""
         set {blue::flag::taker} to ""
