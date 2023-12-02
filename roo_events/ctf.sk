@@ -1,6 +1,5 @@
 # To Do:
-# 1. text & sounds (yes)
-# 2. flag drop on death, quit, kick, other (maby)
+# 1. text & sounds
 
 # -------------------- state variables (don't modify) -------------------- #
 variables:
@@ -83,6 +82,7 @@ function set_block_air(x: number, y: number, z: number):
 function set_block_flag(x: number, y: number, z: number, flag: text, r: number):
     execute console command "/execute in minecraft:ctf run setblock %{_x}% %{_y}% %{_z}% minecraft:%{_flag}%[rotation=%{_r}%] replace"
 
+# -------------------- basic function -------------------- #
 function remove_player_from_team(p: player):
     remove {_p} from {red::team::*}
     remove {_p} from {green::team::*}
