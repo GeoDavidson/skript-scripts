@@ -1,10 +1,9 @@
 # To Do:
-# 1. func or var for flag loc (yes but not ness)
-# 2. text & sounds (yes)
-# 3. flag drop on death, quit, kick, other (maby)
+# 1. text & sounds (yes)
+# 2. flag drop on death, quit, kick, other (maby)
 
+# -------------------- state variables (don't modify) -------------------- #
 variables:
-    # state variables (don't modify)
     {max::team::size} = 0
     {red::flag::taker} = ""
     {green:flag::taker} = ""
@@ -15,6 +14,7 @@ variables:
     {blue::points} = 0
     {yellow::points} = 0
 
+# -------------------- spawn locations -------------------- #
 function team_choosing_spawn() :: object:
     return location(0.5, -54, -20.5, world "ctf")
 
@@ -30,15 +30,17 @@ function blue_spawn() :: object:
 function yellow_spawn() :: object:
     return location(12, -56, -12, world "ctf", 45, 0)
 
+# -------------------- red flag constants -------------------- #
 function red_const(i: number) :: object:
-    set {_x} to 8
-    set {_y} to -57
-    set {_z} to 8
-    set {_name} to "red_banner"
-    set {_rotation} to 6
+    set {_x} to 8               # positon x of flag
+    set {_y} to -57             # positon y of flag
+    set {_z} to 8               # positon z of flag
+    set {_name} to "red_banner" # banner type to spawn
+    set {_rotation} to 6        # rotation of banner (0 - 15)
     set {_list::*} to {_x}, {_y}, {_z}, {_name} and {_rotation}
     return {_list::%{_i}%}
 
+# -------------------- green flag constants -------------------- #
 function green_const(i: number) :: object:
     set {_x} to -8
     set {_y} to -57
@@ -48,6 +50,7 @@ function green_const(i: number) :: object:
     set {_list::*} to {_x}, {_y}, {_z}, {_name} and {_rotation}
     return {_list::%{_i}%}
 
+# -------------------- blue flag constants -------------------- #
 function blue_const(i: number) :: object:
     set {_x} to -8
     set {_y} to -57
@@ -57,6 +60,7 @@ function blue_const(i: number) :: object:
     set {_list::*} to {_x}, {_y}, {_z}, {_name} and {_rotation}
     return {_list::%{_i}%}
 
+# -------------------- yellow flag constants -------------------- #
 function yellow_const(i: number) :: object:
     set {_x} to 8
     set {_y} to -57
@@ -66,6 +70,7 @@ function yellow_const(i: number) :: object:
     set {_list::*} to {_x}, {_y}, {_z}, {_name} and {_rotation}
     return {_list::%{_i}%}
 
+# -------------------- execute command function -------------------- #
 function apply_effect(p: player):
     execute console command "/effect give %{_p}% minecraft:glowing infinite 1 true"
 
@@ -137,6 +142,7 @@ function flag_captures(p: player) :: number:
         add 1 to {_flag::captures}
     return {_flag::captures}
 
+# -------------------- scoreboard -------------------- #
 on join:
     while player is online:
         if player is in world "ctf":
@@ -158,6 +164,7 @@ on join:
             set title of player's scoreboard to "&x&f&f&2&6&2&6&lR&x&f&f&3&a&2&1&lo&x&f&f&4&e&1&6&lo &x&f&f&6&2&1&8&lE&x&f&f&7&7&1&3&lv&x&f&f&8&b&0&e&le&x&f&f&9&f&0&a&ln&x&f&f&b&3&0&5&lt&x&f&f&c&7&0&0&ls"
         wait 1 second
 
+# -------------------- team choosing -------------------- #
 on region enter:
     set {_temp::list::*} to size of {red::team::*}, size of {green::team::*}, size of {blue::team::*} and size of {yellow::team::*}
     set {_temp::list::*} to sorted {_temp::list::*}
@@ -208,6 +215,7 @@ on region enter:
         else:
             teleport player to team_choosing_spawn()
 
+# -------------------- ctf logic -------------------- #
 on region enter:
     if "%region%" is "red_flag_test in world ctf":
         if {red::team::*} does not contain player:
@@ -246,6 +254,7 @@ on region enter:
         else:
             add flag_captures(player) to {yellow::points}
 
+# -------------------- team killing -------------------- #
 on damage of player with priority highest:
     if {red::team::*} contains attacker:
         if {red::team::*} contains victim:
@@ -260,6 +269,7 @@ on damage of player with priority highest:
         if {yellow::team::*} contains victim:
             cancel event
 
+# -------------------- set respawn location -------------------- #
 on respawn:
     if player is in world "ctf":
         if {red::team::*} contains player:
@@ -271,6 +281,7 @@ on respawn:
         else if {yellow::team::*} contains player:
             set respawn location to yellow_spawn()
 
+# -------------------- reset logic -------------------- #
 on death:
     reset_flag(victim)
 
@@ -281,33 +292,34 @@ on quit:
     remove_player_from_team(player)
     reset_flag(player)
 
-command /drop:
+# -------------------- commands -------------------- #
+command /ctfboxopen:
     permission: op
     trigger:
         # red
-        fill("ctf", "14", "-54", "14", "10", "-57", "10", "air")
+        fill("ctf", 14, -54, 14, 10, -57, 10, "air")
         # green
-        fill("ctf", "-14", "-54", "14", "-10", "-57", "10", "air")
+        fill("ctf", -14, -54, 14, -10, -57, 10, "air")
         # blue
-        fill("ctf", "-10", "-57", "-10", "-14", "-54", "-14", "air")
+        fill("ctf", -10, -57, -10, -14, -54, -14, "air")
         # yellow
-        fill("ctf", "14", "-54", "-14", "10", "-57", "-10", "air")
+        fill("ctf", 14, -54, -14, 10, -57, -10, "air")
 
-command /close:
+command /ctfboxclose:
     permission: op
     trigger:
         # red
-        fill("ctf", "14", "-54", "14", "10", "-57", "10", "red_stained_glass")
-        fill("ctf", "13", "-54", "13", "11", "-56", "11", "air")
+        fill("ctf", 14, -54, 14, 10, -57, 10, "red_stained_glass")
+        fill("ctf", 13, -54, 13, 11, -56, 11, "air")
         # green
-        fill("ctf", "-14", "-54", "14", "-10", "-57", "10", "green_stained_glass")
-        fill("ctf", "-13", "-54", "13", "-11", "-56", "11", "air")
+        fill("ctf", -14, -54, 14, -10, -57, 10, "green_stained_glass")
+        fill("ctf", -13, -54, 13, -11, -56, 11, "air")
         # blue
-        fill("ctf", "-10", "-57", "-10", "-14", "-54", "-14", "blue_stained_glass")
-        fill("ctf", "-13", "-54", "-13", "-11", "-56", "-11", "air")
+        fill("ctf", -10, -57, -10, -14, -54, -14, "blue_stained_glass")
+        fill("ctf", -13, -54, -13, -11, -56, -11, "air")
         # yellow
-        fill("ctf", "14", "-54", "-14", "10", "-57", "-10", "yellow_stained_glass")
-        fill("ctf", "11", "-56", "-11", "13", "-54", "-13", "air")
+        fill("ctf", 14, -54, -14, 10, -57, -10, "yellow_stained_glass")
+        fill("ctf", 11, -56, -11, 13, -54, -13, "air")
 
 command /ctfresetteams:
     permission: op

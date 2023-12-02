@@ -1,9 +1,10 @@
-no join:
+function fill(w: text, 1x: number, 1y: number, 1z: number, 2x: number, 2y: number, 2z: number, b: text):
+    execute console command "/execute in minecraft:%{_w}% run forceload add %{_1x}% %{_1z}% %{_2x}% %{_2z}%"
+    execute console command "/execute in minecraft:%{_w}% run fill %{_1x}% %{_1y}% %{_1z}% %{_2x}% %{_2y}% %{_2z}% minecraft:%{_b}%"
+    execute console command "/execute in minecraft:%{_w}% run forceload remove %{_1x}% %{_1z}% %{_2x}% %{_2z}%"
+
+on join:
     clear scoreboard of player
 
 on world change with priority highest:
     clear scoreboard of player
-
-on break of red stained glass:
-    if player is not op:
-        cancel event
