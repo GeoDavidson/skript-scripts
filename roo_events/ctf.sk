@@ -30,38 +30,41 @@ function blue_spawn() :: object:
 function yellow_spawn() :: object:
     return location(12, -56, -12, world "ctf", 45, 0)
 
-# rfl = red flag location
-function rfl(i: number) :: object:
+function red_const(i: number) :: object:
     set {_x} to 8
     set {_y} to -57
     set {_z} to 8
     set {_name} to "red_banner"
     set {_rotation} to 6
     set {_list::*} to {_x}, {_y}, {_z}, {_name} and {_rotation}
+    return {_list::%{_i}%}
 
-function gfl(i: number) :: object:
+function green_const(i: number) :: object:
     set {_x} to -8
     set {_y} to -57
     set {_z} to 8
     set {_name} to "green_banner"
     set {_rotation} to 10
     set {_list::*} to {_x}, {_y}, {_z}, {_name} and {_rotation}
+    return {_list::%{_i}%}
 
-function bfl(i: number) :: object:
+function blue_const(i: number) :: object:
     set {_x} to -8
     set {_y} to -57
     set {_z} to -8
     set {_name} to "blue_banner"
     set {_rotation} to 14
     set {_list::*} to {_x}, {_y}, {_z}, {_name} and {_rotation}
+    return {_list::%{_i}%}
 
-function yfl(i: number) :: object:
+function yellow_const(i: number) :: object:
     set {_x} to 8
     set {_y} to -57
     set {_z} to -8
     set {_name} to "yellow_banner"
     set {_rotation} to 2
     set {_list::*} to {_x}, {_y}, {_z}, {_name} and {_rotation}
+    return {_list::%{_i}%}
 
 function apply_effect(p: player):
     execute console command "/effect give %{_p}% minecraft:glowing infinite 1 true"
@@ -96,41 +99,41 @@ function reset_flag(p: player):
     if {_p} is {red::flag::taker}:
         set {red::flag::taker} to ""
         clear_effect({_p})
-        set_block_flag(rfl(1), rfl(2), rfl(3), rfl(4), rfl(5))
+        set_block_flag(red_const(1), red_const(2), red_const(3), red_const(4), red_const(5))
     if {_p} is {green::flag::taker}:
         set {green::flag::taker} to ""
         clear_effect({_p})
-        set_block_flag(gfl(1), gfl(2), gfl(3), gfl(4), gfl(5))
+        set_block_flag(green_const(1), green_const(2), green_const(3), green_const(4), green_const(5))
     if {_p} is {blue::flag::taker}:
         set {blue::flag::taker} to ""
         clear_effect({_p})
-        set_block_flag(bfl(1), bfl(2), bfl(3), bfl(4), bfl(5))
+        set_block_flag(blue_const(1), blue_const(2), blue_const(3), blue_const(4), blue_const(5))
     if {_p} is {yellow::flag::taker}:
         set {yellow::flag::taker} to ""
         clear_effect({_p})
-        set_block_flag(yfl(1), yfl(2), yfl(3), yfl(4), yfl(5))
+        set_block_flag(yellow_const(1), yellow_const(2), yellow_const(3), yellow_const(4), yellow_const(5))
 
 function flag_captures(p: player) :: number:
     set {_flag::captures} to 0
     if {_p} is {red::flag::taker}:
         set {red::flag::taker} to ""
         clear_effect({_p})
-        set_block_flag(rfl(1), rfl(2), rfl(3), rfl(4), rfl(5))
+        set_block_flag(red_const(1), red_const(2), red_const(3), red_const(4), red_const(5))
         add 1 to {_flag::captures}
     if {_p} is {green::flag::taker}:
         set {green::flag::taker} to ""
         clear_effect({_p})
-        set_block_flag(gfl(1), gfl(2), gfl(3), gfl(4), gfl(5))
+        set_block_flag(green_const(1), green_const(2), green_const(3), green_const(4), green_const(5))
         add 1 to {_flag::captures}
     if {_p} is {blue::flag::taker}:
         set {blue::flag::taker} to ""
         clear_effect({_p})
-        set_block_flag(bfl(1), bfl(2), bfl(3), bfl(4), bfl(5))
+        set_block_flag(blue_const(1), blue_const(2), blue_const(3), blue_const(4), blue_const(5))
         add 1 to {_flag::captures}
     if {_p} is {yellow::flag::taker}:
         set {yellow::flag::taker} to ""
         clear_effect({_p})
-        set_block_flag(yfl(1), yfl(2), yfl(3), yfl(4), yfl(5))
+        set_block_flag(yellow_const(1), yellow_const(2), yellow_const(3), yellow_const(4), yellow_const(5))
         add 1 to {_flag::captures}
     return {_flag::captures}
 
@@ -154,10 +157,6 @@ on join:
             set line 15 of player's scoreboard to "&6&m                              "
             set title of player's scoreboard to "&x&f&f&2&6&2&6&lR&x&f&f&3&a&2&1&lo&x&f&f&4&e&1&6&lo &x&f&f&6&2&1&8&lE&x&f&f&7&7&1&3&lv&x&f&f&8&b&0&e&le&x&f&f&9&f&0&a&ln&x&f&f&b&3&0&5&lt&x&f&f&c&7&0&0&ls"
         wait 1 second
-
-on quit:
-    remove_player_from_team(player)
-    reset_flag(player)
 
 on region enter:
     set {_temp::list::*} to size of {red::team::*}, size of {green::team::*}, size of {blue::team::*} and size of {yellow::team::*}
@@ -213,37 +212,37 @@ on region enter:
     if "%region%" is "red_flag_test in world ctf":
         if {red::team::*} does not contain player:
             if {red::flag::taker} is "":
-                if is_on_team(player) is true:
+                if is_on_team(player):
                     set {red::flag::taker} to player
                     apply_effect(player)
-                    set_block_air(8, -57, 8)
+                    set_block_air(red_const(1), red_const(2), red_const(3))
         else:
             add flag_captures(player) to {red::points}
     else if "%region%" is "green_flag_test in world ctf":
         if {green::team::*} does not contain player:
             if {green::flag::taker} is "":
-                if is_on_team(player) is true:
+                if is_on_team(player):
                     set {green::flag::taker} to player
                     apply_effect(player)
-                    set_block_air(-8, -57, 8)
+                    set_block_air(green_const(1), green_const(2), green_const(3))
         else:
             add flag_captures(player) to {green::points}
     else if "%region%" is "blue_flag_test in world ctf":
         if {blue::team::*} does not contain player:
             if {blue::flag::taker} is "":
-                if is_on_team(player) is true:
+                if is_on_team(player):
                     set {blue::flag::taker} to player
                     apply_effect(player)
-                    set_block_air(-8, -57, -8)
+                    set_block_air(blue_const(1), blue_const(2), blue_const(3))
         else:
             add flag_captures(player) to {blue::points}
     else if "%region%" is "yellow_flag_test in world ctf":
         if {yellow::team::*} does not contain player:
             if {yellow::flag::taker} is "":
-                if is_on_team(player) is true:
+                if is_on_team(player):
                     set {yellow::flag::taker} to player
                     apply_effect(player)
-                    set_block_air(8, -57, -8)
+                    set_block_air(yellow_const(1), yellow_const(2), yellow_const(3))
         else:
             add flag_captures(player) to {yellow::points}
 
@@ -261,12 +260,6 @@ on damage of player with priority highest:
         if {yellow::team::*} contains victim:
             cancel event
 
-on death:
-    reset_flag(victim)
-
-on world change:
-    reset_flag(player)
-
 on respawn:
     if player is in world "ctf":
         if {red::team::*} contains player:
@@ -277,6 +270,16 @@ on respawn:
             set respawn location to blue_spawn()
         else if {yellow::team::*} contains player:
             set respawn location to yellow_spawn()
+
+on death:
+    reset_flag(victim)
+
+on world change:
+    reset_flag(player)
+
+on quit:
+    remove_player_from_team(player)
+    reset_flag(player)
 
 command /drop:
     permission: op
