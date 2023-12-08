@@ -83,7 +83,6 @@ on rightclick on sign:
     # lobby
     if line 2 of block is "PvP Arena":
         teleport player to location(0.5, -43, 0.5, world "pvp")
-        send "<light green>Welcome to The PVP Arena" to player
     else if line 2 of block is "Parkour":
         send "Parkour Comming Soon..." to player
     else if line 2 of block is "CTF":

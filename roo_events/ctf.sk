@@ -1,28 +1,6 @@
 # To Do:
 # 1. text & sounds
 
-# -------------------- remember -------------------- #
-# set up regions
-#   # -- team choosing region names -- #
-#   red = red_team
-#   green = green_team
-#   blue = blue_team
-#   yellow = yellow_team
-#   # -- team flag region names -- #
-#   red = red_flag
-#   green = green_flag
-#   blue = blue_flag
-#   yellow = yellow_flag
-#   # -- team no build region names -- #
-#   red = red_no_build
-#   green = green_no_build
-#   blue = blue_no_build
-#   yellow = yellow_no_build
-#   remeber to set no build region flags: {build: deny}
-# change spawn locations
-# change flag locations and rotation
-# change command pos (ctfboxopen, ctfboxclose)
-
 # -------------------- state variables (don't modify) -------------------- #
 variables:
     {max::team::size} = 0
