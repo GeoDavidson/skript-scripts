@@ -1,71 +1,45 @@
 # To Do:
-# 1. text & sounds
+# text & sounds
+# game timer (death match)
+
+# Problems:
+# if player has helmet, banner will remove it
 
 # -------------------- state variables (don't modify) -------------------- #
 variables:
     {max::team::size} = 0
     {red::flag::taker} = ""
-    {green:flag::taker} = ""
     {blue:flag::taker} = ""
-    {yellow:flag::taker} = ""
     {red::points} = 0
-    {green::points} = 0
     {blue::points} = 0
-    {yellow::points} = 0
 
 # -------------------- spawn locations -------------------- #
 function team_choosing_spawn() :: object:
     return location(0.5, -54, -20.5, world "ctf")
 
 function red_spawn() :: object:
-    return location(12, -56, 12, world "ctf", 135, 0)
-
-function green_spawn() :: object:
-    return location(-12, -56, 12, world "ctf", -135, 0)
+    return location(11, -57, 11, world "ctf", 135, 0)
 
 function blue_spawn() :: object:
-    return location(-12, -56, -12, world "ctf", -45, 0)
-
-function yellow_spawn() :: object:
-    return location(12, -56, -12, world "ctf", 45, 0)
+    return location(-11, -57, -11, world "ctf", -45, 0)
 
 # -------------------- red flag constants -------------------- #
 function red_const(i: number) :: object:
-    set {_x} to 8               # positon x of flag
+    set {_x} to 11              # positon x of flag
     set {_y} to -57             # positon y of flag
-    set {_z} to 8               # positon z of flag
+    set {_z} to 0               # positon z of flag
     set {_name} to "red_banner" # banner type to spawn
-    set {_rotation} to 6        # rotation of banner (0 - 15)
-    set {_list::*} to {_x}, {_y}, {_z}, {_name} and {_rotation}
-    return {_list::%{_i}%}
-
-# -------------------- green flag constants -------------------- #
-function green_const(i: number) :: object:
-    set {_x} to -8
-    set {_y} to -57
-    set {_z} to 8
-    set {_name} to "green_banner"
-    set {_rotation} to 10
+    set {_rotation} to 4        # rotation of banner (0 - 15)
     set {_list::*} to {_x}, {_y}, {_z}, {_name} and {_rotation}
     return {_list::%{_i}%}
 
 # -------------------- blue flag constants -------------------- #
 function blue_const(i: number) :: object:
-    set {_x} to -8
+    set {_x} to -11
     set {_y} to -57
-    set {_z} to -8
+    set {_z} to 0
     set {_name} to "blue_banner"
-    set {_rotation} to 14
-    set {_list::*} to {_x}, {_y}, {_z}, {_name} and {_rotation}
-    return {_list::%{_i}%}
-
-# -------------------- yellow flag constants -------------------- #
-function yellow_const(i: number) :: object:
-    set {_x} to 8
-    set {_y} to -57
-    set {_z} to -8
-    set {_name} to "yellow_banner"
-    set {_rotation} to 2
+    set {_rotation} to 12
     set {_list::*} to {_x}, {_y}, {_z}, {_name} and {_rotation}
     return {_list::%{_i}%}
 
@@ -76,122 +50,84 @@ function apply_effect(p: player):
 function clear_effect(p: player):
     execute console command "/effect clear %{_p}% minecraft:glowing"
 
-function set_block_air(x: number, y: number, z: number):
-    execute console command "/execute in minecraft:ctf run setblock %{_x}% %{_y}% %{_z}% minecraft:air replace"
+function set_block_flag(x: number, y: number, z: number, f: text, r: number):
+    execute console command "/execute in minecraft:ctf run setblock %{_x}% %{_y}% %{_z}% minecraft:%{_f}%[rotation=%{_r}%] replace"
 
-function set_block_flag(x: number, y: number, z: number, flag: text, r: number):
-    execute console command "/execute in minecraft:ctf run setblock %{_x}% %{_y}% %{_z}% minecraft:%{_flag}%[rotation=%{_r}%] replace"
+function set_gamemode(p: player, m: text):
+    execute console command "/minecraft:gamemode %{_m}% %{_p}%"
+
+function set_hat(p: player, f: text):
+    execute console command "/minecraft:item replace entity %{_p}% armor.head with minecraft:%{_f}%"
 
 # -------------------- basic function -------------------- #
 function remove_player_from_team(p: player):
     remove {_p} from {red::team::*}
-    remove {_p} from {green::team::*}
     remove {_p} from {blue::team::*}
-    remove {_p} from {yellow::team::*}
 
 function is_on_team(p: player) :: boolean:
     if {red::team::*} contains {_p}:
         return true
-    else if {green::team::*} contains {_p}:
-        return true
     else if {blue::team::*} contains {_p}:
-        return true
-    else if {yellow::team::*} contains {_p}:
         return true
     return false
 
-function reset_flag(p: player):
-    if {_p} is {red::flag::taker}:
+function return_flag(p: player):
+    if {red::team::*} contains {_p}:
         set {red::flag::taker} to ""
-        clear_effect({_p})
         set_block_flag(red_const(1), red_const(2), red_const(3), red_const(4), red_const(5))
-    if {_p} is {green::flag::taker}:
-        set {green::flag::taker} to ""
-        clear_effect({_p})
-        set_block_flag(green_const(1), green_const(2), green_const(3), green_const(4), green_const(5))
-    if {_p} is {blue::flag::taker}:
+        set {red::flag::location} to location of red_spawn()
+    else if {blue::team::*} contains {_p}:
         set {blue::flag::taker} to ""
-        clear_effect({_p})
         set_block_flag(blue_const(1), blue_const(2), blue_const(3), blue_const(4), blue_const(5))
-    if {_p} is {yellow::flag::taker}:
-        set {yellow::flag::taker} to ""
-        clear_effect({_p})
-        set_block_flag(yellow_const(1), yellow_const(2), yellow_const(3), yellow_const(4), yellow_const(5))
+        set {blue::flag::location} to location of blue_spawn()
 
-function flag_captures(p: player) :: number:
-    set {_flag::captures} to 0
+function drop_flag(p: player):
     if {_p} is {red::flag::taker}:
         set {red::flag::taker} to ""
         clear_effect({_p})
-        set_block_flag(red_const(1), red_const(2), red_const(3), red_const(4), red_const(5))
-        add 1 to {_flag::captures}
-    if {_p} is {green::flag::taker}:
-        set {green::flag::taker} to ""
-        clear_effect({_p})
-        set_block_flag(green_const(1), green_const(2), green_const(3), green_const(4), green_const(5))
-        add 1 to {_flag::captures}
-    if {_p} is {blue::flag::taker}:
+        set_hat({_p}, "air")
+        set block at location at {_p}'s location to red banner
+        set {red::flag::location} to location of {_p}
+    else if {_p} is {blue::flag::taker}:
         set {blue::flag::taker} to ""
         clear_effect({_p})
-        set_block_flag(blue_const(1), blue_const(2), blue_const(3), blue_const(4), blue_const(5))
-        add 1 to {_flag::captures}
-    if {_p} is {yellow::flag::taker}:
-        set {yellow::flag::taker} to ""
-        clear_effect({_p})
-        set_block_flag(yellow_const(1), yellow_const(2), yellow_const(3), yellow_const(4), yellow_const(5))
-        add 1 to {_flag::captures}
-    return {_flag::captures}
+        set_hat({_p}, "air")
+        set block at location at {_p}'s location to blue banner
+        set {blue::flag::location} to location of {_p}
 
 # -------------------- scoreboard -------------------- #
 on join:
     while player is online:
-        if player is in world "ctf":
-            set line 1 of player's scoreboard to "&l&6Yellow: %size of {yellow::team::*}%"
-            set line 2 of player's scoreboard to "&l&1Blue: %size of {blue::team::*}%"
-            set line 3 of player's scoreboard to "&l&2Green: %size of {green::team::*}%"
-            set line 4 of player's scoreboard to "&l&4Red: %size of {red::team::*}%"
-            set line 5 of player's scoreboard to "&lTeams Size:"
-            set line 6 of player's scoreboard to ""
-            set line 7 of player's scoreboard to "&l&6Yellow: %{yellow::points}%"
-            set line 8 of player's scoreboard to "&l&1Blue: %{blue::points}%"
-            set line 9 of player's scoreboard to "&l&2Green: %{green::points}%"
-            set line 10 of player's scoreboard to "&l&4Red: %{red::points}%"
-            set line 11 of player's scoreboard to "&lFlags Captured:"
-            set line 12 of player's scoreboard to ""
-            set line 13 of player's scoreboard to "&lGame Time: 00:00"
-            set line 14 of player's scoreboard to ""
-            set line 15 of player's scoreboard to "&6&m                              "
+        if player is not in world "rooevents":
+            set line 1 of player's scoreboard to "&l&1Blue: %size of {blue::team::*}%"
+            set line 2 of player's scoreboard to "&l&4Red: %size of {red::team::*}%"
+            set line 3 of player's scoreboard to "&lTeams Size:"
+            set line 4 of player's scoreboard to ""
+            set line 5 of player's scoreboard to "&l&1Blue: %{blue::points}%"
+            set line 6 of player's scoreboard to "&l&4Red: %{red::points}%"
+            set line 7 of player's scoreboard to "&lFlags Captured:"
+            set line 8 of player's scoreboard to ""
+            set line 9 of player's scoreboard to "&lGame Time: 00:00"
+            set line 10 of player's scoreboard to ""
+            set line 11 of player's scoreboard to "&6&m                              "
             set title of player's scoreboard to "&x&f&f&2&6&2&6&lR&x&f&f&3&a&2&1&lo&x&f&f&4&e&1&6&lo &x&f&f&6&2&1&8&lE&x&f&f&7&7&1&3&lv&x&f&f&8&b&0&e&le&x&f&f&9&f&0&a&ln&x&f&f&b&3&0&5&lt&x&f&f&c&7&0&0&ls"
         wait 1 second
 
 # -------------------- team choosing -------------------- #
 on region enter:
-    set {_temp::list::*} to size of {red::team::*}, size of {green::team::*}, size of {blue::team::*} and size of {yellow::team::*}
+    set {_temp::list::*} to size of {red::team::*} and size of {blue::team::*}
     set {_temp::list::*} to sorted {_temp::list::*}
-    set {max::team::size} to {_temp::list::4}
+    set {max::team::size} to {_temp::list::2}
     if {_temp::list::1} >= {max::team::size} - 1:
         if {_temp::list::2} >= {max::team::size} - 1:
-            if {_temp::list::3} >= {max::team::size} - 1:
-                if {_temp::list::4} >= {max::team::size} - 1:
-                    add 1 to {max::team::size}
+            add 1 to {max::team::size}
     if "%region%" is "red_team in world ctf":
         if {red::team::*} contains player:
             teleport player to red_spawn()
         else if size of {red::team::*} < {max::team::size}:
             teleport player to red_spawn()
             remove_player_from_team(player)
-            reset_flag(player)
             add player to {red::team::*}
-        else:
-            teleport player to team_choosing_spawn()
-    else if "%region%" is "green_team in world ctf":
-        if {green::team::*} contains player:
-            teleport player to green_spawn()
-        else if size of {green::team::*} < {max::team::size}:
-            teleport player to green_spawn()
-            remove_player_from_team(player)
-            reset_flag(player)
-            add player to {green::team::*}
         else:
             teleport player to team_choosing_spawn()
     else if "%region%" is "blue_team in world ctf":
@@ -200,97 +136,100 @@ on region enter:
         else if size of {blue::team::*} < {max::team::size}:
             teleport player to blue_spawn()
             remove_player_from_team(player)
-            reset_flag(player)
             add player to {blue::team::*}
         else:
             teleport player to team_choosing_spawn()
-    else if "%region%" is "yellow_team in world ctf":
-        if {yellow::team::*} contains player:
-            teleport player to yellow_spawn()
-        else if size of {yellow::team::*} < {max::team::size}:
-            teleport player to yellow_spawn()
-            remove_player_from_team(player)
-            reset_flag(player)
-            add player to {yellow::team::*}
-        else:
-            teleport player to team_choosing_spawn()
 
-# -------------------- ctf logic -------------------- #
+# -------------------- score points logic -------------------- #
 on region enter:
-    if "%region%" is "red_flag in world ctf":
-        if {red::team::*} does not contain player:
-            if {red::flag::taker} is "":
-                if is_on_team(player):
-                    set {red::flag::taker} to player
-                    apply_effect(player)
-                    set_block_air(red_const(1), red_const(2), red_const(3))
-        else:
-            add flag_captures(player) to {red::points}
-    else if "%region%" is "green_flag in world ctf":
-        if {green::team::*} does not contain player:
-            if {green::flag::taker} is "":
-                if is_on_team(player):
-                    set {green::flag::taker} to player
-                    apply_effect(player)
-                    set_block_air(green_const(1), green_const(2), green_const(3))
-        else:
-            add flag_captures(player) to {green::points}
-    else if "%region%" is "blue_flag in world ctf":
-        if {blue::team::*} does not contain player:
-            if {blue::flag::taker} is "":
-                if is_on_team(player):
-                    set {blue::flag::taker} to player
-                    apply_effect(player)
-                    set_block_air(blue_const(1), blue_const(2), blue_const(3))
-        else:
-            add flag_captures(player) to {blue::points}
-    else if "%region%" is "yellow_flag in world ctf":
-        if {yellow::team::*} does not contain player:
-            if {yellow::flag::taker} is "":
-                if is_on_team(player):
-                    set {yellow::flag::taker} to player
-                    apply_effect(player)
-                    set_block_air(yellow_const(1), yellow_const(2), yellow_const(3))
-        else:
-            add flag_captures(player) to {yellow::points}
+    if "%region%" is "red_home in world ctf":
+        if player is {blue::flag::taker}:
+            set {blue::flag::taker} to ""
+            set_block_flag(blue_const(1), blue_const(2), blue_const(3), blue_const(4), blue_const(5))
+            set {blue::flag::location} to location(blue_const(1), blue_const(2), blue_const(3), world "ctf")
+            clear_effect(player)
+            set_hat(player, "air")
+            add 1 to {red::points}
+    else if "%region%" is "blue_home in world ctf":
+        if player is {red::flag::taker}:
+            set {red::flag::taker} to ""
+            set_block_flag(red_const(1), red_const(2), red_const(3), red_const(4), red_const(5))
+            set {red::flag::location} to location(red_const(1), red_const(2), red_const(3), world "ctf")
+            clear_effect(player)
+            set_hat(player, "air")
+            add 1 to {blue::points}
+            
+# -------------------- ctf logic -------------------- #
+on player walk:
+    if player is not in world "rooevents":
+        if is_on_team(player):
+            if gamemode of player is not spectator:
+                if block at player's location is block at {red::flag::location}:
+                    if {red::flag::taker} is "":
+                        if {red::team::*} contain player:
+                            set block at location at player's location to air
+                            set_block_flag(red_const(1), red_const(2), red_const(3), red_const(4), red_const(5))
+                            set {red::flag::location} to location(red_const(1), red_const(2), red_const(3), world "ctf")
+                        else:
+                            set block at location at player's location to air
+                            apply_effect(player)
+                            set_hat(player, "red_banner")
+                            set {red::flag::taker} to player
+                else if block at player's location is block at {blue::flag::location}:
+                    if {blue::flag::taker} is "":
+                        if {blue::team::*} contain player:
+                            set block at location at player's location to air
+                            set_block_flag(blue_const(1), blue_const(2), blue_const(3), blue_const(4), blue_const(5))
+                            set {blue::flag::location} to location(blue_const(1), blue_const(2), blue_const(3), world "ctf")
+                        else:
+                            set block at location at player's location to air
+                            apply_effect(player)
+                            set_hat(player, "blue_banner")
+                            set {blue::flag::taker} to player
 
 # -------------------- team killing -------------------- #
 on damage of player with priority highest:
     if {red::team::*} contains attacker:
         if {red::team::*} contains victim:
             cancel event
-    else if {green::team::*} contains attacker:
-        if {green::team::*} contains victim:
-            cancel event
     else if {blue::team::*} contains attacker:
         if {blue::team::*} contains victim:
-            cancel event
-    else if {yellow::team::*} contains attacker:
-        if {yellow::team::*} contains victim:
             cancel event
 
 # -------------------- set respawn location -------------------- #
 on respawn:
-    if player is in world "ctf":
+    if player is not in world "rooevents":
         if {red::team::*} contains player:
             set respawn location to red_spawn()
-        else if {green::team::*} contains player:
-            set respawn location to green_spawn()
         else if {blue::team::*} contains player:
             set respawn location to blue_spawn()
-        else if {yellow::team::*} contains player:
-            set respawn location to yellow_spawn()
 
 # -------------------- reset logic -------------------- #
-on death:
-    reset_flag(victim)
+on death with priority highest:
+    if victim is not in world "rooevents":
+        if is_on_team(victim):
+            cancel event
+            drop_flag(victim)
+            set_gamemode(victim, "spectator")
+            set {_n} to 2
+            set {_c} to {_n}
+            loop {_n} times:
+                send title "&a%{_c}%" to victim
+                subtract 1 from {_c}
+                wait 1 second
+            send title "" to victim
+            if {red::team::*} contains victim:
+                teleport victim to red_spawn()
+            else if {blue::team::*} contains victim:
+                teleport victim to blue_spawn()
+            set_gamemode(victim, "survival")
 
 on world change:
-    reset_flag(player)
+    drop_flag(player)
 
 on quit:
     remove_player_from_team(player)
-    reset_flag(player)
+    drop_flag(player)
 
 # -------------------- commands -------------------- #
 command /ctfboxopen:
@@ -298,12 +237,8 @@ command /ctfboxopen:
     trigger:
         # red
         fill("ctf", 14, -54, 14, 10, -57, 10, "air")
-        # green
-        fill("ctf", -14, -54, 14, -10, -57, 10, "air")
         # blue
         fill("ctf", -10, -57, -10, -14, -54, -14, "air")
-        # yellow
-        fill("ctf", 14, -54, -14, 10, -57, -10, "air")
 
 command /ctfboxclose:
     permission: op
@@ -311,58 +246,40 @@ command /ctfboxclose:
         # red
         fill("ctf", 14, -54, 14, 10, -57, 10, "red_stained_glass")
         fill("ctf", 13, -54, 13, 11, -56, 11, "air")
-        # green
-        fill("ctf", -14, -54, 14, -10, -57, 10, "green_stained_glass")
-        fill("ctf", -13, -54, 13, -11, -56, 11, "air")
         # blue
         fill("ctf", -10, -57, -10, -14, -54, -14, "blue_stained_glass")
         fill("ctf", -13, -54, -13, -11, -56, -11, "air")
-        # yellow
-        fill("ctf", 14, -54, -14, 10, -57, -10, "yellow_stained_glass")
-        fill("ctf", 11, -56, -11, 13, -54, -13, "air")
 
 command /ctfresetteams:
     permission: op
     trigger:
         delete {red::team::*}
-        delete {green::team::*}
         delete {blue::team::*}
-        delete {yellow::team::*}
 
 command /ctfresetpoints:
     permission: op
     trigger:
         set {red::points} to 0
-        set {green::points} to 0
         set {blue::points} to 0
-        set {yellow::points} to 0
 
 command /ctfresetflags:
     permission: op
     trigger:
         set {red::flag::taker} to ""
-        set {green::flag::taker} to ""
         set {blue::flag::taker} to ""
-        set {yellow::flag::taker} to ""
 
 command /ctfresetall:
     permission: op
     trigger:
         delete {red::team::*}
-        delete {green::team::*}
         delete {blue::team::*}
-        delete {yellow::team::*}
         set {red::points} to 0
-        set {green::points} to 0
         set {blue::points} to 0
-        set {yellow::points} to 0
         set {red::flag::taker} to ""
-        set {green::flag::taker} to ""
         set {blue::flag::taker} to ""
-        set {yellow::flag::taker} to ""
         set_block_flag(red_const(1), red_const(2), red_const(3), red_const(4), red_const(5))
-        set_block_flag(green_const(1), green_const(2), green_const(3), green_const(4), green_const(5))
         set_block_flag(blue_const(1), blue_const(2), blue_const(3), blue_const(4), blue_const(5))
-        set_block_flag(yellow_const(1), yellow_const(2), yellow_const(3), yellow_const(4), yellow_const(5))
+        set {red::flag::location} to location(red_const(1), red_const(2), red_const(3), world "ctf")
+        set {blue::flag::location} to location(blue_const(1), blue_const(2), blue_const(3), world "ctf")
         loop all players:
             clear_effect(loop-player)
