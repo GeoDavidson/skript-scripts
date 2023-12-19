@@ -1,13 +1,17 @@
 # -------------------- state variables (don't modify) -------------------- #
 variables:
-    # {game:status} = false
-    # {game:time} = 0
+    {game::state} = false
+    {deathmatch} = false
+    {auto::team} = false
     {round} = 0
-    {red::flag::taker} = ""
-    {blue:flag::taker} = ""
-    {max::team::size} = 0
+    {game::time} = 0
+    {timer::sec} = 0
+    {timer::min} = 0
     {red::points} = 0
     {blue::points} = 0
+    {red::flag::taker} = ""
+    {blue:flag::taker} = ""
+    {world} = ""
     {red::x} = 0
     {red::y} = 0
     {red::z} = 0
@@ -15,49 +19,491 @@ variables:
     {blue::y} = 0
     {blue::z} = 0
 
-# -------------------- spawn locations -------------------- #
-function team_choosing_spawn() :: object:
-    return location(0.5, -54, -20.5, world "ctf")
+# -------------------- spawns -------------------- #
+function lobby_spawn() :: object:
+    return location(0.5, 0, 0.5, world "rooevents", 90, 0)
 
+function desert_spawn() :: object:
+    return location(-36, 52, -687, world "ctf1", 0, 0)
+
+function plains_spawn() :: object:
+    return location(-57, 52, 810, world "ctf1", 180, 0)
+
+function jungle_spawn() :: object:
+    return location(-66, 52, -691, world "ctf2", 0, 0)
+
+function cherry_spawn() :: object:
+    return location(-67, 52, 806, world "ctf2", 180, 0)
+
+function crimson_spawn() :: object:
+    return location(-62, 52, -671, world "ctf3", 0, 0)
+
+function warped_spawn() :: object:
+    return location(-65, 52, 825, world "ctf3", 180, 0)
+
+function spruce_spawn() :: object:
+    return location(-74, 52, -650, world "ctf4", 0, 0)
+
+function snow_spawn() :: object:
+    return location(-56, 52, 773, world "ctf4", 180, 0)
+
+function mushroom_spawn() :: object:
+    return location(-99, 52, -648, world "ctf5", 0, 0)
+
+function savanna_spawn() :: object:
+    return location(-48, 52, 767, world "ctf5", 180, 0)
+
+# -------------------- spawn locations dynamics -------------------- #
 function red_spawn() :: object:
-    return location(11, -57, 11, world "ctf", 135, 0)
+    if "%{world}%" is "ctf1":
+        if not {game::state}:
+            return desert_spawn()
+        return location(ctf1_desert_team(1), ctf1_desert_team(2), ctf1_desert_team(3), ctf1_desert_team(4), ctf1_desert_team(5), ctf1_desert_team(6))
+    else if "%{world}%" is "ctf2":
+        if not {game::state}:
+            return jungle_spawn()
+        return location(ctf2_jungle_team(1), ctf2_jungle_team(2), ctf2_jungle_team(3), ctf2_jungle_team(4), ctf2_jungle_team(5), ctf2_jungle_team(6))
+    else if "%{world}%" is "ctf3":
+        if not {game::state}:
+            return crimson_spawn()
+        return location(ctf3_crimson_team(1), ctf3_crimson_team(2), ctf3_crimson_team(3), ctf3_crimson_team(4), ctf3_crimson_team(5), ctf3_crimson_team(6))
+    else if "%{world}%" is "ctf4":
+        if not {game::state}:
+            return spruce_spawn()
+        return location(ctf4_spruce_team(1), ctf4_spruce_team(2), ctf4_spruce_team(3), ctf4_spruce_team(4), ctf4_spruce_team(5), ctf4_spruce_team(6))
+    else if "%{world}%" is "ctf5":
+        if not {game::state}:
+            return mushroom_spawn()
+        return location(ctf5_muchroom_team(1), ctf5_muchroom_team(2), ctf5_muchroom_team(3), ctf5_muchroom_team(4), ctf5_muchroom_team(5), ctf5_muchroom_team(6))
 
 function blue_spawn() :: object:
-    return location(-11, -57, -11, world "ctf", -45, 0)
+    if "%{world}%" is "ctf1":
+        if not {game::state}:
+            return plains_spawn()
+        return location(ctf1_plains_team(1), ctf1_plains_team(2), ctf1_plains_team(3), ctf1_plains_team(4), ctf1_plains_team(5), ctf1_plains_team(6))
+    else if "%{world}%" is "ctf2":
+        if not {game::state}:
+            return cherry_spawn()
+        return location(ctf2_cherry_team(1), ctf2_cherry_team(2), ctf2_cherry_team(3), ctf2_cherry_team(4), ctf2_cherry_team(5), ctf2_cherry_team(6))
+    else if "%{world}%" is "ctf3":
+        if not {game::state}:
+            return warped_spawn()
+        return location(ctf3_warped_team(1), ctf3_warped_team(2), ctf3_warped_team(3), ctf3_warped_team(4), ctf3_warped_team(5), ctf3_warped_team(6))
+    else if "%{world}%" is "ctf4":
+        if not {game::state}:
+            return snow_spawn()
+        return location(ctf4_snow_team(1), ctf4_snow_team(2), ctf4_snow_team(3), ctf4_snow_team(4), ctf4_snow_team(5), ctf4_snow_team(6))
+    else if "%{world}%" is "ctf5":
+        if not {game::state}:
+            return savanna_spawn()
+        return location(ctf5_savanna_team(1), ctf5_savanna_team(2), ctf5_savanna_team(3), ctf5_savanna_team(4), ctf5_savanna_team(5), ctf5_savanna_team(6))
 
-# -------------------- red flag constants -------------------- #
-function red_const(i: number) :: object:
-    set {_x} to 11              # positon x of flag
-    set {_y} to -57             # positon y of flag
-    set {_z} to 0               # positon z of flag
-    set {_name} to "red_banner" # banner type to spawn
-    set {_rotation} to 4        # rotation of banner (0 - 15)
+# -------------------- team constants -------------------- #
+# -------------------- ctf1 -------------------- #
+function ctf1_desert_team(i: number) :: object: # red
+    set {_x} to -42
+    set {_y} to 50
+    set {_z} to -727
+    set {_world} to "ctf1"
+    set {_pitch} to 0
+    set {_yaw} to 0
+    set {_team} to "&6&lDesert"
+    set {_lp} to "desert"
+    set {_list::*} to {_x}, {_y}, {_z}, {_world}, {_pitch}, {_yaw}, {_team} and {_lp}
+    return {_list::%{_i}%}
+
+function ctf1_plains_team(i: number) :: object: # blue
+    set {_x} to -60
+    set {_y} to 51
+    set {_z} to 855
+    set {_world} to "ctf1"
+    set {_pitch} to 180
+    set {_yaw} to 0
+    set {_team} to "&2&lPlains"
+    set {_lp} to "plains"
+    set {_list::*} to {_x}, {_y}, {_z}, {_world}, {_pitch}, {_yaw}, {_team} and {_lp}
+    return {_list::%{_i}%}
+
+# -------------------- ctf2 -------------------- #
+function ctf2_jungle_team(i: number) :: object: # red
+    set {_x} to -67
+    set {_y} to 51
+    set {_z} to -713
+    set {_world} to "ctf2"
+    set {_pitch} to 0
+    set {_yaw} to 0
+    set {_team} to "&a&lJungle"
+    set {_lp} to "jungle"
+    set {_list::*} to {_x}, {_y}, {_z}, {_world}, {_pitch}, {_yaw}, {_team} and {_lp}
+    return {_list::%{_i}%}
+
+function ctf2_cherry_team(i: number) :: object: # blue
+    set {_x} to -67
+    set {_y} to 51
+    set {_z} to 829
+    set {_world} to "ctf2"
+    set {_pitch} to 180
+    set {_yaw} to 0
+    set {_team} to "&d&lCherry"
+    set {_lp} to "cherry"
+    set {_list::*} to {_x}, {_y}, {_z}, {_world}, {_pitch}, {_yaw}, {_team} and {_lp}
+    return {_list::%{_i}%}
+
+# -------------------- ctf3 -------------------- #
+function ctf3_crimson_team(i: number) :: object: # red
+    set {_x} to -62
+    set {_y} to 51
+    set {_z} to -693
+    set {_world} to "ctf3"
+    set {_pitch} to 0
+    set {_yaw} to 0
+    set {_team} to "&c&lCrimson"
+    set {_lp} to "crimson"
+    set {_list::*} to {_x}, {_y}, {_z}, {_world}, {_pitch}, {_yaw}, {_team} and {_lp}
+    return {_list::%{_i}%}
+
+function ctf3_warped_team(i: number) :: object: # blue
+    set {_x} to -65
+    set {_y} to 51
+    set {_z} to 852
+    set {_world} to "ctf3"
+    set {_pitch} to 180
+    set {_yaw} to 0
+    set {_team} to "&3&lWarped"
+    set {_lp} to "warped"
+    set {_list::*} to {_x}, {_y}, {_z}, {_world}, {_pitch}, {_yaw}, {_team} and {_lp}
+    return {_list::%{_i}%}
+
+# -------------------- ctf4 -------------------- #
+function ctf4_spruce_team(i: number) :: object: # red
+    set {_x} to -64
+    set {_y} to 52
+    set {_z} to -684
+    set {_world} to "ctf4"
+    set {_pitch} to 0
+    set {_yaw} to 0
+    set {_team} to "&d&lSpruce"
+    set {_lp} to "spruce"
+    set {_list::*} to {_x}, {_y}, {_z}, {_world}, {_pitch}, {_yaw}, {_team} and {_lp}
+    return {_list::%{_i}%}
+
+function ctf4_snow_team(i: number) :: object: # blue
+    set {_x} to -57
+    set {_y} to 52
+    set {_z} to 804
+    set {_world} to "ctf4"
+    set {_pitch} to 180
+    set {_yaw} to 0
+    set {_team} to "&b&lSnow"
+    set {_lp} to "snow"
+    set {_list::*} to {_x}, {_y}, {_z}, {_world}, {_pitch}, {_yaw}, {_team} and {_lp}
+    return {_list::%{_i}%}
+
+# -------------------- ctf5 -------------------- #
+function ctf5_muchroom_team(i: number) :: object: # red
+    set {_x} to -74
+    set {_y} to 51
+    set {_z} to -664
+    set {_world} to "ctf5"
+    set {_pitch} to 0
+    set {_yaw} to 0
+    set {_team} to "&b&lMushroom"
+    set {_lp} to "mushroom"
+    set {_list::*} to {_x}, {_y}, {_z}, {_world}, {_pitch}, {_yaw}, {_team} and {_lp}
+    return {_list::%{_i}%}
+
+function ctf5_savanna_team(i: number) :: object: # blue
+    set {_x} to -51
+    set {_y} to 52
+    set {_z} to 794
+    set {_world} to "ctf5"
+    set {_pitch} to 180
+    set {_yaw} to 0
+    set {_team} to "&6&lSavanna"
+    set {_lp} to "savanna"
+    set {_list::*} to {_x}, {_y}, {_z}, {_world}, {_pitch}, {_yaw}, {_team} and {_lp}
+    return {_list::%{_i}%}
+
+# -------------------- team dynamics -------------------- #
+function red_team(i: number) :: object:
+    if {world} is "ctf1":
+        set {_x} to ctf1_desert_team(1)
+        set {_y} to ctf1_desert_team(2)
+        set {_z} to ctf1_desert_team(3)
+        set {_world} to ctf1_desert_team(4)
+        set {_pitch} to ctf1_desert_team(5)
+        set {_yaw} to ctf1_desert_team(6)
+        set {_team} to ctf1_desert_team(7)
+        set {_lp} to ctf1_desert_team(8)
+    else if {world} is "ctf2":
+        set {_x} to ctf2_jungle_team(1)
+        set {_y} to ctf2_jungle_team(2)
+        set {_z} to ctf2_jungle_team(3)
+        set {_world} to ctf2_jungle_team(4)
+        set {_pitch} to ctf2_jungle_team(5)
+        set {_yaw} to ctf2_jungle_team(6)
+        set {_team} to ctf2_jungle_team(7)
+        set {_lp} to ctf2_jungle_team(8)
+    else if {world} is "ctf3":
+        set {_x} to ctf3_crimson_team(1)
+        set {_y} to ctf3_crimson_team(2)
+        set {_z} to ctf3_crimson_team(3)
+        set {_world} to ctf3_crimson_team(4)
+        set {_pitch} to ctf3_crimson_team(5)
+        set {_yaw} to ctf3_crimson_team(6)
+        set {_team} to ctf3_crimson_team(7)
+        set {_lp} to ctf3_crimson_team(8)
+    else if {world} is "ctf4":
+        set {_x} to ctf4_spruce_team(1)
+        set {_y} to ctf4_spruce_team(2)
+        set {_z} to ctf4_spruce_team(3)
+        set {_world} to ctf4_spruce_team(4)
+        set {_pitch} to ctf4_spruce_team(5)
+        set {_yaw} to ctf4_spruce_team(6)
+        set {_team} to ctf4_spruce_team(7)
+        set {_lp} to ctf4_spruce_team(8)
+    else if {world} is "ctf5":
+        set {_x} to ctf5_muchroom_team(1)
+        set {_y} to ctf5_muchroom_team(2)
+        set {_z} to ctf5_muchroom_team(3)
+        set {_world} to ctf5_muchroom_team(4)
+        set {_pitch} to ctf5_muchroom_team(5)
+        set {_yaw} to ctf5_muchroom_team(6)
+        set {_team} to ctf5_muchroom_team(7)
+        set {_lp} to ctf5_muchroom_team(8)
+    set {_list::*} to {_x}, {_y}, {_z}, {_world}, {_pitch}, {_yaw}, {_team} and {_lp}
+    return {_list::%{_i}%}
+
+function blue_team(i: number) :: object:
+    if {world} is "ctf1":
+        set {_x} to ctf1_plains_team(1)
+        set {_y} to ctf1_plains_team(2)
+        set {_z} to ctf1_plains_team(3)
+        set {_world} to ctf1_plains_team(4)
+        set {_pitch} to ctf1_plains_team(5)
+        set {_yaw} to ctf1_plains_team(6)
+        set {_team} to ctf1_plains_team(7)
+        set {_lp} to ctf1_plains_team(8)
+    else if {world} is "ctf2":
+        set {_x} to ctf2_cherry_team(1)
+        set {_y} to ctf2_cherry_team(2)
+        set {_z} to ctf2_cherry_team(3)
+        set {_world} to ctf2_cherry_team(4)
+        set {_pitch} to ctf2_cherry_team(5)
+        set {_yaw} to ctf2_cherry_team(6)
+        set {_team} to ctf2_cherry_team(7)
+        set {_lp} to ctf2_cherry_team(8)
+    else if {world} is "ctf3":
+        set {_x} to ctf3_warped_team(1)
+        set {_y} to ctf3_warped_team(2)
+        set {_z} to ctf3_warped_team(3)
+        set {_world} to ctf3_warped_team(4)
+        set {_pitch} to ctf3_warped_team(5)
+        set {_yaw} to ctf3_warped_team(6)
+        set {_team} to ctf3_warped_team(7)
+        set {_lp} to ctf3_warped_team(8)
+    else if {world} is "ctf4":
+        set {_x} to ctf4_snow_team(1)
+        set {_y} to ctf4_snow_team(2)
+        set {_z} to ctf4_snow_team(3)
+        set {_world} to ctf4_snow_team(4)
+        set {_pitch} to ctf4_snow_team(5)
+        set {_yaw} to ctf4_snow_team(6)
+        set {_team} to ctf4_snow_team(7)
+        set {_lp} to ctf4_snow_team(8)
+    else if {world} is "ctf5":
+        set {_x} to ctf5_savanna_team(1)
+        set {_y} to ctf5_savanna_team(2)
+        set {_z} to ctf5_savanna_team(3)
+        set {_world} to ctf5_savanna_team(4)
+        set {_pitch} to ctf5_savanna_team(5)
+        set {_yaw} to ctf5_savanna_team(6)
+        set {_team} to ctf5_savanna_team(7)
+        set {_lp} to ctf5_savanna_team(8)
+    set {_list::*} to {_x}, {_y}, {_z}, {_world}, {_pitch}, {_yaw}, {_team} and {_lp}
+    return {_list::%{_i}%}
+
+# -------------------- flag constants -------------------- #
+# -------------------- ctf1 -------------------- #
+function ctf1_desert_flag(i: number) :: object:
+    set {_x} to -36
+    set {_y} to 52
+    set {_z} to -684
+    set {_name} to "orange_banner"
+    set {_rotation} to 0
     set {_list::*} to {_x}, {_y}, {_z}, {_name} and {_rotation}
     return {_list::%{_i}%}
 
-# -------------------- blue flag constants -------------------- #
-function blue_const(i: number) :: object:
-    set {_x} to -11
-    set {_y} to -57
-    set {_z} to 0
-    set {_name} to "blue_banner"
-    set {_rotation} to 12
+function ctf1_plains_flag(i: number) :: object:
+    set {_x} to -57
+    set {_y} to 52
+    set {_z} to 807
+    set {_name} to "green_banner"
+    set {_rotation} to 8
     set {_list::*} to {_x}, {_y}, {_z}, {_name} and {_rotation}
     return {_list::%{_i}%}
 
-# -------------------- execute command function -------------------- #
+# -------------------- ctf2 -------------------- #
+function ctf2_jungle_flag(i: number) :: object:
+    set {_x} to -66
+    set {_y} to 52
+    set {_z} to -688
+    set {_name} to "lime_banner"
+    set {_rotation} to 0
+    set {_list::*} to {_x}, {_y}, {_z}, {_name} and {_rotation}
+    return {_list::%{_i}%}
+
+function ctf2_cherry_flag(i: number) :: object:
+    set {_x} to -67
+    set {_y} to 52
+    set {_z} to 803
+    set {_name} to "pink_banner"
+    set {_rotation} to 8
+    set {_list::*} to {_x}, {_y}, {_z}, {_name} and {_rotation}
+    return {_list::%{_i}%}
+
+# -------------------- ctf3 -------------------- #
+function ctf3_crimson_flag(i: number) :: object:
+    set {_x} to -62
+    set {_y} to 52
+    set {_z} to -668
+    set {_name} to "red_banner"
+    set {_rotation} to 0
+    set {_list::*} to {_x}, {_y}, {_z}, {_name} and {_rotation}
+    return {_list::%{_i}%}
+
+function ctf3_warped_flag(i: number) :: object:
+    set {_x} to -65
+    set {_y} to 52
+    set {_z} to 822
+    set {_name} to "cyan_banner"
+    set {_rotation} to 8
+    set {_list::*} to {_x}, {_y}, {_z}, {_name} and {_rotation}
+    return {_list::%{_i}%}
+
+# -------------------- ctf4 -------------------- #
+function ctf4_spruce_flag(i: number) :: object:
+    set {_x} to -74
+    set {_y} to 52
+    set {_z} to -647
+    set {_name} to "purple_banner"
+    set {_rotation} to 0
+    set {_list::*} to {_x}, {_y}, {_z}, {_name} and {_rotation}
+    return {_list::%{_i}%}
+
+function ctf4_snow_flag(i: number) :: object:
+    set {_x} to -57
+    set {_y} to 52
+    set {_z} to 770
+    set {_name} to "white_banner"
+    set {_rotation} to 8
+    set {_list::*} to {_x}, {_y}, {_z}, {_name} and {_rotation}
+    return {_list::%{_i}%}
+
+# -------------------- ctf5 -------------------- #
+function ctf5_muchroom_flag(i: number) :: object:
+    set {_x} to -99
+    set {_y} to 52
+    set {_z} to -645
+    set {_name} to "light_blue_banner"
+    set {_rotation} to 0
+    set {_list::*} to {_x}, {_y}, {_z}, {_name} and {_rotation}
+    return {_list::%{_i}%}
+
+function ctf5_savanna_flag(i: number) :: object:
+    set {_x} to -48
+    set {_y} to 52
+    set {_z} to 764
+    set {_name} to "orange_banner"
+    set {_rotation} to 8
+    set {_list::*} to {_x}, {_y}, {_z}, {_name} and {_rotation}
+    return {_list::%{_i}%}
+
+# -------------------- flag dynamics -------------------- #
+function red_flag(i: number) :: object:
+    if "%{world}%" is "ctf1":
+        set {_x} to ctf1_desert_flag(1)
+        set {_y} to ctf1_desert_flag(2)
+        set {_z} to ctf1_desert_flag(3)
+        set {_name} to ctf1_desert_flag(4)
+        set {_rotation} to ctf1_desert_flag(5)
+    else if "%{world}%" is "ctf2":
+        set {_x} to ctf2_jungle_flag(1)
+        set {_y} to ctf2_jungle_flag(2)
+        set {_z} to ctf2_jungle_flag(3)
+        set {_name} to ctf2_jungle_flag(4)
+        set {_rotation} to ctf2_jungle_flag(5)
+    else if "%{world}%" is "ctf3":
+        set {_x} to ctf3_crimson_flag(1)
+        set {_y} to ctf3_crimson_flag(2)
+        set {_z} to ctf3_crimson_flag(3)
+        set {_name} to ctf3_crimson_flag(4)
+        set {_rotation} to ctf3_crimson_flag(5)
+    else if "%{world}%" is "ctf4":
+        set {_x} to ctf4_spruce_flag(1)
+        set {_y} to ctf4_spruce_flag(2)
+        set {_z} to ctf4_spruce_flag(3)
+        set {_name} to ctf4_spruce_flag(4)
+        set {_rotation} to ctf4_spruce_flag(5)
+    else if "%{world}%" is "ctf5":
+        set {_x} to ctf5_muchroom_flag(1)
+        set {_y} to ctf5_muchroom_flag(2)
+        set {_z} to ctf5_muchroom_flag(3)
+        set {_name} to ctf5_muchroom_flag(4)
+        set {_rotation} to ctf5_muchroom_flag(5)
+    set {_list::*} to {_x}, {_y}, {_z}, {_name} and {_rotation}
+    return {_list::%{_i}%}
+
+function blue_flag(i: number) :: object:
+    if "%{world}%" is "ctf1":
+        set {_x} to ctf1_plains_flag(1)
+        set {_y} to ctf1_plains_flag(2)
+        set {_z} to ctf1_plains_flag(3)
+        set {_name} to ctf1_plains_flag(4)
+        set {_rotation} to ctf1_plains_flag(5)
+    else if "%{world}%" is "ctf2":
+        set {_x} to ctf2_cherry_flag(1)
+        set {_y} to ctf2_cherry_flag(2)
+        set {_z} to ctf2_cherry_flag(3)
+        set {_name} to ctf2_cherry_flag(4)
+        set {_rotation} to ctf2_cherry_flag(5)
+    else if "%{world}%" is "ctf3":
+        set {_x} to ctf3_warped_flag(1)
+        set {_y} to ctf3_warped_flag(2)
+        set {_z} to ctf3_warped_flag(3)
+        set {_name} to ctf3_warped_flag(4)
+        set {_rotation} to ctf3_warped_flag(5)
+    else if "%{world}%" is "ctf4":
+        set {_x} to ctf4_snow_flag(1)
+        set {_y} to ctf4_snow_flag(2)
+        set {_z} to ctf4_snow_flag(3)
+        set {_name} to ctf4_snow_flag(4)
+        set {_rotation} to ctf4_snow_flag(5)
+    else if "%{world}%" is "ctf5":
+        set {_x} to ctf5_savanna_flag(1)
+        set {_y} to ctf5_savanna_flag(2)
+        set {_z} to ctf5_savanna_flag(3)
+        set {_name} to ctf5_savanna_flag(4)
+        set {_rotation} to ctf5_savanna_flag(5)
+    set {_list::*} to {_x}, {_y}, {_z}, {_name} and {_rotation}
+    return {_list::%{_i}%}
+
+# -------------------- command function -------------------- #
 function apply_effect(p: player):
     execute console command "/effect give %{_p}% minecraft:glowing infinite 1 true"
 
 function clear_effect(p: player):
     execute console command "/effect clear %{_p}% minecraft:glowing"
 
-function set_block_flag(x: number, y: number, z: number, f: text, r: number):
-    execute console command "/execute in minecraft:ctf run setblock %{_x}% %{_y}% %{_z}% minecraft:%{_f}%[rotation=%{_r}%] replace"
+function set_block_flag(w: text, x: number, y: number, z: number, f: text, r: number):
+    execute console command "/execute in minecraft:%{_w}% run forceload add %{_x}% %{_z}% %{_x}% %{_z}%"
+    execute console command "/execute in minecraft:%{_w}% run setblock %{_x}% %{_y}% %{_z}% minecraft:%{_f}%[rotation=%{_r}%] replace"
+    execute console command "/execute in minecraft:%{_w}% run forceload remove %{_x}% %{_z}% %{_x}% %{_z}%"
 
-# to-do: (because of consistency)
-# function set_block_air(x: number, y: number, z: number):
-#     execute console command ""
+function set_block(w: text, x: number, y: number, z: number, b: text):
+    execute console command "/execute in minecraft:%{_w}% run forceload add %{_x}% %{_z}% %{_x}% %{_z}%"
+    execute console command "/execute in minecraft:%{_w}% run setblock %{_x}% %{_y}% %{_z}% minecraft:%{_b}% replace"
+    execute console command "/execute in minecraft:%{_w}% run forceload remove %{_x}% %{_z}% %{_x}% %{_z}%"
 
 function set_gamemode(p: player, m: text):
     execute console command "/minecraft:gamemode %{_m}% %{_p}%"
@@ -65,7 +511,13 @@ function set_gamemode(p: player, m: text):
 function set_hat(p: player, f: text):
     execute console command "/minecraft:item replace entity %{_p}% armor.head with minecraft:%{_f}%"
 
-# -------------------- basic function -------------------- #
+function set_lp(p: player, n: text):
+    execute console command "/luckperms user %{_p}% parent set %{_n}%"
+
+function give_item(p: player, i: text, a: number):
+    execute console command "/minecraft:give %{_p}% %{_i}% %{_a}%"
+
+# -------------------- helper function -------------------- #
 function set_red_flag(x: number, y: number, z: number):
     set {red::x} to {_x}
     set {red::y} to {_y}
@@ -89,43 +541,61 @@ function is_on_team(p: player) :: boolean:
 
 function drop_flag(p: player):
     if {_p} is {red::flag::taker}:
+        send title "" with subtitle "%{red::flag::taker}%&r&c Dropped The &r%red_team(7)% Flag" to all players for 4 seconds
         set {red::flag::taker} to ""
         clear_effect({_p})
         set_hat({_p}, "air")
-        if block at {_p}'s location is block at location({blue::x}, {blue::y}, {blue::z}, world "ctf"):
-            set block at location({_p}'s x-coordinate, {_p}'s y-coordinate + 2, {_p}'s z-coordinate, world "ctf") to bedrock
-            set block at location({_p}'s x-coordinate, {_p}'s y-coordinate + 3, {_p}'s z-coordinate, world "ctf") to red banner
-            set_red_flag({_p}'s x-coordinate, {_p}'s y-coordinate + 3, {_p}'s z-coordinate)
+        if block at {_p}'s location is block at location({blue::x}, {blue::y}, {blue::z}, world "%{world}%"):
+            set_block(red_team(4), round({_p}'s x-coordinate), round({_p}'s y-coordinate) + 2, round({_p}'s z-coordinate), "bedrock")
+            set_block_flag(red_team(4), round({_p}'s x-coordinate), round({_p}'s y-coordinate) + 3, round({_p}'s z-coordinate), red_flag(4), red_flag(5))
+            set_red_flag(round({_p}'s x-coordinate), round({_p}'s y-coordinate) + 3, round({_p}'s z-coordinate))
         else:
-            set block at location({_p}'s x-coordinate, {_p}'s y-coordinate - 1, {_p}'s z-coordinate, world "ctf") to bedrock
-            set block at location at {_p}'s location to red banner
-            set_red_flag({_p}'s x-coordinate, {_p}'s y-coordinate, {_p}'s z-coordinate)
+            set_block(red_team(4), round({_p}'s x-coordinate), round({_p}'s y-coordinate) - 1, round({_p}'s z-coordinate), "bedrock")
+            set_block_flag(red_team(4), round({_p}'s x-coordinate), round({_p}'s y-coordinate), round({_p}'s z-coordinate), red_flag(4), red_flag(5))
+            set_red_flag(round({_p}'s x-coordinate), round({_p}'s y-coordinate), round({_p}'s z-coordinate))
     else if {_p} is {blue::flag::taker}:
+        send title "" with subtitle "%{blue::flag::taker}%&r&c Dropped The &r%blue_team(7)% Flag" to all players for 4 seconds
         set {blue::flag::taker} to ""
         clear_effect({_p})
         set_hat({_p}, "air")
-        if block at {_p}'s location is block at location({red::x}, {red::y}, {red::z}, world "ctf"):
-            set block at location({_p}'s x-coordinate, {_p}'s y-coordinate + 2, {_p}'s z-coordinate, world "ctf") to bedrock
-            set block at location({_p}'s x-coordinate, {_p}'s y-coordinate + 3, {_p}'s z-coordinate, world "ctf") to blue banner
-            set_blue_flag({_p}'s x-coordinate, {_p}'s y-coordinate + 3, {_p}'s z-coordinate)
+        if block at {_p}'s location is block at location({red::x}, {red::y}, {red::z}, world "%{world}%"):
+            set_block(blue_team(4), round({_p}'s x-coordinate), round({_p}'s y-coordinate) + 2, round({_p}'s z-coordinate), "bedrock")
+            set_block_flag(blue_team(4), round({_p}'s x-coordinate), round({_p}'s y-coordinate) + 3, round({_p}'s z-coordinate), blue_flag(4), blue_flag(5))
+            set_blue_flag(round({_p}'s x-coordinate), round({_p}'s y-coordinate) + 3, round({_p}'s z-coordinate))
         else:
-            set block at location({_p}'s x-coordinate, {_p}'s y-coordinate - 1, {_p}'s z-coordinate, world "ctf") to bedrock
-            set block at location at {_p}'s location to blue banner
-            set_blue_flag({_p}'s x-coordinate, {_p}'s y-coordinate, {_p}'s z-coordinate)
+            set_block(blue_team(4), round({_p}'s x-coordinate), round({_p}'s y-coordinate) - 1, round({_p}'s z-coordinate), "bedrock")
+            set_block_flag(blue_team(4), round({_p}'s x-coordinate), round({_p}'s y-coordinate), round({_p}'s z-coordinate), blue_flag(4), blue_flag(5))
+            set_blue_flag(round({_p}'s x-coordinate), round({_p}'s y-coordinate), round({_p}'s z-coordinate))
+
+# -------------------- scoreboard functions -------------------- #
+function game_time() :: string:
+    if {deathmatch}:
+        return "Next Point Wins!"
+    else if not {game::state}:
+        return "&6&m                               "
+    set {timer::min} to floor({game::time} / 60)
+    set {timer::sec} to mod({game::time}, 60)
+    if {timer::min} < 10:
+        if {timer::sec} < 10:
+            return "Round Ends In: 0%{timer::min}%:0%{timer::sec}%"
+        return "Round Ends In: 0%{timer::min}%:%{timer::sec}%"
+    else if {timer::sec} < 10:
+        return "Round Ends In: %{timer::min}%:0%{timer::sec}%"
+    return "Round Ends In: %{timer::min}%:%{timer::sec}%"
 
 function red_flag_status() :: text:
     if {red::flag::taker} is not "":
-        return "<red>Captured"
-    else if {red::x} is red_const(1):
-        return "<green>Home"
-    return "<yellow>Dropped"
+        return "&cCaptured"
+    else if {red::x} is red_flag(1):
+        return "&aHome"
+    return "&eDropped"
 
 function blue_flag_status() :: text:
     if {blue::flag::taker} is not "":
-        return "<red>Captured"
-    else if {blue::x} is blue_const(1):
-        return "<green>Home"
-    return "<yellow>Dropped"
+        return "&cCaptured"
+    else if {blue::x} is blue_flag(1):
+        return "&aHome"
+    return "&eDropped"
 
 function on_red(p: player) :: text:
     if {red::team::*} contains {_p}:
@@ -139,28 +609,55 @@ function on_blue(p: player) :: text:
 
 function get_round() :: text:
     if {round} is 0:
-        return "<green>1<reset> - 2 - 3 - 4 - 5"
+        return "&a&l1&7 - 2 - 3 - 5 - 5"
     else if {round} is 1:
-        return "1 - <green>2<reset> - 3 - 4 - 5"
+        return "&71 - &r&a&l2&r&7 - 3 - 4 - 5"
     else if {round} is 2:
-        return "1 - 2 - <green>3<reset> - 4 - 5"
+        return "&71 - 2 - &r&a&l3&r&7 - 4 - 5"
     else if {round} is 3:
-        return "1 - 2 - 3 - <green>4<reset> - 5"
+        return "&71 - 2 - 3 - &r&a&l4&r&7 - 5"
     else if {round} is 4:
-        return "1 - 2 - 3 - 4 - <green>5<reset>"
+        return "&71 - 2 - 3 - 4 - &r&a&l5"
 
 # -------------------- scoreboard -------------------- #
-on join:
-    if not is_on_team(player):
+on first join:
+    if {auto::team}:
+        wait 1 second
+        set slot 1 of player to 32 cooked beef
         if size of {red::team::*} > size of {blue::team::*}:
             remove_player_from_team(player)
-            wait 1 second
             add player to {blue::team::*}
+            set_lp(player, blue_team(8))
+            teleport player to blue_spawn()
         else:
             remove_player_from_team(player)
-            wait 1 second
             add player to {red::team::*}
+            set_lp(player, red_team(8))
+            teleport player to red_spawn()
 
+on join:
+    if {auto::team}:
+        if not is_on_team(player):
+            set slot 1 of player to 32 cooked beef
+            if size of {red::team::*} > size of {blue::team::*}:
+                remove_player_from_team(player)
+                add player to {blue::team::*}
+                set_lp(player, blue_team(8))
+                teleport player to blue_spawn()
+            else:
+                remove_player_from_team(player)
+                add player to {red::team::*}
+                set_lp(player, red_team(8))
+                teleport player to red_spawn()
+        else:
+            if {red::team::*} contains player:
+                set_lp(player, red_team(8))
+            else:
+                set_lp(player, blue_team(8))
+    else:
+        teleport player to lobby_spawn()
+        remove_player_from_team(player)
+        set_lp(player, "default")
     if {left::in::spectator::*} contains player:
         if {red::team::*} contains player:
             teleport player to red_spawn()
@@ -169,91 +666,106 @@ on join:
         remove player from {left::in::spectator::*}
     while player is online:
         if player is not in world "rooevents":
-            set line 1 of player's scoreboard to "<gray>Status: <reset>%blue_flag_status()%"
-            set line 2 of player's scoreboard to "<gray>Captures: %{blue::points}%/3"
-            set line 3 of player's scoreboard to "<bold><blue>Blue Team: %on_blue(player)%"
-            set line 4 of player's scoreboard to ""
-            set line 5 of player's scoreboard to "&6&m                              "
-            set line 6 of player's scoreboard to "<gray>Status: <reset>%red_flag_status()%"
-            set line 7 of player's scoreboard to "<gray>Captures: %{red::points}%/3"
-            set line 8 of player's scoreboard to "<bold><red>Red Team: %on_red(player)%"
-            set line 9 of player's scoreboard to ""
-            set line 10 of player's scoreboard to "&6&m                              "
-            set line 11 of player's scoreboard to "Round: %get_round()%"
-            set line 12 of player's scoreboard to "&6&m                              "
+            set line 1 of player's scoreboard to "&6&m                               "
+            set line 2 of player's scoreboard to game_time()
+            set line 3 of player's scoreboard to "&6&m                               "
+            set line 4 of player's scoreboard to "Status: %blue_flag_status()%"
+            set line 5 of player's scoreboard to "Points: %{blue::points}%/3"
+            set line 6 of player's scoreboard to "%blue_team(7)% %on_blue(player)%"
+            set line 7 of player's scoreboard to ""
+            set line 8 of player's scoreboard to "&6&m                               "
+            set line 9 of player's scoreboard to "Status: %red_flag_status()%"
+            set line 10 of player's scoreboard to "Points: %{red::points}%/3"
+            set line 11 of player's scoreboard to "%red_team(7)% %on_red(player)%"
+            set line 12 of player's scoreboard to ""
+            set line 13 of player's scoreboard to "&6&m                               "
+            set line 14 of player's scoreboard to "Round: %get_round()%"
+            set line 15 of player's scoreboard to "&6&m                               "
             set title of player's scoreboard to "&x&f&f&2&6&2&6&lR&x&f&f&3&a&2&1&lo&x&f&f&4&e&1&6&lo &x&f&f&6&2&1&8&lE&x&f&f&7&7&1&3&lv&x&f&f&8&b&0&e&le&x&f&f&9&f&0&a&ln&x&f&f&b&3&0&5&lt&x&f&f&c&7&0&0&ls"
         wait 1 second
 
-# -------------------- team choosing -------------------- #
-on region enter:
-    set {_temp::list::*} to size of {red::team::*} and size of {blue::team::*}
-    set {_temp::list::*} to sorted {_temp::list::*}
-    set {max::team::size} to {_temp::list::2}
-    if {_temp::list::1} >= {max::team::size} - 1:
-        if {_temp::list::2} >= {max::team::size} - 1:
-            add 1 to {max::team::size}
-    if "%region%" is "red_team in world ctf":
-        if {red::team::*} contains player:
-            teleport player to red_spawn()
-        else if size of {red::team::*} < {max::team::size}:
-            teleport player to red_spawn()
-            remove_player_from_team(player)
-            add player to {red::team::*}
-        else:
-            teleport player to team_choosing_spawn()
-    else if "%region%" is "blue_team in world ctf":
-        if {blue::team::*} contains player:
-            teleport player to blue_spawn()
-        else if size of {blue::team::*} < {max::team::size}:
-            teleport player to blue_spawn()
-            remove_player_from_team(player)
-            add player to {blue::team::*}
-        else:
-            teleport player to team_choosing_spawn()
-
 # -------------------- score points logic -------------------- #
 on region enter:
-    if "%region%" is "red_home in world ctf":
-        if player is {blue::flag::taker}:
-            set {blue::flag::taker} to ""
-            set_block_flag(blue_const(1), blue_const(2), blue_const(3), blue_const(4), blue_const(5))
-            set_blue_flag(blue_const(1), blue_const(2), blue_const(3))
-            clear_effect(player)
-            set_hat(player, "air")
-            add 1 to {red::points}
-            if {red::points} >= 3:
-                send title "<red>RED <reset>WINS" to all players
-                
-    else if "%region%" is "blue_home in world ctf":
-        if player is {red::flag::taker}:
-            set {red::flag::taker} to ""
-            set_block_flag(red_const(1), red_const(2), red_const(3), red_const(4), red_const(5))
-            set_red_flag(red_const(1), red_const(2), red_const(3))
-            clear_effect(player)
-            set_hat(player, "air")
-            add 1 to {blue::points}
-            if {blue::points} >= 3:
-                send title "<blue>BLUE <reset>WINS" to all players
+    if {game::state}:
+        if "%region%" is "red_home in world %{world}%":
+            if player is {blue::flag::taker}:
+                send title "" with subtitle "%red_team(7)%&r&c Has Scored a Point" to all players for 4 seconds
+                set {blue::flag::taker} to ""
+                set_block_flag(blue_team(4), blue_flag(1), blue_flag(2), blue_flag(3), blue_flag(4), blue_flag(5))
+                set_blue_flag(blue_flag(1), blue_flag(2), blue_flag(3))
+                clear_effect(player)
+                set_hat(player, "air")
+                add 1 to {red::points}
+                if {deathmatch}:
+                    set {game::state} to false
+                    send title "%red_team(7)% Wins!" to all players for 5 seconds
+                    execute console command "/execute at @a run playsound minecraft:entity.firework_rocket.twinkle player @p ~ ~ ~ 0.5 1"
+                    wait 7 seconds
+                    loop {blue::team::*}:
+                        set_gamemode(loop-value, "spectator")
+                    teleport all players to red_spawn()
+                else if {red::points} >= 3:
+                    set {game::state} to false
+                    send title "%red_team(7)% Wins!" to all players for 5 seconds
+                    execute console command "/execute at @a run playsound minecraft:entity.firework_rocket.twinkle player @p ~ ~ ~ 0.5 1"
+                    wait 7 seconds
+                    loop {blue::team::*}:
+                        set_gamemode(loop-value, "spectator")
+                    teleport all players to red_spawn()
+        else if "%region%" is "blue_home in world %{world}%":
+            if player is {red::flag::taker}:
+                send title "" with subtitle "%blue_team(7)%&r&c Has Scored a Point" to all players for 4 seconds
+                set {red::flag::taker} to ""
+                set_block_flag(red_team(4), red_flag(1), red_flag(2), red_flag(3), red_flag(4), red_flag(5))
+                set_red_flag(red_flag(1), red_flag(2), red_flag(3))
+                clear_effect(player)
+                set_hat(player, "air")
+                add 1 to {blue::points}
+                if {deathmatch}:
+                    set {game::state} to false
+                    send title "%blue_team(7)% Wins!" to all players for 5 seconds
+                    execute console command "/execute at @a run playsound minecraft:entity.firework_rocket.twinkle player @p ~ ~ ~ 0.5 1"
+                    wait 7 seconds
+                    loop {red::team::*}:
+                        set_gamemode(loop-value, "spectator")
+                    teleport all players to blue_spawn()
+                else if {blue::points} >= 3:
+                    set {game::state} to false
+                    send title "%blue_team(7)% Wins!" to all players for 5 seconds
+                    execute console command "/execute at @a run playsound minecraft:entity.firework_rocket.twinkle player @p ~ ~ ~ 0.5 1"
+                    wait 7 seconds
+                    loop {red::team::*}:
+                        set_gamemode(loop-value, "spectator")
+                    teleport all players to blue_spawn()
 
-# -------------------- ctf logic -------------------- #
+# -------------------- %{world}% logic -------------------- #
 on player walk:
-    if player is not in world "rooevents":
-        if is_on_team(player):
-            if gamemode of player is not spectator:
-                if block at player's location is block at location({red::x}, {red::y}, {red::z}, world "ctf"):
-                    if {red::flag::taker} is "":
-                        if {red::team::*} does not contain player:
-                            set block at location at player's location to air
-                            apply_effect(player)
-                            set_hat(player, "red_banner")
-                            set {red::flag::taker} to player
-                if block at player's location is block at location({blue::x}, {blue::y}, {blue::z}, world "ctf"):
-                    if {blue::flag::taker} is "":
-                        if {blue::team::*} does not contain player:
-                            set block at location at player's location to air
-                            apply_effect(player)
-                            set_hat(player, "blue_banner")
-                            set {blue::flag::taker} to player
+    if {game::state}:
+        if player is not in world "rooevents":
+            if is_on_team(player):
+                if gamemode of player is not spectator:
+                    if block at player's location is block at location({red::x}, {red::y}, {red::z}, world "%{world}%"):
+                        if {red::flag::taker} is "":
+                            if {red::team::*} does not contain player:
+                                set block at location at player's location to air
+                                apply_effect(player)
+                                set_hat(player, red_flag(4))
+                                set {red::flag::taker} to player
+                                if {red::x} is not red_flag(1):
+                                    send title "" with subtitle "%{red::flag::taker}%&c Picked Up The &r%red_team(7)% Flag" to all players for 4 seconds
+                                else:
+                                    send title "" with subtitle "%{red::flag::taker}%&c Captured The &r%red_team(7)% Flag" to all players for 4 seconds
+                    if block at player's location is block at location({blue::x}, {blue::y}, {blue::z}, world "%{world}%"):
+                        if {blue::flag::taker} is "":
+                            if {blue::team::*} does not contain player:
+                                set block at location at player's location to air
+                                apply_effect(player)
+                                set_hat(player, blue_flag(4))
+                                set {blue::flag::taker} to player
+                                if {blue::x} is not blue_flag(1):
+                                    send title "" with subtitle "%{blue::flag::taker}%&c Picked Up The &r%blue_team(7)% Flag" to all players for 4 seconds
+                                else:
+                                    send title "" with subtitle "%{blue::flag::taker}%&c Captured The &r%blue_team(7)% Flag" to all players for 4 seconds
 
 # -------------------- team killing -------------------- #
 on damage of player with priority highest:
@@ -272,14 +784,14 @@ on respawn:
         else if {blue::team::*} contains player:
             set respawn location to blue_spawn()
 
-# -------------------- reset logic -------------------- #
+# -------------------- on death logic -------------------- #
 on death with priority highest:
     if victim is not in world "rooevents":
         if is_on_team(victim):
             cancel event
             drop_flag(victim)
             set_gamemode(victim, "spectator")
-            set {_n} to 3
+            set {_n} to 10
             set {_c} to {_n}
             loop {_n} times:
                 send title "&a%{_c}%" to victim
@@ -292,13 +804,6 @@ on death with priority highest:
                 teleport victim to blue_spawn()
             set_gamemode(victim, "survival")
 
-# -------------------- flag particles -------------------- #
-every 0.5 second:
-    if {red::flag::taker} is "":
-        execute console command "/execute in minecraft:ctf run particle dust 1 0 0 2 %{red::x}% %{red::y} + 1% %{red::z}% 0 0.5 0 0 10"
-    if {blue::flag::taker} is "":
-        execute console command "/execute in minecraft:ctf run particle dust 0 0 1 2 %{blue::x}% %{blue::y} + 1% %{blue::z}% 0 0.5 0 0 10"
-
 # -------------------- other stuff -------------------- #
 on quit:
     drop_flag(player)
@@ -309,91 +814,168 @@ on break of banner:
     if player is not op:
         cancel event
 
+# -------------------- event timer -------------------- #
+every 1 second:
+    subtract 1 from {game::time}
+    if {game::state}:
+        if {game::time} < 0:
+            if {red::points} > {blue::points}:
+                set {game::state} to false
+                send title "%red_team(7)% Wins!" to all players for 5 seconds
+                execute console command "/execute at @a run playsound minecraft:entity.firework_rocket.twinkle player @p ~ ~ ~ 0.5 1"
+                wait 7 seconds
+                loop {blue::team::*}:
+                    set_gamemode(loop-value, "spectator")
+                teleport all players to red_spawn()
+            else if {blue::points} > {red::points}:
+                set {game::state} to false
+                send title "%blue_team(7)% Wins!" to all players for 5 seconds
+                execute console command "/execute at @a run playsound minecraft:entity.firework_rocket.twinkle player @p ~ ~ ~ 0.5 1"
+                wait 7 seconds
+                loop {red::team::*}:
+                    set_gamemode(loop-value, "spectator")
+                teleport all players to blue_spawn()
+            else if not {deathmatch}:
+                send title "&c&lDeathmatch" with subtitle "&6Next Point Wins!" to all players for 5 seconds
+                set {deathmatch} to true
+
+# -------------------- command functions -------------------- #
+function reset_round(r: number, w: text):
+    set {auto::team} to true
+    set {round} to {_r}
+    set {world} to {_w}
+    delete {red::team::*}
+    delete {blue::team::*}
+    set {red::points} to 0
+    set {blue::points} to 0
+    set {red::flag::taker} to ""
+    set {blue::flag::taker} to ""
+    set_red_flag(red_flag(1), red_flag(2), red_flag(3))
+    set_blue_flag(blue_flag(1), blue_flag(2), blue_flag(3))
+    set_block_flag(red_team(4), red_flag(1), red_flag(2), red_flag(3), red_flag(4), red_flag(5))
+    set_block_flag(blue_team(4), blue_flag(1), blue_flag(2), blue_flag(3), blue_flag(4), blue_flag(5))
+    loop all players:
+        clear_effect(loop-player)
+        set_hat(loop-player, "air")
+        if size of {blue::team::*} > size of {red::team::*}:
+            add loop-player to {red::team::*}
+            set_lp(loop-player, red_team(8))
+            teleport loop-player to red_spawn()
+        else:
+            add loop-player to {blue::team::*}
+            set_lp(loop-player, blue_team(8))
+            teleport loop-player to blue_spawn()
+
+function start_round():
+    send title "" with subtitle "&a&lGO" to all players for 4 seconds
+    set {game::time} to 1500
+    set {game::state} to true
+    loop all players:
+        set slot 1 of loop-player to 32 cooked beef
+
+function end_round():
+    set {game::state} to false
+    set {deathmatch} to false
+    set {auto::team} to false
+    delete {red::team::*}
+    delete {blue::team::*}
+    loop all players:
+        set_lp(loop-player, "default")
+        clear_effect(loop-player)
+        set_hat(loop-player, "air")
+    teleport all players to lobby_spawn()
+
 # -------------------- commands -------------------- #
-command /ctfboxopen:
+command /ctfround1:
     permission: op
     trigger:
-        # red
-        fill("ctf", 14, -54, 14, 10, -57, 10, "air")
-        # blue
-        fill("ctf", -10, -57, -10, -14, -54, -14, "air")
+        reset_round(0, "ctf1")
 
-command /ctfboxclose:
+command /ctfstart1:
     permission: op
     trigger:
-        # red
-        fill("ctf", 14, -54, 14, 10, -57, 10, "red_stained_glass")
-        fill("ctf", 13, -54, 13, 11, -56, 11, "air")
-        # blue
-        fill("ctf", -10, -57, -10, -14, -54, -14, "blue_stained_glass")
-        fill("ctf", -13, -54, -13, -11, -56, -11, "air")
+        start_round()
+        fill("ctf1", -42, 56, -685, -30, 52, -690, "air") # desert
+        fill("ctf1", -51, 56, 808, -63, 52, 813, "air") # plains
 
-command /ctfresetall:
+command /ctfend:
     permission: op
     trigger:
-        {round} = 0
-        delete {red::team::*}
-        delete {blue::team::*}
-        set {red::points} to 0
-        set {blue::points} to 0
-        set {red::flag::taker} to ""
-        set {blue::flag::taker} to ""
-        set_red_flag(red_const(1), red_const(2), red_const(3))
-        set_blue_flag(blue_const(1), blue_const(2), blue_const(3))
-        set_block_flag(red_const(1), red_const(2), red_const(3), red_const(4), red_const(5))
-        set_block_flag(blue_const(1), blue_const(2), blue_const(3), blue_const(4), blue_const(5))
-        loop all players:
-            clear_effect(loop-player)
-            set_hat(loop-player, "air")
+        end_round()
 
-command /ctfmaketeams:
+command /ctfround2:
     permission: op
     trigger:
-        loop all players:
-            if size of {red::team::*} > size of {blue::team::*}:
-                remove_player_from_team(loop-player)
-                add loop-player to {blue::team::*}
-            else:
-                remove_player_from_team(loop-player)
-                add loop-player to {red::team::*}
+        reset_round(1, "ctf2")
+
+command /ctfstart2:
+    permission: op
+    trigger:
+        start_round()
+        fill("ctf2", -72, 56, -689, -60, 52, -694, "air") # jungle
+        fill("ctf2", -61, 56, 804, -73, 52, 809, "air") # cherry
+
+command /ctfround3:
+    permission: op
+    trigger:
+        reset_round(2, "ctf3")
+
+command /ctfstart3:
+    permission: op
+    trigger:
+        start_round()
+        fill("ctf3", -68, 56, -669, -56, 52, -674, "air") # crimson
+        fill("ctf3", -59, 56, 823, -71, 52, 828, "air") # warped
+
+command /ctfround4:
+    permission: op
+    trigger:
+        reset_round(3, "ctf4")
+
+command /ctfstart4:
+    permission: op
+    trigger:
+        start_round()
+        fill("ctf4", -80, 56, -648, -68, 52, -653, "air") # spruce
+        fill("ctf4", -51, 56, 771, -63, 52, 776, "air") # snow
+
+command /ctfround5:
+    permission: op
+    trigger:
+        reset_round(4, "ctf5")
+
+command /ctfstart5:
+    permission: op
+    trigger:
+        start_round()
+        fill("ctf5", -105, 56, -646, -93, 52, -651, "air") # mushroom
+        fill("ctf5", -42, 56, 765, -54, 52, 770, "air") # savanna
 
 command /ctfsetteam <player> <string>:
     permission: op
     trigger:
-        if arg-2 is "red":
+        if arg-2 is red_team(8):
             remove_player_from_team(arg-1)
             add arg-1 to {red::team::*}
-        else if arg-2 is "blue":
+            teleport arg-1 to red_spawn()
+            set_lp(arg-1, red_team(8))
+        else if arg-2 is blue_team(8):
             remove_player_from_team(arg-1)
             add arg-1 to {blue::team::*}
+            teleport arg-1 to blue_spawn()
+            set_lp(arg-1, blue_team(8))
 
 command /ctftpteam <string>:
     permission: op
     trigger:
-        if arg-1 is "red":
+        if arg-1 is red_team(8):
             loop {red::team::*}:
                 teleport loop-value to player
-        else if arg-1 is "blue":
+        else if arg-1 is blue_team(8):
             loop {blue::team::*}:
                 teleport loop-value to player
 
-# command /ctfboxclose <string>:
-#     permission: op
-#     trigger:
-        # if arg-1 is "ctf1":
-        # else if arg-1 is "ctf2":
-        # else if arg-1 is "ctf3":
-        # else if arg-1 is "ctf4":
-        # else if arg-1 is "ctf5":
-
-# command /ctfround1:
-#     permission: op
-#     trigger:
-
-# command /ctfstart1:
-#     permission: op
-#     trigger:
-
-# command /ctfend1:
-#     permission: op
-#     trigger:
+command /ctfsettime <number>:
+    permission: op
+    trigger:
+        set {game::time} to arg-1

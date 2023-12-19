@@ -3,24 +3,26 @@ variables:
     {player_kills::%player%} = 0
 
 on join:
-    if player is in world "lobby":
+    if player is in world "rooevents":
         send title "&x&f&f&2&6&2&6&lR&x&f&f&3&a&2&1&lo&x&f&f&4&e&1&6&lo &x&f&f&6&2&1&8&lE&x&f&f&7&7&1&3&lv&x&f&f&8&b&0&e&le&x&f&f&9&f&0&a&ln&x&f&f&b&3&0&5&lt&x&f&f&c&7&0&0&ls" with subtitle "<light green><bold>Welcome %player%" to player for 4 seconds
     while player is online:
-        if player is in world "lobby":
-            if {status_timer::%player%} > 0:
-                set line 1 of player's scoreboard to "&cIn Combat <gold>(%{status_timer::%player%}%)"
-            else:
-                set line 1 of player's scoreboard to "<light green>Not In Combat"
+        if player is in world "rooevents":
+            set line 1 of player's scoreboard to "&6&m                              "
             set line 2 of player's scoreboard to ""
-            set line 3 of player's scoreboard to "Kill Streak: %{player_kills::%player%}%"
+            if {status_timer::%player%} > 0:
+                set line 3 of player's scoreboard to "&cIn Combat <gold>(%{status_timer::%player%}%)"
+            else:
+                set line 3 of player's scoreboard to "<light green>Not In Combat"
             set line 4 of player's scoreboard to ""
-            set line 5 of player's scoreboard to "&6&m                              "
+            set line 5 of player's scoreboard to "Kill Streak: %{player_kills::%player%}%"
+            set line 6 of player's scoreboard to ""
+            set line 7 of player's scoreboard to "&6&m                              "
             set title of player's scoreboard to "&x&f&f&2&6&2&6&lR&x&f&f&3&a&2&1&lo&x&f&f&4&e&1&6&lo &x&f&f&6&2&1&8&lE&x&f&f&7&7&1&3&lv&x&f&f&8&b&0&e&le&x&f&f&9&f&0&a&ln&x&f&f&b&3&0&5&lt&x&f&f&c&7&0&0&ls"
             subtract 1 from {status_timer::%player%}
         wait 1 second
 
 on quit:
-    if player is in world "lobby":
+    if player is in world "rooevents":
         if {status_timer::%player%} > 0:
             add 1 to {player_kills::%{last_attacker}%}
             add 1 to {player_kills::%{last_victim}%}
@@ -31,28 +33,28 @@ on quit:
     delete {last_victim}
 
 on damage:
-    if victim is in world "lobby":
+    if victim is in world "rooevents":
         set {last_attacker} to attacker
         set {last_victim} to victim
         set {status_timer::%victim%} to 6
         set {status_timer::%attacker%} to 6
 
 on death:
-    if victim is in world "lobby":
+    execute console command "/execute at %victim% run particle item minecraft:redstone ~ ~1 ~ 0 0 0 0.4 500 normal"
+    execute console command "/execute at %victim% run playsound minecraft:entity.dragon_fireball.explode player @a ~ ~ ~ 0.5 2"
+    if victim is in world "rooevents":
         execute console command "/minecraft:clear %victim%"
-        execute console command "/execute at %victim% run particle item minecraft:redstone ~ ~1 ~ 0 0 0 0.4 500 normal"
-        execute console command "/execute at %victim% run playsound minecraft:entity.dragon_fireball.explode player @a ~ ~ ~ 0.5 2"
         add 1 to {player_kills::%attacker%}
         set {status_timer::%victim%} to 0 
         set {player_kills::%victim%} to 0
         heal attacker
 
 on region enter:
-    if "%region%" is "up in world lobby":
+    if "%region%" is "up in world rooevents":
         if {status_timer::%player%} > 0:
             send "&c<bold>You can't go up whlie in combat!!!" to player
             cancel event
-    if "%region%" is "pvp in world lobby":
+    if "%region%" is "pvp in world rooevents":
         set slot 40 of player to unbreakable shield
         set slot 0 of player to unbreakable diamond sword
         set slot 1 of player to unbreakable diamond axe
@@ -63,12 +65,12 @@ on region enter:
         set boots of player to unbreakable diamond boots
 
 on region exit:
-    if "%region%" is "pvp in world lobby":
+    if "%region%" is "pvp in world rooevents":
         execute console command "/minecraft:clear %player%"
         set {player_kills::%player%} to 0
         heal player
         feed player
 
 on drop:
-    if player is in world "lobby":
+    if player is in world "rooevents":
         cancel event
