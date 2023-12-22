@@ -1,10 +1,38 @@
+# -------------------- global functions -------------------- #
 function fill(w: text, 1x: number, 1y: number, 1z: number, 2x: number, 2y: number, 2z: number, b: text):
     execute console command "/execute in minecraft:%{_w}% run forceload add %{_1x}% %{_1z}% %{_2x}% %{_2z}%"
     execute console command "/execute in minecraft:%{_w}% run fill %{_1x}% %{_1y}% %{_1z}% %{_2x}% %{_2y}% %{_2z}% minecraft:%{_b}%"
     execute console command "/execute in minecraft:%{_w}% run forceload remove %{_1x}% %{_1z}% %{_2x}% %{_2z}%"
 
+# -------------------- global events -------------------- #
+on chat with priority highest:
+    if {cooldown::*} does not contain player's uuid:
+        add player's uuid to {cooldown::*}
+        wait 3 second
+        remove player's uuid from {cooldown::*}
+    else:
+        cancel event
+        message "&cYou must wait 3 seconds before chatting again!"
+
+on inventory slot change:
+    if event-item is lava bucket:
+        if amount of lava buckets in player's inventory is greater than 1:
+            remove (amount of lava buckets in player's inventory - 1) of lava buckets from player's inventory
+            message "&cYou had too many buckets of lava in your inventory! The extra buckets have been evaporated."
+
 on join:
     clear scoreboard of player
 
-on world change with priority highest:
+on world change:
     clear scoreboard of player
+
+# -------------------- global commands -------------------- #
+command /eventclose:
+    permission: op
+    trigger:
+        fill("overworld", -17, -1, 1, -19, -1, -1, "light_blue_stained_glass")
+
+command /eventopen:
+    permission: op
+    trigger:
+        fill("overworld", -17, -1, 1, -19, -1, -1, "air")

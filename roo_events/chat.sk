@@ -1,8 +1,0 @@
-on chat with priority highest:
-    if {chatfilter::cooldownplayers::*} does not contain player's uuid:
-        add player's uuid to {chatfilter::cooldownplayers::*}
-        wait 3 second
-        remove player's uuid from {chatfilter::cooldownplayers::*}
-    else:
-        cancel event
-        message "&cYou must wait 3 seconds before chatting again!"

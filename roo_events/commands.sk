@@ -1,9 +1,0 @@
-command /eventclose:
-    permission: op
-    trigger:
-        fill("overworld", 33, -29, 18, 31, -29, 16, "light_blue_stained_glass")
-
-command /eventopen:
-    permission: op
-    trigger:
-        fill("overworld", 33, -29, 18, 31, -29, 16, "air")

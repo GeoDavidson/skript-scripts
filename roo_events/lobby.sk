@@ -2,21 +2,53 @@ variables:
     {status_timer::%player%} = 0
     {player_kills::%player%} = 0
 
+local function give_kit(p: player):
+    # execute console command "/minecraft:item replace entity %{_p}% hotbar.0 with minecraft:diamond_sword"
+    # execute console command "/minecraft:item replace entity %{_p}% hotbar.1 with minecraft:diamond_axe"
+    # execute console command "/minecraft:item replace entity %{_p}% hotbar.2 with minecraft:cooked_beef 64"
+    execute console command "/minecraft:give %{_p}% minecraft:diamond_sword"
+    execute console command "/minecraft:give %{_p}% minecraft:diamond_axe"
+    execute console command "/minecraft:give %{_p}% minecraft:cooked_beef 64"
+    execute console command "/minecraft:item replace entity %{_p}% armor.head with minecraft:diamond_helmet"
+    execute console command "/minecraft:item replace entity %{_p}% armor.chest with minecraft:diamond_chestplate"
+    execute console command "/minecraft:item replace entity %{_p}% armor.legs with minecraft:diamond_leggings"
+    execute console command "/minecraft:item replace entity %{_p}% armor.feet with minecraft:diamond_boots"
+    execute console command "/minecraft:item replace entity %{_p}% weapon.offhand with minecraft:shield"
+
+local function clear_kit(p: player):
+    execute console command "/minecraft:clear %{_p}% minecraft:diamond_sword"
+    execute console command "/minecraft:clear %{_p}% minecraft:diamond_axe"
+    execute console command "/minecraft:clear %{_p}% minecraft:cooked_beef"
+    execute console command "/minecraft:clear %{_p}% minecraft:diamond_helmet"
+    execute console command "/minecraft:clear %{_p}% minecraft:diamond_chestplate"
+    execute console command "/minecraft:clear %{_p}% minecraft:diamond_leggings"
+    execute console command "/minecraft:clear %{_p}% minecraft:diamond_boots"
+    execute console command "/minecraft:clear %{_p}% minecraft:shield"
+
+local function summon_particle(p: player):
+    execute console command "/execute at %{_p}% run particle item minecraft:redstone ~ ~1 ~ 0 0 0 0.4 500 normal"
+
+local function play_sound(p: player):
+    execute console command "/execute at %{_p}% run playsound minecraft:entity.dragon_fireball.explode player @a ~ ~ ~ 0.5 2"
+
+local function player_status(p: player) :: string:
+    if {status_timer::%{_p}%} > 0:
+        return "&cIn Combat &6(%{status_timer::%{_p}%}%)"
+    else:
+        return "&aNot In Combat"
+
 on join:
     if player is in world "rooevents":
         send title "&x&f&f&2&6&2&6&lR&x&f&f&3&a&2&1&lo&x&f&f&4&e&1&6&lo &x&f&f&6&2&1&8&lE&x&f&f&7&7&1&3&lv&x&f&f&8&b&0&e&le&x&f&f&9&f&0&a&ln&x&f&f&b&3&0&5&lt&x&f&f&c&7&0&0&ls" with subtitle "<light green><bold>Welcome %player%" to player for 4 seconds
     while player is online:
         if player is in world "rooevents":
-            set line 1 of player's scoreboard to "&6&m                              "
+            set line 1 of player's scoreboard to "&6&m                      "
             set line 2 of player's scoreboard to ""
-            if {status_timer::%player%} > 0:
-                set line 3 of player's scoreboard to "&cIn Combat <gold>(%{status_timer::%player%}%)"
-            else:
-                set line 3 of player's scoreboard to "<light green>Not In Combat"
+            set line 3 of player's scoreboard to player_status(player)
             set line 4 of player's scoreboard to ""
-            set line 5 of player's scoreboard to "Kill Streak: %{player_kills::%player%}%"
+            set line 5 of player's scoreboard to "&6Kill Streak: %{player_kills::%player%}%"
             set line 6 of player's scoreboard to ""
-            set line 7 of player's scoreboard to "&6&m                              "
+            set line 7 of player's scoreboard to "&6&m                      "
             set title of player's scoreboard to "&x&f&f&2&6&2&6&lR&x&f&f&3&a&2&1&lo&x&f&f&4&e&1&6&lo &x&f&f&6&2&1&8&lE&x&f&f&7&7&1&3&lv&x&f&f&8&b&0&e&le&x&f&f&9&f&0&a&ln&x&f&f&b&3&0&5&lt&x&f&f&c&7&0&0&ls"
             subtract 1 from {status_timer::%player%}
         wait 1 second
@@ -24,53 +56,41 @@ on join:
 on quit:
     if player is in world "rooevents":
         if {status_timer::%player%} > 0:
-            add 1 to {player_kills::%{last_attacker}%}
-            add 1 to {player_kills::%{last_victim}%}
             kill player
     delete {status_timer::%player%}
     delete {player_kills::%player%}
-    delete {last_attacker}
-    delete {last_victim}
 
 on damage:
     if victim is in world "rooevents":
-        set {last_attacker} to attacker
-        set {last_victim} to victim
         set {status_timer::%victim%} to 6
         set {status_timer::%attacker%} to 6
 
 on death:
-    execute console command "/execute at %victim% run particle item minecraft:redstone ~ ~1 ~ 0 0 0 0.4 500 normal"
-    execute console command "/execute at %victim% run playsound minecraft:entity.dragon_fireball.explode player @a ~ ~ ~ 0.5 2"
+    summon_particle(victim)
+    play_sound(victim)
     if victim is in world "rooevents":
-        execute console command "/minecraft:clear %victim%"
-        add 1 to {player_kills::%attacker%}
-        set {status_timer::%victim%} to 0 
+        clear_kit(victim)
+        set {status_timer::%victim%} to 0
         set {player_kills::%victim%} to 0
+        add 1 to {player_kills::%attacker%}
         heal attacker
 
 on region enter:
     if "%region%" is "up in world rooevents":
         if {status_timer::%player%} > 0:
-            send "&c<bold>You can't go up whlie in combat!!!" to player
+            message "&cYou can't go up whlie in combat!"
             cancel event
     if "%region%" is "pvp in world rooevents":
-        set slot 40 of player to unbreakable shield
-        set slot 0 of player to unbreakable diamond sword
-        set slot 1 of player to unbreakable diamond axe
-        set slot 2 of player to 64 cooked beef
-        set helmet of player to unbreakable diamond helmet
-        set chestplate of player to unbreakable diamond chestplate
-        set leggings of player to unbreakable diamond leggings
-        set boots of player to unbreakable diamond boots
+        give_kit(player)
 
 on region exit:
     if "%region%" is "pvp in world rooevents":
-        execute console command "/minecraft:clear %player%"
-        set {player_kills::%player%} to 0
+        clear_kit(player)
+        set {player_kills::%player%} to 0 
         heal player
         feed player
 
 on drop:
     if player is in world "rooevents":
-        cancel event
+        if player is not op:
+            cancel event

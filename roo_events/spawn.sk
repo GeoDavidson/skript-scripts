@@ -1,0 +1,41 @@
+on spawn:
+    if event-entity is a zombie:
+        chance of 15%:
+            execute console command "/disasters summon elf %event-entity's x-coordinate% %event-entity's y-coordinate% %event-entity's z-coordinate% test"
+        set event-entity's tool to wooden axe of sharpness 1
+        set {_item} to leather helmet
+        dye {_item} green
+        set event-entity's helmet to {_item}
+        set {_item} to leather chestplate
+        dye {_item} red
+        set event-entity's chestplate to {_item}
+        set {_item} to leather leggings
+        dye {_item} green
+        set event-entity's leggings to {_item}
+        set {_item} to leather boots
+        dye {_item} red
+        set event-entity's boots to {_item}
+    else if event-entity is a skeleton:
+        chance of 12%:
+            execute console command "/disasters summon frosty %event-entity's x-coordinate% %event-entity's y-coordinate% %event-entity's z-coordinate% test"
+        set event-entity's tool to wooden axe of sharpness 1
+        set {_item} to leather helmet
+        dye {_item} red
+        set event-entity's helmet to {_item}
+        set {_item} to leather chestplate
+        dye {_item} green
+        set event-entity's chestplate to {_item}
+        set {_item} to leather leggings
+        dye {_item} red
+        set event-entity's leggings to {_item}
+        set {_item} to leather boots
+        dye {_item} green
+        set event-entity's boots to {_item}
+    else if event-entity is a creeper:
+        chance of 10%:
+            execute console command "/disasters summon yeti %event-entity's x-coordinate% %event-entity's y-coordinate% %event-entity's z-coordinate% test"
+        cancel event
+    else if event-entity is a spider:
+        chance of 8%:
+            execute console command "/disasters summon grinch %event-entity's x-coordinate% %event-entity's y-coordinate% %event-entity's z-coordinate% test"
+        cancel event
