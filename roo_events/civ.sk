@@ -1,18 +1,231 @@
+# to-do:
+# luck perms
+# boxes
+# titles and messages
+
+# -------------------- state variables (don't modify) -------------------- #
+variables:
+    # ----- unnecessary initialization ----- #
+    # {red::team::*}
+    # {green::team::*}
+    # {blue::team::*}
+    # {white::team::*}
+    # {red::alive::*}
+    # {green::alive::*}
+    # {blue::alive::*}
+    # {white::alive::*}
+    # {is::dead::*}
+    # {in::spec::*}
+    {respawn} = true
+
+# -------------------- spawns -------------------- #
 local function team_choosing_spawn() :: object:
-    return location(0, -60, 0, world "test_flat", 0, 0)
+    return location(0.5, -60, 0.5, world "test_flat", 0, 0)
 
 local function red_spawn() :: object:
-    return location(6, -60, 9, world "test_flat", 0, 0)
+    return location(6.5, -60, 9.5, world "test_flat", 180, 0)
 
 local function green_spawn() :: object:
-    return location(2, -60, 9, world "test_flat", 0, 0)
+    return location(2.5, -60, 9.5, world "test_flat", 180, 0)
 
 local function blue_spawn() :: object:
-    return location(-2, -60, 9, world "test_flat", 0, 0)
+    return location(-2.5, -60, 9.5, world "test_flat", 180, 0)
 
 local function white_spawn() :: object:
-    return location(-6, -60, 9, world "test_flat", 0, 0)
+    return location(-6.5, -60, 9.5, world "test_flat", 180, 0)
 
+# -------------------- command function -------------------- #
+local function set_gamemode(p: player, m: text):
+    execute console command "/minecraft:gamemode %{_m}% %{_p}%"
+
+# -------------------- helper function -------------------- #
+local function remove_from_team(p: player):
+    remove {_p} from {red::team::*}
+    remove {_p} from {green::team::*}
+    remove {_p} from {blue::team::*}
+    remove {_p} from {white::team::*}
+
+local function remove_from_alive(p: player):
+    remove {_p} from {red::alive::*}
+    remove {_p} from {green::alive::*}
+    remove {_p} from {blue::alive::*}
+    remove {_p} from {white::alive::*}
+
+local function is_on_team(p: player) :: boolean:
+    if {red::team::*} contains {_p}:
+        return true
+    else if {green::team::*} contains {_p}:
+        return true
+    else if {blue::team::*} contains {_p}:
+        return true
+    else if {while::team::*} contains {_p}:
+        return true
+    return false
+
+# -------------------- scoreboard function -------------------- #
+local function get_team(p: player) :: text:
+    if {red::team::*} contains {_p}:
+        return "&c&lReindeer"
+    else if {green::team::*} contains {_p}:
+        return "&a&lGrinches"
+    else if {blue::team::*} contains {_p}:
+        return "&9&lElves"
+    else if {white::team::*} contains {_p}:
+        return "&b&lSnowmen"
+    return ""
+
+# -------------------- scoreboard -------------------- #
+on join:
+    if not {respawn}: # if {is::dead::*} contains player:
+        wait 1 tick
+        set_gamemode(player, "spectator")
+    else if {in::spec::*} contains player:
+        if {red::team::*} contains player:
+            add player to {red::alive::*}
+            teleport player to red_spawn()
+        else if {green::team::*} contains player:
+            add player to {green::alive::*}
+            teleport player to green_spawn()
+        else if {blue::team::*} contains player:
+            add player to {blue::alive::*}
+            teleport player to blue_spawn()
+        else if {white::team::*} contains player:
+            add player to {white::alive::*}
+            teleport player to white_spawn()
+        remove player from {in::spec::*}
+    else:
+        if {red::team::*} contains player:
+            add player to {red::alive::*}
+        else if {green::team::*} contains player:
+            add player to {green::alive::*}
+        else if {blue::team::*} contains player:
+            add player to {blue::alive::*}
+        else if {white::team::*} contains player:
+            add player to {white::alive::*}
+    while player is online:
+        if player is in world "test_flat":
+            set line 1 of player's scoreboard to "&6&m                               "
+            set line 2 of player's scoreboard to "%colored {phase}%:&r %game_time()%"
+            set line 3 of player's scoreboard to "&6&m                               "
+            set line 4 of player's scoreboard to "&b&lSnowmen Alive: %size of {white::alive::*}%"
+            set line 5 of player's scoreboard to "&9&lElves Alive: %size of {blue::alive::*}%"
+            set line 6 of player's scoreboard to "&a&lGrinches Alive: %size of {green::alive::*}%"
+            set line 7 of player's scoreboard to "&c&lReindeer Alive: %size of {red::alive::*}%"
+            set line 8 of player's scoreboard to ""
+            set line 9 of player's scoreboard to "&lTeam:&r %get_team(player)%"
+            set line 10 of player's scoreboard to "&6&m                               "
+            set title of player's scoreboard to "&x&f&f&2&6&2&6&lR&x&f&f&3&a&2&1&lo&x&f&f&4&e&1&6&lo &x&f&f&6&2&1&8&lE&x&f&f&7&7&1&3&lv&x&f&f&8&b&0&e&le&x&f&f&9&f&0&a&ln&x&f&f&b&3&0&5&lt&x&f&f&c&7&0&0&ls"
+        wait 1 second
+
+# -------------------- team choosing -------------------- #
+on region enter:
+    if gamemode of player is not spectator:
+        set {_max::team::size} to max(size of {red::team::*}, size of {green::team::*}, size of {blue::team::*}, size of {white::team::*})
+        if size of {red::team::*} >= {_max::team::size} - 1:
+            if size of {green::team::*} >= {_max::team::size} - 1:
+                if size of {blue::team::*} >= {_max::team::size} - 1:
+                    if size of {white::team::*} >= {_max::team::size} - 1:
+                        add 1 to {_max::team::size}
+        if "%region%" is "red_team in world test_flat":
+            if {red::team::*} contains player:
+                teleport player to red_spawn()
+            else if size of {red::team::*} < {_max::team::size}:
+                remove_from_team(player)
+                remove_from_alive(player)
+                add player to {red::team::*}
+                add player to {red::alive::*}
+                teleport player to red_spawn()
+            else:
+                teleport player to team_choosing_spawn()
+        else if "%region%" is "green_team in world test_flat":
+            if {green::team::*} contains player:
+                teleport player to green_spawn()
+            else if size of {green::team::*} < {_max::team::size}:
+                remove_from_team(player)
+                remove_from_alive(player)
+                add player to {green::team::*}
+                add player to {green::alive::*}
+                teleport player to green_spawn()
+            else:
+                teleport player to team_choosing_spawn()
+        else if "%region%" is "blue_team in world test_flat":
+            if {blue::team::*} contains player:
+                teleport player to blue_spawn()
+            else if size of {blue::team::*} < {_max::team::size}:
+                remove_from_team(player)
+                remove_from_alive(player)
+                add player to {blue::team::*}
+                add player to {blue::alive::*}
+                teleport player to blue_spawn()
+            else:
+                teleport player to team_choosing_spawn()
+        else if "%region%" is "white_team in world test_flat":
+            if {white::team::*} contains player:
+                teleport player to white_spawn()
+            else if size of {white::team::*} < {_max::team::size}:
+                remove_from_team(player)
+                remove_from_alive(player)
+                add player to {white::team::*}
+                add player to {white::alive::*}
+                teleport player to white_spawn()
+            else:
+                teleport player to team_choosing_spawn()
+
+# -------------------- team killing -------------------- #
+on damage of player with priority highest:
+    if {red::team::*} contains attacker:
+        if {red::team::*} contains victim:
+            cancel event
+    else if {green::team::*} contains attacker:
+        if {green::team::*} contains victim:
+            cancel event
+    else if {blue::team::*} contains attacker:
+        if {blue::team::*} contains victim:
+            cancel event
+    else if {white::team::*} contains attacker:
+        if {white::team::*} contains victim:
+            cancel event
+
+# -------------------- on death logic -------------------- #
+on death of player with priority highest:
+    if victim is not in world "rooevents":
+        if is_on_team(victim):
+            cancel event
+            remove_from_alive(victim)
+            set_gamemode(victim, "spectator")
+            if {respawn}:
+                set {_n} to 5
+                set {_c} to {_n}
+                loop {_n} times:
+                    send title "&a%{_c}%" to victim
+                    subtract 1 from {_c}
+                    wait 1 second
+                send title "" to victim
+                if {in::spec::*} does not contain victim:
+                    if {red::team::*} contains victim:
+                        add victim to {red::alive::*}
+                        teleport victim to red_spawn()
+                    else if {green::team::*} contains victim:
+                        add victim to {green::alive::*}
+                        teleport victim to green_spawn()
+                    else if {blue::team::*} contains victim:
+                        add victim to {blue::alive::*}
+                        teleport victim to blue_spawn()
+                    else if {white::team::*} contains victim:
+                        add victim to {white::alive::*}
+                        teleport victim to white_spawn()
+                    set_gamemode(victim, "survival")
+            else:
+                add victim to {is::dead::*}
+                send title "&cDead" to victim
+
+# -------------------- quit logic -------------------- #
+on quit:
+    remove_from_alive(player)
+    if gamemode of player is spectator:
+        add player to {in::spec::*}
+
+# -------------------- on spawn function -------------------- #
 local function set_armour(e: entity):
     set {_chance} to a random integer between 1 and 2
     if {_chance} is 1:
@@ -43,74 +256,6 @@ local function set_armour(e: entity):
     else:
         dye {_item} green
     set {_e}'s boots to {_item}
-
-local function remove_player(p: player):
-    remove {_p} from {red::team::*}
-    remove {_p} from {green::team::*}
-    remove {_p} from {blue::team::*}
-    remove {_p} from {white::team::*}
-
-# local function get_team() :: text:
-
-# -------------------- team choosing -------------------- #
-on region enter:
-    set {_temp::list::*} to size of {red::team::*}, size of {green::team::*}, size of {blue::team::*} and size of {white::team::*}
-    set {_temp::list::*} to sorted {_temp::list::*}
-    set {max::team::size} to {_temp::list::4}
-    if {_temp::list::1} >= {max::team::size} - 1:
-        if {_temp::list::2} >= {max::team::size} - 1:
-            if {_temp::list::3} >= {max::team::size} - 1:
-                if {_temp::list::4} >= {max::team::size} - 1:
-                    add 1 to {max::team::size}
-    if "%region%" is "red_team in world test_flat":
-        if size of {red::team::*} < {max::team::size}:
-            remove_player(player)
-            add player to {red::team::*}
-            teleport player to red_spawn()
-            message "Red Team"
-        else:
-            teleport player to team_choosing_spawn()
-    else if "%region%" is "green_team in world test_flat":
-        if size of {green::team::*} < {max::team::size}:
-            remove_player(player)
-            add player to {green::team::*}
-            teleport player to green_spawn()
-            message "Green Team"
-        else:
-            teleport player to team_choosing_spawn()
-    else if "%region%" is "blue_team in world test_flat":
-        if size of {blue::team::*} < {max::team::size}:
-            remove_player(player)
-            add player to {blue::team::*}
-            teleport player to blue_spawn()
-            message "Blue Team"
-        else:
-            teleport player to team_choosing_spawn()
-    else if "%region%" is "white_team in world test_flat":
-        if size of {white::team::*} < {max::team::size}:
-            remove_player(player)
-            add player to {white::team::*}
-            teleport player to white_spawn()
-            message "White Team"
-        else:
-            teleport player to team_choosing_spawn()
-
-# -------------------- scoreboard -------------------- #
-on join:
-    while player is online:
-        if player is in world "test_flat":
-            set line 1 of player's scoreboard to "&6&m                               "
-            set line 2 of player's scoreboard to "Phase: 00:00"
-            set line 3 of player's scoreboard to "&6&m                               "
-            set line 4 of player's scoreboard to "Snowman Alive: %size of {white::team::*}%"
-            set line 5 of player's scoreboard to "Elves Alive: %size of {blue::team::*}%"
-            set line 6 of player's scoreboard to "Grinches Alive: %size of {green::team::*}%"
-            set line 7 of player's scoreboard to "Reindeer Alive: %size of {red::team::*}%"
-            set line 8 of player's scoreboard to ""
-            set line 9 of player's scoreboard to "Team: NULL"
-            set line 10 of player's scoreboard to "&6&m                               "
-            set title of player's scoreboard to "&x&f&f&2&6&2&6&lR&x&f&f&3&a&2&1&lo&x&f&f&4&e&1&6&lo &x&f&f&6&2&1&8&lE&x&f&f&7&7&1&3&lv&x&f&f&8&b&0&e&le&x&f&f&9&f&0&a&ln&x&f&f&b&3&0&5&lt&x&f&f&c&7&0&0&ls"
-        wait 1 second
 
 # -------------------- custome spawn -------------------- #
 on spawn:
@@ -152,10 +297,105 @@ on rightclick:
             send action bar ""
             remove player's uuid from {cooldown::*}
 
-command /resetall:
+# -------------------- commands -------------------- #
+command /civresetall:
     permission: op
     trigger:
         delete {red::team::*}
         delete {green::team::*}
         delete {blue::team::*}
         delete {white::team::*}
+        delete {red::alive::*}
+        delete {green::alive::*}
+        delete {blue::alive::*}
+        delete {white::alive::*}
+        delete {is::dead::*}
+        delete {in::spec::*}
+        set {respawn} to true
+
+command /civrespawn <boolean>:
+    permission: op
+    trigger:
+        set {respawn} to arg-1
+
+command /civsetteam <player> <text>:
+    permission: op
+    trigger:
+        if arg-2 is "reindeer":
+            remove_from_team(arg-1)
+            remove_from_alive(arg-1)
+            add arg-1 to {red::team::*}
+            add arg-1 to {red::alive::*}
+        else if arg-2 is "grinches":
+            remove_from_team(arg-1)
+            remove_from_alive(arg-1)
+            add arg-1 to {green::team::*}
+            add arg-1 to {green::alive::*}
+        else if arg-2 is "elves":
+            remove_from_team(arg-1)
+            remove_from_alive(arg-1)
+            add arg-1 to {blue::team::*}
+            add arg-1 to {blue::alive::*}
+        else if arg-2 is "snowman":
+            remove_from_team(arg-1)
+            remove_from_alive(arg-1)
+            add arg-1 to {white::team::*}
+            add arg-1 to {white::alive::*}
+
+command /civtpteam <text>:
+    permission: op
+    trigger:
+        if arg-1 is "reindeer":
+            loop {red::team::*}:
+                teleport loop-value to player
+        else if arg-1 is "grinches":
+            loop {green::team::*}:
+                teleport loop-value to player
+        else if arg-1 is "elves":
+            loop {blue::team::*}:
+                teleport loop-value to player
+        else if arg-1 is "snowman":
+            loop {white::team::*}:
+                teleport loop-value to player
+
+command /civreviveall:
+    permission: op
+    trigger:
+        loop {is::dead::*}:
+            if is_on_team(loop-value):
+                remove_from_alive(loop-value)
+                remove loop-value from {is::dead::*}
+                if {red::team::*} contains loop-value:
+                    add loop-value to {red::alive::*}
+                    teleport loop-value to red_spawn()
+                else if {green::team::*} contains loop-value:
+                    add loop-value to {green::alive::*}
+                    teleport loop-value to green_spawn()
+                else if {blue::team::*} contains loop-value:
+                    add loop-value to {blue::alive::*}
+                    teleport loop-value to blue_spawn()
+                else if {white::team::*} contains loop-value:
+                    add loop-value to {white::alive::*}
+                    teleport loop-value to white_spawn()
+                set_gamemode(loop-value, "survival")
+
+command /civreviveplayer <player>:
+    permission: op
+    trigger:
+        if {is::dead::*} contains arg-1:
+            if is_on_team(arg-1):
+                remove_from_alive(arg-1)
+                remove arg-1 from {is::dead::*}
+                if {red::team::*} contains arg-1:
+                    add arg-1 to {red::alive::*}
+                    teleport arg-1 to red_spawn()
+                else if {green::team::*} contains arg-1:
+                    add arg-1 to {green::alive::*}
+                    teleport arg-1 to green_spawn()
+                else if {blue::team::*} contains arg-1:
+                    add arg-1 to {blue::alive::*}
+                    teleport arg-1 to blue_spawn()
+                else if {white::team::*} contains arg-1:
+                    add arg-1 to {white::alive::*}
+                    teleport arg-1 to white_spawn()
+                set_gamemode(arg-1, "survival")

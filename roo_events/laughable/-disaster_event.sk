@@ -1,0 +1,579 @@
+on region enter:
+    if "%region%" is "red in world cd":
+        if ({event::red::playercount} - 1) is not greater than {event::blue::playercount}:
+            if ({event::red::playercount} - 1) is not greater than {event::green::playercount}:
+                set {_uuid} to uuid of player
+                if {event::red::players::*} contains {_uuid}:
+                    remove {_uuid} from {event::red::players::*}
+                    set {event::red::playercount} to ({event::red::playercount} - 1)
+                    remove {_uuid} from {event::red::aaoplayers::*}
+                if {event::blue::players::*} contains {_uuid}:
+                    remove {_uuid} from {event::blue::players::*}
+                    set {event::blue::playercount} to ({event::blue::playercount} - 1)
+                    remove {_uuid} from {event::blue::aaoplayers::*}
+                if {event::green::players::*} contains {_uuid}:
+                    remove {_uuid} from {event::green::players::*}
+                    set {event::green::playercount} to ({event::green::playercount} - 1)
+                    remove {_uuid} from {event::green::aaoplayers::*}
+                add {_uuid} to {event::red::players::*}
+                add {_uuid} to {event::red::aaoplayers::*}
+                set {event::red::playercount} to ({event::red::playercount} + 1)
+                execute console command "lp user %player% parent set red"
+                teleport player to location(-511, 72, -456, world "cd")
+                message "&aYou joined the &6Desert Team!"
+            else:
+                teleport player to location(-91, -62, -178, world "cd")
+                message "&cThe team you tried to join is full! Join another team or wait for the teams to balance out."
+        else:
+            teleport player to location(-91, -62, -178, world "cd")
+            message "&cThe team you tried to join is full! Join another team or wait for the teams to balance out."
+    else if "%region%" is "blue in world cd":
+        if ({event::blue::playercount} - 1) is not greater than {event::red::playercount}:
+            if ({event::blue::playercount} - 1) is not greater than {event::green::playercount}:
+                set {_uuid} to uuid of player
+                if {event::red::players::*} contains {_uuid}:
+                    remove {_uuid} from {event::red::players::*}
+                    set {event::red::playercount} to ({event::red::playercount} - 1)
+                    remove {_uuid} from {event::red::aaoplayers::*}
+                if {event::blue::players::*} contains {_uuid}:
+                    remove {_uuid} from {event::blue::players::*}
+                    set {event::blue::playercount} to ({event::blue::playercount} - 1)
+                    remove {_uuid} from {event::blue::aaoplayers::*}
+                if {event::green::players::*} contains {_uuid}:
+                    remove {_uuid} from {event::green::players::*}
+                    set {event::green::playercount} to ({event::green::playercount} - 1)
+                    remove {_uuid} from {event::green::aaoplayers::*}
+                add {_uuid} to {event::blue::players::*}
+                add {_uuid} to {event::blue::aaoplayers::*}
+                set {event::blue::playercount} to ({event::blue::playercount} + 1)
+                execute console command "lp user %player% parent set blue"
+                teleport player to location(314, 48, -522, world "cd")
+                message "&aYou joined the &bSnow Team!"
+            else:
+                teleport player to location(-91, -62, -178, world "cd")
+                message "&cThe team you tried to join is full! Join another team or wait for the teams to balance out."
+        else:
+            teleport player to location(-91, -62, -178, world "cd")
+            message "&cThe team you tried to join is full! Join another team or wait for the teams to balance out."
+    else if "%region%" is "green in world cd":
+        if ({event::green::playercount} - 1) is not greater than {event::red::playercount}:
+            if ({event::green::playercount} - 1) is not greater than {event::blue::playercount}:
+                set {_uuid} to uuid of player
+                if {event::red::players::*} contains {_uuid}:
+                    remove {_uuid} from {event::red::players::*}
+                    set {event::red::playercount} to ({event::red::playercount} - 1)
+                    remove {_uuid} from {event::red::aaoplayers::*}
+                if {event::blue::players::*} contains {_uuid}:
+                    remove {_uuid} from {event::blue::players::*}
+                    set {event::blue::playercount} to ({event::blue::playercount} - 1)
+                    remove {_uuid} from {event::blue::aaoplayers::*}
+                if {event::green::players::*} contains {_uuid}:
+                    remove {_uuid} from {event::green::players::*}
+                    set {event::green::playercount} to ({event::green::playercount} - 1)
+                    remove {_uuid} from {event::green::aaoplayers::*}
+                add {_uuid} to {event::green::players::*}
+                add {_uuid} to {event::green::aaoplayers::*}
+                set {event::green::playercount} to ({event::green::playercount} + 1)
+                execute console command "lp user %player% parent set green"
+                teleport player to location(29, 48, 316, world "cd")
+                message "&aYou joined the &aPlains Team!"
+            else:
+                teleport player to location(-91, -62, -178, world "cd")
+                message "&cThe team you tried to join is full! Join another team or wait for the teams to balance out."
+        else:
+            teleport player to location(-91, -62, -178, world "cd")
+            message "&cThe team you tried to join is full! Join another team or wait for the teams to balance out."
+
+on damage of player:
+    if final damage is greater than or equal to health of victim:
+        if world of victim is not "lobby":
+            if {event::permadeath} is true:
+                if {event::dead::*} does not contain victim's uuid:
+                    cancel event
+                    set victim's gamemode to spectator
+                    heal victim   #Heal the player just in case they need to be revived
+                    set {_p} to victim
+                    drop all items in {_p}'s inventory
+                    execute console command "/minecraft:clear %victim%"   #No duping
+                    remove victim's uuid from {event::alive::*}
+                    add victim's uuid to {event::dead::*}
+                    if {event::red::players::*} contains victim's uuid:
+                        remove victim's uuid from {event::red::aaoplayers::*}
+                    if {event::blue::players::*} contains victim's uuid:
+                        remove victim's uuid from {event::blue::aaoplayers::*}
+                    if {event::green::players::*} contains victim's uuid:
+                        remove victim's uuid from {event::green::aaoplayers::*}
+                    strike lightning effect at the victim
+                    if attacker is not a player:
+                        if {event::red::players::*} contains victim's uuid:
+                            broadcast "&8The player &6%victim% &8has been eliminated!"
+                        else if {event::blue::players::*} contains victim's uuid:
+                            broadcast "&8The player &b%victim% &8has been eliminated!"
+                        else if {event::green::players::*} contains victim's uuid:
+                            broadcast "&8The player &a%victim% &8has been eliminated!"
+                        else:
+                            broadcast "&8The player &7%victim% &8has been eliminated!"
+                    else:
+                        if {event::red::players::*} contains victim's uuid:
+                            if {event::red::players::*} contains attacker's uuid:
+                                broadcast "&8The player &6%victim% &8has been eliminated by &6%attacker%&8!"
+                            else if {event::blue::players::*} contains attacker's uuid:
+                                broadcast "&8The player &6%victim% &8has been eliminated by &b%attacker%&8!"
+                            else if {event::green::players::*} contains attacker's uuid:
+                                broadcast "&8The player &6%victim% &8has been eliminated by &a%attacker%&8!"
+                            else:
+                                broadcast "&8The player &6%victim% &8has been eliminated by &7%attacker%&8!"
+                        else if {event::blue::players::*} contains victim's uuid:
+                            if {event::red::players::*} contains attacker's uuid:
+                                broadcast "&8The player &b%victim% &8has been eliminated by &6%attacker%&8!"
+                            else if {event::blue::players::*} contains attacker's uuid:
+                                broadcast "&8The player &b%victim% &8has been eliminated by &b%attacker%&8!"
+                            else if {event::green::players::*} contains attacker's uuid:
+                                broadcast "&8The player &b%victim% &8has been eliminated by &a%attacker%&8!"
+                            else:
+                                broadcast "&8The player &b%victim% &8has been eliminated by &7%attacker%&8!"
+                        else if {event::green::players::*} contains victim's uuid:
+                            if {event::red::players::*} contains attacker's uuid:
+                                broadcast "&8The player &a%victim% &8has been eliminated by &6%attacker%&8!"
+                            else if {event::blue::players::*} contains attacker's uuid:
+                                broadcast "&8The player &a%victim% &8has been eliminated by &b%attacker%&8!"
+                            else if {event::green::players::*} contains attacker's uuid:
+                                broadcast "&8The player &a%victim% &8has been eliminated by &a%attacker%&8!"
+                            else:
+                                broadcast "&8The player &a%victim% &8has been eliminated by &7%attacker%&8!"
+                        else:
+                            if {event::red::players::*} contains attacker's uuid:
+                                broadcast "&8The player &7%victim% &8has been eliminated by &6%attacker%&8!"
+                            else if {event::blue::players::*} contains attacker's uuid:
+                                broadcast "&8The player &7%victim% &8has been eliminated by &b%attacker%&8!"
+                            else if {event::green::players::*} contains attacker's uuid:
+                                broadcast "&8The player &7%victim% &8has been eliminated by &a%attacker%&8!"
+                            else:
+                                broadcast "&8The player &7%victim% &8has been eliminated by &7%attacker%&8!"
+            else:
+                if {event::red::players::*} contains victim's uuid:
+                    cancel event
+                    set victim's gamemode to spectator
+                    heal victim   # heal the player just in case they need to be revived
+                    feed victim
+                    set {_p} to victim
+                    drop all items in {_p}'s inventory
+                    execute console command "/minecraft:clear %victim%"   # no duping
+                    # make an explosion effect at location of victim
+                    if attacker is a player:
+                        if {event::red::players::*} contains attacker's uuid:
+                            broadcast "&6%victim% &rwas killed by &6%attacker%&r!"
+                        else if {event::blue::players::*} contains attacker's uuid:
+                            broadcast "&6%victim% &rwas killed by &9%attacker%&r!"
+                        else if {event::green::players::*} contains attacker's uuid:
+                            broadcast "&6%victim% &rwas killed by &a%attacker%&r!"
+                        else:
+                            broadcast "&6%victim% &rwas killed by &7%attacker%&r!"
+                    else:
+                        broadcast "&6%victim% &rdied!"
+                    send title "&a10" to victim   #Revive Countdown
+                    wait 1 second
+                    send title "&a9" to victim
+                    wait 1 second
+                    send title "&a8" to victim
+                    wait 1 second
+                    send title "&a7" to victim
+                    wait 1 second
+                    send title "&a6" to victim
+                    wait 1 second
+                    send title "&a5" to victim
+                    wait 1 second
+                    send title "&a4" to victim
+                    wait 1 second
+                    send title "&a3" to victim
+                    wait 1 second
+                    send title "&a2" to victim
+                    wait 1 second
+                    send title "&a1" to victim
+                    wait 1 second
+                    send title " " to victim   #End of Revive Countdown
+                    teleport victim to location(-511, 72, -456, world "cd")
+                    set victim's gamemode to survival
+                else if {event::blue::players::*} contains victim's uuid:
+                    cancel event
+                    set victim's gamemode to spectator
+                    heal victim   #Heal the player just in case they need to be revived
+                    feed victim
+                    set {_p} to victim
+                    drop all items in {_p}'s inventory
+                    execute console command "/minecraft:clear %victim%"   #No duping
+                    make an explosion effect at location of victim
+                    if attacker is a player:
+                        if {event::red::players::*} contains attacker's uuid:
+                            broadcast "&b%victim% &rwas killed by &6%attacker%&r!"
+                        else if {event::blue::players::*} contains attacker's uuid:
+                            broadcast "&b%victim% &rwas killed by &9%attacker%&r!"
+                        else if {event::green::players::*} contains attacker's uuid:
+                            broadcast "&b%victim% &rwas killed by &a%attacker%&r!"
+                        else:
+                            broadcast "&b%victim% &rwas killed by &7%attacker%&r!"
+                    else:
+                        broadcast "&b%victim% &rdied!"
+                    send title "&a10" to victim   #Revive Countdown
+                    wait 1 second
+                    send title "&a9" to victim
+                    wait 1 second
+                    send title "&a8" to victim
+                    wait 1 second
+                    send title "&a7" to victim
+                    wait 1 second
+                    send title "&a6" to victim
+                    wait 1 second
+                    send title "&a5" to victim
+                    wait 1 second
+                    send title "&a4" to victim
+                    wait 1 second
+                    send title "&a3" to victim
+                    wait 1 second
+                    send title "&a2" to victim
+                    wait 1 second
+                    send title "&a1" to victim
+                    wait 1 second
+                    send title " " to victim   #End of Revive Countdown
+                    teleport victim to location(314, 48, -522, world "cd")
+                    set victim's gamemode to survival
+                else if {event::green::players::*} contains victim's uuid:
+                    cancel event
+                    set victim's gamemode to spectator
+                    heal victim   #Heal the player just in case they need to be revived
+                    feed victim
+                    set {_p} to victim
+                    drop all items in {_p}'s inventory
+                    execute console command "/minecraft:clear %victim%"   #No duping
+                    make an explosion effect at location of victim
+                    if attacker is a player:
+                        if {event::red::players::*} contains attacker's uuid:
+                            broadcast "&a%victim% &rwas killed by &6%attacker%&r!"
+                        else if {event::blue::players::*} contains attacker's uuid:
+                            broadcast "&a%victim% &rwas killed by &9%attacker%&r!"
+                        else if {event::green::players::*} contains attacker's uuid:
+                            broadcast "&a%victim% &rwas killed by &a%attacker%&r!"
+                        else:
+                            broadcast "&a%victim% &rwas killed by &7%attacker%&r!"
+                    else:
+                        broadcast "&a%victim% &rdied!"
+                    send title "&a10" to victim   #Revive Countdown
+                    wait 1 second
+                    send title "&a9" to victim
+                    wait 1 second
+                    send title "&a8" to victim
+                    wait 1 second
+                    send title "&a7" to victim
+                    wait 1 second
+                    send title "&a6" to victim
+                    wait 1 second
+                    send title "&a5" to victim
+                    wait 1 second
+                    send title "&a4" to victim
+                    wait 1 second
+                    send title "&a3" to victim
+                    wait 1 second
+                    send title "&a2" to victim
+                    wait 1 second
+                    send title "&a1" to victim
+                    wait 1 second
+                    send title " " to victim   #End of Revive Countdown
+                    teleport victim to location(29, 48, 316, world "cd")
+                    set victim's gamemode to survival
+        else:
+            cancel event
+            make an explosion effect at location of victim
+            broadcast "&8The Player &c%victim% &8Was Killed By &c%attacker% &8In the Pvp Arena"
+            heal victim
+            feed victim
+            teleport victim to location(49, -28, 17, world "lobby", 90, 0)
+
+on chat with priority highest:
+    if player's gamemode is spectator:
+        if player does not have permission "event.admin":
+            cancel event
+
+on leave:
+    if {event::red::players::*} contains player's uuid:
+        remove player's uuid from {event::red::aaoplayers::*}
+    if {event::blue::players::*} contains player's uuid:
+        remove player's uuid from {event::blue::aaoplayers::*}
+    if {event::green::players::*} contains player's uuid:
+        remove player's uuid from {event::green::aaoplayers::*}
+
+on join:
+    if {event::alive::*} contains player's uuid:
+        if {event::red::players::*} contains player's uuid:
+            if {event::red::aooplayers::*} does not contain player's uuid:
+                add player's uuid to {event::red::aaoplayers::*}
+        if {event::blue::players::*} contains player's uuid:
+            if {event::blue::aooplayers::*} does not contain player's uuid:
+                add player's uuid to {event::blue::aaoplayers::*}
+        if {event::green::players::*} contains player's uuid:
+            if {event::green::aooplayers::*} does not contain player's uuid:
+                add player's uuid to {event::green::aaoplayers::*}
+
+command /permadeath <boolean>:
+    permission: event.admin
+    trigger:
+        if arg-1 is true:
+            set {event::permadeath} to true
+            broadcast "&c&lPermadeath &8Has been enabled. &cYou may no longer respawn"
+        else if arg-1 is false:
+            set {event::permadeath} to false
+            broadcast "&a&lPermadeath &8Has been disabled. &aYou may now respawn"
+
+command /revive <player> [<string>]:
+    permission: event.admin
+    trigger:
+        if {event::dead::*} contains arg-1's uuid:
+            remove arg-1's uuid from {event::dead::*}
+            add arg-1's uuid to {event::alive::*}
+            if {event::red::players::*} contains arg-1's uuid:
+                if {event::red::aaoplayers::*} does not contain arg-1's uuid:
+                    add arg-1's uuid to {event::red::aaoplayers::*}
+            if {event::blue::players::*} contains arg-1's uuid:
+                if {event::blue::aaoplayers::*} does not contain arg-1's uuid:
+                    add arg-1's uuid to {event::blue::aaoplayers::*}
+            if {event::green::players::*} contains arg-1's uuid:
+                if {event::green::aaoplayers::*} does not contain arg-1's uuid:
+                    add arg-1's uuid to {event::green::aaoplayers::*}
+            teleport arg-1 to player
+            set arg-1's gamemode to survival
+            if arg-2 is not "-s":
+                message "&a%arg-1% &8has been &aRevived &8by %player%."
+        else:
+            message "&cThat player is very much alive."
+
+
+command /reviveall:
+    permission: event.admin
+    trigger:
+        loop {event::dead::*}:
+            set {_p} to loop-value parsed as offline player
+            if {_p} is online:
+                remove {_p}'s uuid from {event::dead::*}
+                add {_p}'s uuid to {event::alive::*}
+                if {event::red::players::*} contains {_p}'s uuid:
+                    if {event::red::aaoplayers::*} does not contain {_p}'s uuid:
+                        add {_p}'s uuid to {event::red::aaoplayers::*}
+                if {event::blue::players::*} contains {_p}'s uuid:
+                    if {event::blue::aaoplayers::*} does not contain {_p}'s uuid:
+                        add {_p}'s uuid to {event::blue::aaoplayers::*}
+                if {event::green::players::*} contains {_p}'s uuid:
+                    if {event::green::aaoplayers::*} does not contain {_p}'s uuid:
+                        add {_p}'s uuid to {event::green::aaoplayers::*}
+                teleport {_p} to player
+                set {_p}'s gamemode to survival
+
+
+command /reseteverything [<string>]:
+    permission: event.admin
+    trigger:
+        if arg-1 is "confirm":
+            broadcast "&cResetting All Event Data."
+            delete {event::alive::*}
+            message "&aRemoved Alive Players"
+            delete {event::dead::*}
+            message "&aRemoved Dead Players"
+            delete {event::red::players::*}
+            message "&aRemoved &6&lDesert &aPlayers"
+            delete {event::blue::players::*}
+            message "&aRemoved &b&lSnow &aPlayers"
+            delete {event::green::players::*}
+            message "&aRemoved &a&lPlains &aPlayers"
+            delete {event::red::aaoplayers::*}
+            message "&aRemoved &6&lDessery &aAlive and Online Players"
+            delete {event::blue::aaoplayers::*}
+            message "&aRemoved &b&lSnow &aAlive and Online Players"
+            delete {event::green::aaoplayers::*}
+            message "&aRemoved &a&lPlains &aAlive and Online Players"
+            delete {event::red::playercount}
+            delete {event::blue::playercount}
+            delete {event::green::playercount}
+            message "&aRemoved Team Choosing Player Counts"
+            loop all players:
+                if loop-player has permission "group.red":
+                    execute console command "lp user %loop-player% parent set default"
+                else if loop-player has permission "group.blue":
+                    execute console command "lp user %loop-player% parent set default"
+                else if loop-player has permission "group.green":
+                    execute console command "lp user %loop-player% parent set default"
+            broadcast "&aReset Complete!"
+        else:
+            message "&cAre you &c&lSURE &r&cyou want to reset everything? This resets every variable and basically deletes all player information. &aType /reseteverything confirm to confirm."
+
+command /setteam <player> <string>:
+    permission: event.admin
+    trigger:
+        if arg-2 is "red":
+            set {_uuid} to uuid of arg-1
+            if {event::red::players::*} contains {_uuid}:
+                remove {_uuid} from {event::red::players::*}
+                remove {_uuid} from {event::red::aaoplayers::*}
+                set {event::red::playercount} to ({event::red::playercount} - 1)
+            if {event::blue::players::*} contains {_uuid}:
+                remove {_uuid} from {event::blue::players::*}
+                remove {_uuid} from {event::blue::aaoplayers::*}
+                set {event::blue::playercount} to ({event::blue::playercount} - 1)
+            if {event::green::players::*} contains {_uuid}:
+                remove {_uuid} from {event::green::players::*}
+                remove {_uuid} from {event::green::aaoplayers::*}
+                set {event::green::playercount} to ({event::green::playercount} - 1)
+            add {_uuid} to {event::red::players::*}
+            add {_uuid} to {event::red::aaoplayers::*}
+            set {event::red::playercount} to ({event::red::playercount} + 1)
+            execute console command "lp user %arg-1% parent set red"
+        if arg-2 is "blue":
+            set {_uuid} to uuid of arg-1
+            if {event::red::players::*} contains {_uuid}:
+                remove {_uuid} from {event::red::players::*}
+                remove {_uuid} from {event::red::aaoplayers::*}
+                set {event::red::playercount} to ({event::red::playercount} - 1)
+            if {event::blue::players::*} contains {_uuid}:
+                remove {_uuid} from {event::blue::players::*}
+                remove {_uuid} from {event::blue::aaoplayers::*}
+                set {event::blue::playercount} to ({event::blue::playercount} - 1)
+            if {event::green::players::*} contains {_uuid}:
+                remove {_uuid} from {event::green::players::*}
+                remove {_uuid} from {event::green::aaoplayers::*}
+                set {event::green::playercount} to ({event::green::playercount} - 1)
+            add {_uuid} to {event::blue::players::*}
+            add {_uuid} to {event::blue::aaoplayers::*}
+            set {event::blue::playercount} to ({event::blue::playercount} + 1)
+            execute console command "lp user %arg-1% parent set blue"
+        if arg-2 is "green":
+            set {_uuid} to uuid of arg-1
+            if {event::red::players::*} contains {_uuid}:
+                remove {_uuid} from {event::red::players::*}
+                remove {_uuid} from {event::red::aaoplayers::*}
+                set {event::red::playercount} to ({event::red::playercount} - 1)
+            if {event::blue::players::*} contains {_uuid}:
+                remove {_uuid} from {event::blue::players::*}
+                remove {_uuid} from {event::blue::aaoplayers::*}
+                set {event::blue::playercount} to ({event::blue::playercount} - 1)
+            if {event::green::players::*} contains {_uuid}:
+                remove {_uuid} from {event::green::players::*}
+                remove {_uuid} from {event::green::aaoplayers::*}
+                set {event::green::playercount} to ({event::green::playercount} - 1)
+            add {_uuid} to {event::green::players::*}
+            add {_uuid} to {event::green::aaoplayers::*}
+            set {event::red::playercount} to ({event::green::playercount} + 1)
+            execute console command "lp user %arg-1% parent set green"
+        if arg-2 is "none":
+            set {_uuid} to uuid of arg-1
+            if {event::red::players::*} contains {_uuid}:
+                remove {_uuid} from {event::red::players::*}
+                remove {_uuid} from {event::red::aaoplayers::*}
+                set {event::red::playercount} to ({event::red::playercount} - 1)
+            if {event::blue::players::*} contains {_uuid}:
+                remove {_uuid} from {event::blue::players::*}
+                remove {_uuid} from {event::blue::aaoplayers::*}
+                set {event::blue::playercount} to ({event::blue::playercount} - 1)
+            if {event::green::players::*} contains {_uuid}:
+                remove {_uuid} from {event::green::players::*}
+                remove {_uuid} from {event::green::aaoplayers::*}
+                set {event::green::playercount} to ({event::green::playercount} - 1)
+            execute console command "lp user %arg-1% parent set default"
+
+on damage of player with priority highest:
+    if {event::red::players::*} contains victim's uuid:
+        if {event::red::players::*} contains attacker's uuid:
+            cancel event
+    else if {event::blue::players::*} contains victim's uuid:
+        if {event::blue::players::*} contains attacker's uuid:
+            cancel event
+    else if {event::green::players::*} contains victim's uuid:
+        if {event::green::players::*} contains attacker's uuid:
+            cancel event
+
+on join:
+    if {event::dead::*} contains player's uuid:
+        wait 0.1 seconds
+        set player's gamemode to spectator
+
+on respawn:
+    set player's gamemode to spectator
+    teleport player to location(-90, 35, -180, world "cd")
+
+command /fix:
+    permission: event.admin
+    trigger:
+        delete {event::red::aaoplayers::*}
+        delete {event::green::aaoplayers::*}
+        delete {event::blue::aaoplayers::*}
+        loop all players:
+            if loop-player's gamemode is survival:
+                if {event::red::players::*} contains loop-player's uuid:
+                    add loop-player's uuid to {event::red::aaoplayers::*}
+                if {event::green::players::*} contains loop-player's uuid:
+                    add loop-player's uuid to {event::green::aaoplayers::*}
+                if {event::blue::players::*} contains loop-player's uuid:
+                    add loop-player's uuid to {event::blue::aaoplayers::*}
+
+#scoreboard
+on join:
+    while player is online:
+        if player is in world "event":
+            set title of player's scoreboard to " "
+            set line 15 of player's scoreboard to "&x&f&f&2&6&2&6&lR&x&f&f&3&a&2&1&lo&x&f&f&4&e&1&6&lo &x&f&f&6&2&1&8&lE&x&f&f&7&7&1&3&lv&x&f&f&8&b&0&e&le&x&f&f&9&f&0&a&ln&x&f&f&b&3&0&5&lt&x&f&f&c&7&0&0&ls"
+            set line 14 of player's scoreboard to "&6&m                              "
+            if {event::red::players::*} contains player's uuid:
+                set line 13 of player's scoreboard to "&fTeam: &6&lDesert"
+            else if {event::blue::players::*} contains player's uuid:
+                set line 13 of player's scoreboard to "&fTeam: &b&lSnow"
+            else if {event::green::players::*} contains player's uuid:
+                set line 13 of player's scoreboard to "&fTeam: &a&lPlains"
+            else:
+                set line 13 of player's scoreboard to "&fTeam: &7&lNone"
+            set line 8 of player's scoreboard to " "
+            set line 7 of player's scoreboard to "&6&lDesert &7Alive: &f%size of {event::red::aaoplayers::*}%"
+            set line 6 of player's scoreboard to "&b&lSnow &7Alive: &f%size of {event::blue::aaoplayers::*}%"
+            set line 5 of player's scoreboard to "&a&lPlains &7Alive: &f%size of {event::green::aaoplayers::*}%"
+            set line 4 of player's scoreboard to "&6&m                              "
+            set line 3 of player's scoreboard to colored {event::phase}
+            set line 2 of player's scoreboard to "Time: %gettimer()%"
+            set line 1 of player's scoreboard to "&6&m                              "
+        wait 1 second
+
+command /setphase <string>:
+    permission: event.admin
+    trigger:
+        set {event::phase} to arg-1
+        message "&8You set the phase to %colored arg-1%&8."
+
+command /settimer <integer>:
+    permission: event.admin
+    trigger:
+        if arg-1 is not less than 0:
+            set {event::timer::time} to arg-1
+
+every 1 second:
+    if {event::timer::*} is set:
+        set {event::timer::minutes} to rounded down ({event::timer::time} / 60)
+        set {event::timer::seconds} to ({event::timer::time} - ({event::timer::minutes} * 60))
+        if {event::timer::time} is greater than 0:
+            subtract 1 from {event::timer::time}
+        else:
+            delete {event::timer::*}
+
+function gettimer() :: string:
+    if {event::timer::*} is set:
+        if {event::timer::minutes} is greater than 0:
+            if {event::timer::seconds} is greater than 0:
+                if {event::timer::seconds} is not greater than 9:
+                    return "%{event::timer::minutes}%:0%{event::timer::seconds}%"
+                else:
+                    return "%{event::timer::minutes}%:%{event::timer::seconds}%"
+            else:
+                return "%{event::timer::minutes}%:00"
+        else:
+            if {event::timer::seconds} is greater than 0:
+                if {event::timer::seconds} is not greater than 9:
+                    return "0:0%{event::timer::seconds}%"
+                else:
+                    return "0:%{event::timer::seconds}%"
+            else:
+                return "0:00"
+    else:
+        return "0:00"
