@@ -23,79 +23,79 @@ variables:
 function lobby_spawn() :: object:
     return location(0.5, 0, 0.5, world "rooevents", 90, 0)
 
-function desert_spawn() :: object:
-    return location(-36, 52, -687, world "ctf1", 0, 0)
+function ctf1_red_spawn() :: object:
+    return location(0, 0, 0, world "ctf1", 0, 0)
 
-function plains_spawn() :: object:
-    return location(-57, 52, 810, world "ctf1", 180, 0)
+function ctf1_blue_spawn() :: object:
+    return location(0, 0, 0, world "ctf1", 180, 0)
 
-function jungle_spawn() :: object:
-    return location(-66, 52, -691, world "ctf2", 0, 0)
+function ctf2_red_spawn() :: object:
+    return location(0, 0, 0, world "ctf2", 0, 0)
 
-function cherry_spawn() :: object:
-    return location(-67, 52, 806, world "ctf2", 180, 0)
+function ctf2_blue_spawn() :: object:
+    return location(0, 0, 0, world "ctf2", 180, 0)
 
-function crimson_spawn() :: object:
-    return location(-62, 52, -671, world "ctf3", 0, 0)
+function ctf3_red_spawn() :: object:
+    return location(0, 0, 0, world "ctf3", 0, 0)
 
-function warped_spawn() :: object:
-    return location(-65, 52, 825, world "ctf3", 180, 0)
+function ctf3_blue_spawn() :: object:
+    return location(0, 0, 0, world "ctf3", 180, 0)
 
-function spruce_spawn() :: object:
-    return location(-74, 52, -650, world "ctf4", 0, 0)
+function ctf4_red_spawn() :: object:
+    return location(0, 0, 0, world "ctf4", 0, 0)
 
-function snow_spawn() :: object:
-    return location(-56, 52, 773, world "ctf4", 180, 0)
+function ctf4_blue_spawn() :: object:
+    return location(0, 0, 0, world "ctf4", 180, 0)
 
-function mushroom_spawn() :: object:
-    return location(-99, 52, -648, world "ctf5", 0, 0)
+function ctf5_red_spawn() :: object:
+    return location(0, 0, 0, world "ctf5", 0, 0)
 
-function savanna_spawn() :: object:
-    return location(-48, 52, 767, world "ctf5", 180, 0)
+function ctf5_blue_spawn() :: object:
+    return location(0, 0, 0, world "ctf5", 180, 0)
 
 # -------------------- spawn locations dynamics -------------------- #
 function red_spawn() :: object:
     if "%{world}%" is "ctf1":
         if not {game::state}:
-            return desert_spawn()
+            return ctf1_red_spawn()
         return location(ctf1_desert_team(1), ctf1_desert_team(2), ctf1_desert_team(3), ctf1_desert_team(4), ctf1_desert_team(5), ctf1_desert_team(6))
     else if "%{world}%" is "ctf2":
         if not {game::state}:
-            return jungle_spawn()
+            return ctf2_red_spawn()
         return location(ctf2_jungle_team(1), ctf2_jungle_team(2), ctf2_jungle_team(3), ctf2_jungle_team(4), ctf2_jungle_team(5), ctf2_jungle_team(6))
     else if "%{world}%" is "ctf3":
         if not {game::state}:
-            return crimson_spawn()
+            return ctf3_red_spawn()
         return location(ctf3_crimson_team(1), ctf3_crimson_team(2), ctf3_crimson_team(3), ctf3_crimson_team(4), ctf3_crimson_team(5), ctf3_crimson_team(6))
     else if "%{world}%" is "ctf4":
         if not {game::state}:
-            return spruce_spawn()
+            return ctf4_red_spawn()
         return location(ctf4_spruce_team(1), ctf4_spruce_team(2), ctf4_spruce_team(3), ctf4_spruce_team(4), ctf4_spruce_team(5), ctf4_spruce_team(6))
     else if "%{world}%" is "ctf5":
         if not {game::state}:
-            return mushroom_spawn()
+            return ctf5_red_spawn()
         return location(ctf5_muchroom_team(1), ctf5_muchroom_team(2), ctf5_muchroom_team(3), ctf5_muchroom_team(4), ctf5_muchroom_team(5), ctf5_muchroom_team(6))
 
 function blue_spawn() :: object:
     if "%{world}%" is "ctf1":
         if not {game::state}:
-            return plains_spawn()
+            return ctf1_blue_spawn()
         return location(ctf1_plains_team(1), ctf1_plains_team(2), ctf1_plains_team(3), ctf1_plains_team(4), ctf1_plains_team(5), ctf1_plains_team(6))
     else if "%{world}%" is "ctf2":
         if not {game::state}:
-            return cherry_spawn()
+            return ctf2_blue_spawn()
         return location(ctf2_cherry_team(1), ctf2_cherry_team(2), ctf2_cherry_team(3), ctf2_cherry_team(4), ctf2_cherry_team(5), ctf2_cherry_team(6))
     else if "%{world}%" is "ctf3":
         if not {game::state}:
-            return warped_spawn()
+            return ctf3_blue_spawn()
         return location(ctf3_warped_team(1), ctf3_warped_team(2), ctf3_warped_team(3), ctf3_warped_team(4), ctf3_warped_team(5), ctf3_warped_team(6))
     else if "%{world}%" is "ctf4":
         if not {game::state}:
-            return snow_spawn()
+            return ctf5_blue_spawn()
         return location(ctf4_snow_team(1), ctf4_snow_team(2), ctf4_snow_team(3), ctf4_snow_team(4), ctf4_snow_team(5), ctf4_snow_team(6))
     else if "%{world}%" is "ctf5":
         if not {game::state}:
-            return savanna_spawn()
+            return ctf5_blue_spawn()
         return location(ctf5_savanna_team(1), ctf5_savanna_team(2), ctf5_savanna_team(3), ctf5_savanna_team(4), ctf5_savanna_team(5), ctf5_savanna_team(6))
 
 # -------------------- team constants -------------------- #

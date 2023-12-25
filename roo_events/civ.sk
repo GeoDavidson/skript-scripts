@@ -4,33 +4,36 @@ variables:
     # {red::team::*}
     # {green::team::*}
     # {blue::team::*}
-    # {white::team::*}
+    # {yellow::team::*}
     # {red::alive::*}
     # {green::alive::*}
     # {blue::alive::*}
-    # {white::alive::*}
+    # {yellow::alive::*}
     # {is::dead::*}
     # {in::spec::*}
+    # {civ::combat::*}
+    # ----- global initialization ----- #
+    # {combat::cooldown::%player%} = 0
     {respawn} = true
 
 # -------------------- spawns -------------------- #
 local function lobby_spawn() :: object:
-    return location(0, 0, 0, world "rooevents", 90, 0)
+    return location(0.5, 0, 0.5, world "rooevents", 90, 0)
 
 local function team_choosing_spawn() :: object:
-    return location(0.5, -60, 0.5, world "test_flat", 0, 0)
+    return location(0.5, -62, 0.5, world "cc", 0, 0)
 
 local function red_spawn() :: object:
-    return location(6.5, -60, 9.5, world "test_flat", 180, 0)
+    return location(12.5, -62, 5.5, world "cc", 180, 0)
 
 local function green_spawn() :: object:
-    return location(2.5, -60, 9.5, world "test_flat", 180, 0)
+    return location(16.5, -62, 5.5, world "cc", 180, 0)
 
 local function blue_spawn() :: object:
-    return location(-2.5, -60, 9.5, world "test_flat", 180, 0)
+    return location(14.5, -62, 5.5, world "cc", 180, 0)
 
-local function white_spawn() :: object:
-    return location(-6.5, -60, 9.5, world "test_flat", 180, 0)
+local function yellow_spawn() :: object:
+    return location(10.5, -62, 5.5, world "cc", 180, 0)
 
 # -------------------- command function -------------------- #
 local function set_gamemode(p: player, m: text):
@@ -44,13 +47,13 @@ local function remove_from_team(p: player):
     remove {_p} from {red::team::*}
     remove {_p} from {green::team::*}
     remove {_p} from {blue::team::*}
-    remove {_p} from {white::team::*}
+    remove {_p} from {yellow::team::*}
 
 local function remove_from_alive(p: player):
     remove {_p} from {red::alive::*}
     remove {_p} from {green::alive::*}
     remove {_p} from {blue::alive::*}
-    remove {_p} from {white::alive::*}
+    remove {_p} from {yellow::alive::*}
 
 local function is_on_team(p: player) :: boolean:
     if {red::team::*} contains {_p}:
@@ -59,9 +62,22 @@ local function is_on_team(p: player) :: boolean:
         return true
     else if {blue::team::*} contains {_p}:
         return true
-    else if {while::team::*} contains {_p}:
+    else if {yellow::team::*} contains {_p}:
         return true
     return false
+
+local function clean_up():
+    delete {red::team::*}
+    delete {green::team::*}
+    delete {blue::team::*}
+    delete {yellow::team::*}
+    delete {red::alive::*}
+    delete {green::alive::*}
+    delete {blue::alive::*}
+    delete {yellow::alive::*}
+    delete {is::dead::*}
+    delete {in::spec::*}
+    set {respawn} to true
 
 # -------------------- scoreboard function -------------------- #
 local function get_team(p: player) :: text:
@@ -70,9 +86,9 @@ local function get_team(p: player) :: text:
     else if {green::team::*} contains {_p}:
         return "&a&lGrinches"
     else if {blue::team::*} contains {_p}:
-        return "&9&lElves"
-    else if {white::team::*} contains {_p}:
         return "&b&lSnowmen"
+    else if {yellow::team::*} contains {_p}:
+        return "&e&lElves"
     return ""
 
 # -------------------- scoreboard -------------------- #
@@ -90,10 +106,23 @@ on join:
         else if {blue::team::*} contains player:
             add player to {blue::alive::*}
             teleport player to blue_spawn()
-        else if {white::team::*} contains player:
-            add player to {white::alive::*}
-            teleport player to white_spawn()
+        else if {yellow::team::*} contains player:
+            add player to {yellow::alive::*}
+            teleport player to yellow_spawn()
         remove player from {in::spec::*}
+    else if {civ::combat::*} contain player:
+        if {red::team::*} contains player:
+            add player to {red::alive::*}
+            teleport player to red_spawn()
+        else if {green::team::*} contains player:
+            add player to {green::alive::*}
+            teleport player to green_spawn()
+        else if {blue::team::*} contains player:
+            add player to {blue::alive::*}
+            teleport player to blue_spawn()
+        else if {yellow::team::*} contains player:
+            add player to {yellow::alive::*}
+            teleport player to yellow_spawn() 
     else:
         if {red::team::*} contains player:
             add player to {red::alive::*}
@@ -101,15 +130,16 @@ on join:
             add player to {green::alive::*}
         else if {blue::team::*} contains player:
             add player to {blue::alive::*}
-        else if {white::team::*} contains player:
-            add player to {white::alive::*}
+        else if {yellow::team::*} contains player:
+            add player to {yellow::alive::*}
+    remove player from {civ::combat::*}
     while player is online:
-        if player is in world "test_flat":
+        if player is in world "cc":
             set line 1 of player's scoreboard to "&6&m                               "
             set line 2 of player's scoreboard to "%colored {phase}%:&r %game_time()%"
             set line 3 of player's scoreboard to "&6&m                               "
-            set line 4 of player's scoreboard to "&b&lSnowmen Alive: %size of {white::alive::*}%"
-            set line 5 of player's scoreboard to "&9&lElves Alive: %size of {blue::alive::*}%"
+            set line 4 of player's scoreboard to "&e&lElves Alive: %size of {yellow::alive::*}%"
+            set line 5 of player's scoreboard to "&b&lSnowmen Alive: %size of {blue::alive::*}%"
             set line 6 of player's scoreboard to "&a&lGrinches Alive: %size of {green::alive::*}%"
             set line 7 of player's scoreboard to "&c&lReindeer Alive: %size of {red::alive::*}%"
             set line 8 of player's scoreboard to ""
@@ -121,13 +151,13 @@ on join:
 # -------------------- team choosing -------------------- #
 on region enter:
     if gamemode of player is not spectator:
-        set {_max::team::size} to max(size of {red::team::*}, size of {green::team::*}, size of {blue::team::*}, size of {white::team::*})
+        set {_max::team::size} to max(size of {red::team::*}, size of {green::team::*}, size of {blue::team::*}, size of {yellow::team::*})
         if size of {red::team::*} >= {_max::team::size} - 1:
             if size of {green::team::*} >= {_max::team::size} - 1:
                 if size of {blue::team::*} >= {_max::team::size} - 1:
-                    if size of {white::team::*} >= {_max::team::size} - 1:
+                    if size of {yellow::team::*} >= {_max::team::size} - 1:
                         add 1 to {_max::team::size}
-        if "%region%" is "red_team in world test_flat":
+        if "%region%" is "red in world cc":
             if {red::team::*} contains player:
                 teleport player to red_spawn()
             else if size of {red::team::*} < {_max::team::size}:
@@ -139,7 +169,7 @@ on region enter:
                 teleport player to red_spawn()
             else:
                 teleport player to team_choosing_spawn()
-        else if "%region%" is "green_team in world test_flat":
+        else if "%region%" is "green in world cc":
             if {green::team::*} contains player:
                 teleport player to green_spawn()
             else if size of {green::team::*} < {_max::team::size}:
@@ -151,28 +181,28 @@ on region enter:
                 teleport player to green_spawn()
             else:
                 teleport player to team_choosing_spawn()
-        else if "%region%" is "blue_team in world test_flat":
+        else if "%region%" is "blue in world cc":
             if {blue::team::*} contains player:
                 teleport player to blue_spawn()
             else if size of {blue::team::*} < {_max::team::size}:
                 remove_from_team(player)
                 remove_from_alive(player)
-                set_lp(player, "elf")
+                set_lp(player, "snowman")
                 add player to {blue::team::*}
                 add player to {blue::alive::*}
                 teleport player to blue_spawn()
             else:
                 teleport player to team_choosing_spawn()
-        else if "%region%" is "white_team in world test_flat":
-            if {white::team::*} contains player:
-                teleport player to white_spawn()
-            else if size of {white::team::*} < {_max::team::size}:
+        else if "%region%" is "yellow in world cc":
+            if {yellow::team::*} contains player:
+                teleport player to yellow_spawn()
+            else if size of {yellow::team::*} < {_max::team::size}:
                 remove_from_team(player)
                 remove_from_alive(player)
-                set_lp(player, "snowman")
-                add player to {white::team::*}
-                add player to {white::alive::*}
-                teleport player to white_spawn()
+                set_lp(player, "elf")
+                add player to {yellow::team::*}
+                add player to {yellow::alive::*}
+                teleport player to yellow_spawn()
             else:
                 teleport player to team_choosing_spawn()
 
@@ -187,16 +217,15 @@ on damage of player with priority highest:
     else if {blue::team::*} contains attacker:
         if {blue::team::*} contains victim:
             cancel event
-    else if {white::team::*} contains attacker:
-        if {white::team::*} contains victim:
+    else if {yellow::team::*} contains attacker:
+        if {yellow::team::*} contains victim:
             cancel event
 
 # -------------------- on death logic -------------------- #
 on death of player with priority highest:
-    if victim is not in world "rooevents":
+    if victim is in world "cc":
         if is_on_team(victim):
             cancel event
-            remove_from_alive(victim)
             set_gamemode(victim, "spectator")
             if {respawn}:
                 set {_n} to 5
@@ -208,58 +237,39 @@ on death of player with priority highest:
                 send title "" to victim
                 if {in::spec::*} does not contain victim:
                     if {red::team::*} contains victim:
-                        add victim to {red::alive::*}
                         teleport victim to red_spawn()
                     else if {green::team::*} contains victim:
-                        add victim to {green::alive::*}
                         teleport victim to green_spawn()
                     else if {blue::team::*} contains victim:
-                        add victim to {blue::alive::*}
                         teleport victim to blue_spawn()
-                    else if {white::team::*} contains victim:
-                        add victim to {white::alive::*}
-                        teleport victim to white_spawn()
+                    else if {yellow::team::*} contains victim:
+                        teleport victim to yellow_spawn()
                     set_gamemode(victim, "survival")
             else:
+                remove_from_alive(victim)
                 add victim to {is::dead::*}
+                strike lightning effect at the victim
                 send title "&cDead" to victim
 
 # -------------------- quit logic -------------------- #
 on quit:
     remove_from_alive(player)
+    if {combat::cooldown::%player%} > 0:
+        add player to {civ::combat::*}
     if gamemode of player is spectator:
         add player to {in::spec::*}
 
-# -------------------- custome items -------------------- #
-on rightclick:
-    if player is holding a feather:
-        if {cooldown::*} does not contain player's uuid:
-            push player forwards at speed 1
-            add player's uuid to {cooldown::*}
-            set {_n} to 3
-            set {_c} to {_n}
-            loop {_n} times:
-                send action bar "&c%{_c}%"
-                subtract 1 from {_c}
-                wait 1 second
-            send action bar ""
-            remove player's uuid from {cooldown::*}
+# -------------------- no chat -------------------- #
+on chat with priority highest:
+    if player's gamemode is spectator:
+        if player is not op:
+            cancel event
 
 # -------------------- commands -------------------- #
 command /civresetall:
     permission: op
     trigger:
-        delete {red::team::*}
-        delete {green::team::*}
-        delete {blue::team::*}
-        delete {white::team::*}
-        delete {red::alive::*}
-        delete {green::alive::*}
-        delete {blue::alive::*}
-        delete {white::alive::*}
-        delete {is::dead::*}
-        delete {in::spec::*}
-        set {respawn} to true
+        clean_up()
         loop all players:
             set_lp(loop-player, "default")
 
@@ -283,17 +293,17 @@ command /civsetteam <player> <text>:
             add arg-1 to {green::team::*}
             add arg-1 to {green::alive::*}
             set_lp(arg-1, arg-2)
-        else if arg-2 is "elves":
+        else if arg-2 is "snowman":
             remove_from_team(arg-1)
             remove_from_alive(arg-1)
             add arg-1 to {blue::team::*}
             add arg-1 to {blue::alive::*}
             set_lp(arg-1, arg-2)
-        else if arg-2 is "snowman":
+        else if arg-2 is "elves":
             remove_from_team(arg-1)
             remove_from_alive(arg-1)
-            add arg-1 to {white::team::*}
-            add arg-1 to {white::alive::*}
+            add arg-1 to {yellow::team::*}
+            add arg-1 to {yellow::alive::*}
             set_lp(arg-1, arg-2)
 
 command /civtpteam <text>:
@@ -305,11 +315,11 @@ command /civtpteam <text>:
         else if arg-1 is "grinches":
             loop {green::team::*}:
                 teleport loop-value to player
-        else if arg-1 is "elves":
+        else if arg-1 is "snowman":
             loop {blue::team::*}:
                 teleport loop-value to player
-        else if arg-1 is "snowman":
-            loop {white::team::*}:
+        else if arg-1 is "elves":
+            loop {yellow::team::*}:
                 teleport loop-value to player
 
 command /civreviveall:
@@ -328,9 +338,9 @@ command /civreviveall:
                 else if {blue::team::*} contains loop-value:
                     add loop-value to {blue::alive::*}
                     teleport loop-value to blue_spawn()
-                else if {white::team::*} contains loop-value:
-                    add loop-value to {white::alive::*}
-                    teleport loop-value to white_spawn()
+                else if {yellow::team::*} contains loop-value:
+                    add loop-value to {yellow::alive::*}
+                    teleport loop-value to yellow_spawn()
                 set_gamemode(loop-value, "survival")
 
 command /civreviveplayer <player>:
@@ -342,32 +352,160 @@ command /civreviveplayer <player>:
                 remove arg-1 from {is::dead::*}
                 if {red::team::*} contains arg-1:
                     add arg-1 to {red::alive::*}
-                    teleport arg-1 to red_spawn()
                 else if {green::team::*} contains arg-1:
                     add arg-1 to {green::alive::*}
-                    teleport arg-1 to green_spawn()
                 else if {blue::team::*} contains arg-1:
                     add arg-1 to {blue::alive::*}
-                    teleport arg-1 to blue_spawn()
-                else if {white::team::*} contains arg-1:
-                    add arg-1 to {white::alive::*}
-                    teleport arg-1 to white_spawn()
+                else if {yellow::team::*} contains arg-1:
+                    add arg-1 to {yellow::alive::*}
                 set_gamemode(arg-1, "survival")
 
 command /civend:
     permission: op
     trigger:
-        delete {red::team::*}
-        delete {green::team::*}
-        delete {blue::team::*}
-        delete {white::team::*}
-        delete {red::alive::*}
-        delete {green::alive::*}
-        delete {blue::alive::*}
-        delete {white::alive::*}
-        delete {is::dead::*}
-        delete {in::spec::*}
-        set {respawn} to true
+        clean_up()
         loop all players:
             set_lp(loop-player, "default")
             teleport loop-player to lobby_spawn()
+
+command /civwallsdown:
+    permission: op
+    trigger:
+        # center
+        wait 5 ticks
+        fill("cc", -159, 113, 161, -159, 27, -158, "air")
+        wait 5 ticks
+        fill("cc", -159, 27, -158, 159, 113, -158, "air")
+        wait 5 ticks
+        fill("cc", 159, 113, -158, 159, 27, 161, "air")
+        wait 5 ticks
+        fill("cc", 159, 27, 161, -159, 113, 161, "air")
+        # outer
+        wait 5 ticks
+        fill("cc", 0, 27, 162, 0, 58, 1000, "air")
+        wait 5 ticks
+        fill("cc", -160, 27, 0, -1000, 58, 0, "air")
+        wait 5 ticks
+        fill("cc", 0, 27, -159, 0, 58, -1000, "air")
+        wait 5 ticks
+        fill("cc", 160, 27, 0, 1000, 58, 0, "air")
+        wait 5 ticks
+        fill("cc", 0, 59, 162, 0, 90, 1000, "air")
+        wait 5 ticks
+        fill("cc", -160, 59, 0, -1000, 90, 0, "air")
+        wait 5 ticks
+        fill("cc", 0, 59, -159, 0, 90, -1000, "air")
+        wait 5 ticks
+        fill("cc", 160, 59, 0, 1000, 90, 0, "air")
+        wait 5 ticks
+        fill("cc", 0, 91, 162, 0, 122, 1000, "air")
+        wait 5 ticks
+        fill("cc", -160, 91, 0, -1000, 122, 0, "air")
+        wait 5 ticks
+        fill("cc", 0, 91, -159, 0, 122, -1000, "air")
+        wait 5 ticks
+        fill("cc", 160, 91, 0, 1000, 122, 0, "air")
+        wait 5 ticks
+        fill("cc", 0, 123, 162, 0, 154, 1000, "air")
+        wait 5 ticks
+        fill("cc", -160, 123, 0, -1000, 154, 0, "air")
+        wait 5 ticks
+        fill("cc", 0, 123, -159, 0, 154, -1000, "air")
+        wait 5 ticks
+        fill("cc", 160, 123, 0, 1000, 154, 0, "air")
+        wait 5 ticks
+        fill("cc", 0, 155, 162, 0, 186, 1000, "air")
+        wait 5 ticks
+        fill("cc", -160, 155, 0, -1000, 186, 0, "air")
+        wait 5 ticks
+        fill("cc", 0, 155, -159, 0, 186, -1000, "air")
+        wait 5 ticks
+        fill("cc", 160, 155, 0, 1000, 186, 0, "air")
+        wait 5 ticks
+        fill("cc", 0, 187, 162, 0, 200, 1000, "air")
+        wait 5 ticks
+        fill("cc", -160, 187, 0, -1000, 200, 0, "air")
+        wait 5 ticks
+        fill("cc", 0, 187, -159, 0, 200, -1000, "air")
+        wait 5 ticks
+        fill("cc", 160, 187, 0, 1000, 200, 0, "air")
+        # center
+        wait 5 ticks
+        fill("cc", -159, 200, 161, -159, 114, -158, "air")
+        wait 5 ticks
+        fill("cc", -159, 114, -158, 159, 200, -158, "air")
+        wait 5 ticks
+        fill("cc", 159, 200, -158, 159, 114, 161, "air")
+        wait 5 ticks
+        fill("cc", 159, 114, 161, -159, 200, 161, "air")
+
+command /civwallsup:
+    permission: op
+    trigger:
+        # center
+        wait 5 ticks
+        fill("cc", -159, 113, 161, -159, 27, -158, "barrier")
+        wait 5 ticks
+        fill("cc", -159, 27, -158, 159, 113, -158, "barrier")
+        wait 5 ticks
+        fill("cc", 159, 113, -158, 159, 27, 161, "barrier")
+        wait 5 ticks
+        fill("cc", 159, 27, 161, -159, 113, 161, "barrier")
+        # outer
+        wait 5 ticks
+        fill("cc", 0, 27, 162, 0, 58, 1000, "barrier")
+        wait 5 ticks
+        fill("cc", -160, 27, 0, -1000, 58, 0, "barrier")
+        wait 5 ticks
+        fill("cc", 0, 27, -159, 0, 58, -1000, "barrier")
+        wait 5 ticks
+        fill("cc", 160, 27, 0, 1000, 58, 0, "barrier")
+        wait 5 ticks
+        fill("cc", 0, 59, 162, 0, 90, 1000, "barrier")
+        wait 5 ticks
+        fill("cc", -160, 59, 0, -1000, 90, 0, "barrier")
+        wait 5 ticks
+        fill("cc", 0, 59, -159, 0, 90, -1000, "barrier")
+        wait 5 ticks
+        fill("cc", 160, 59, 0, 1000, 90, 0, "barrier")
+        wait 5 ticks
+        fill("cc", 0, 91, 162, 0, 122, 1000, "barrier")
+        wait 5 ticks
+        fill("cc", -160, 91, 0, -1000, 122, 0, "barrier")
+        wait 5 ticks
+        fill("cc", 0, 91, -159, 0, 122, -1000, "barrier")
+        wait 5 ticks
+        fill("cc", 160, 91, 0, 1000, 122, 0, "barrier")
+        wait 5 ticks
+        fill("cc", 0, 123, 162, 0, 154, 1000, "barrier")
+        wait 5 ticks
+        fill("cc", -160, 123, 0, -1000, 154, 0, "barrier")
+        wait 5 ticks
+        fill("cc", 0, 123, -159, 0, 154, -1000, "barrier")
+        wait 5 ticks
+        fill("cc", 160, 123, 0, 1000, 154, 0, "barrier")
+        wait 5 ticks
+        fill("cc", 0, 155, 162, 0, 186, 1000, "barrier")
+        wait 5 ticks
+        fill("cc", -160, 155, 0, -1000, 186, 0, "barrier")
+        wait 5 ticks
+        fill("cc", 0, 155, -159, 0, 186, -1000, "barrier")
+        wait 5 ticks
+        fill("cc", 160, 155, 0, 1000, 186, 0, "barrier")
+        wait 5 ticks
+        fill("cc", 0, 187, 162, 0, 200, 1000, "barrier")
+        wait 5 ticks
+        fill("cc", -160, 187, 0, -1000, 200, 0, "barrier")
+        wait 5 ticks
+        fill("cc", 0, 187, -159, 0, 200, -1000, "barrier")
+        wait 5 ticks
+        fill("cc", 160, 187, 0, 1000, 200, 0, "barrier")
+        # center
+        wait 5 ticks
+        fill("cc", -159, 200, 161, -159, 114, -158, "barrier")
+        wait 5 ticks
+        fill("cc", -159, 114, -158, 159, 200, -158, "barrier")
+        wait 5 ticks
+        fill("cc", 159, 200, -158, 159, 114, 161, "barrier")
+        wait 5 ticks
+        fill("cc", 159, 114, 161, -159, 200, 161, "barrier")

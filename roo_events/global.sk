@@ -1,5 +1,8 @@
 # -------------------- global state variables (don't modify) -------------------- #
 variables:
+    # ----- unnecessary initialization ----- #
+    # {global::combat::*}
+    {combat::cooldown::%player%} = 0
     {game::time} = 0
     {timer::min} = 0
     {timer::sec} = 0
@@ -24,13 +27,50 @@ function game_time() :: string:
         return "%{timer::min}%:0%{timer::sec}%"
     return "%{timer::min}%:%{timer::sec}%"
 
-# -------------------- global events -------------------- #
+# -------------------- local functions -------------------- #
+local function combat(p: player):
+    if {global::combat::*} does not contain {_p}:
+        add {_p} to {global::combat::*}
+        set {combat::cooldown::%{_p}%} to 5
+        send "&cYou Are In Combat" to {_p}
+        while {combat::cooldown::%{_p}%} > 0:
+            subtract 1 from {combat::cooldown::%{_p}%}
+            if {combat::cooldown::%{_p}%} <= 0:
+                remove {_p} from {global::combat::*}
+                send "&aYou Are No Longer In Combat" to {_p}
+            wait 1 second
+    else:
+        set {combat::cooldown::%{_p}%} to 5
+
+# -------------------- scoreboard clear -------------------- #
+on join:
+    clear scoreboard of player
+
+on world change:
+    clear scoreboard of player
+
+# -------------------- combat log -------------------- #
+on damage of player with priority highest:
+    combat(attacker)
+    combat(victim)
+
+on death of player with priority highest:
+    remove victim from {global::combat::*}
+    set {combat::cooldown::%victim%} to 0
+    send "&aYou Are No Longer In Combat" to victim
+
+on quit:
+    if {combat::cooldown::%player%} > 0:
+        kill player
+        remove player from {global::combat::*}
+        set {combat::cooldown::%player%} to 0
+
 # -------------------- chat cooldown -------------------- #
 on chat with priority highest:
-    if {cooldown::*} does not contain player's uuid:
-        add player's uuid to {cooldown::*}
+    if {chat::cooldown::*} does not contain player's uuid:
+        add player's uuid to {chat::cooldown::*}
         wait 3 second
-        remove player's uuid from {cooldown::*}
+        remove player's uuid from {chat::cooldown::*}
     else:
         cancel event
         message "&cYou must wait 3 seconds before chatting again!"
@@ -41,13 +81,6 @@ on inventory slot change:
         if amount of lava buckets in player's inventory is greater than 1:
             remove (amount of lava buckets in player's inventory - 1) of lava buckets from player's inventory
             message "&cYou had too many buckets of lava in your inventory! The extra buckets have been evaporated."
-
-# -------------------- scoreboard clear -------------------- #
-on join:
-    clear scoreboard of player
-
-on world change:
-    clear scoreboard of player
 
 # -------------------- event timer -------------------- #
 every 1 second:
@@ -79,3 +112,11 @@ command /eventsettime <number>:
     permission: op
     trigger:
         set {game::time} to arg-1
+
+# -------------------- testing commands -------------------- #
+command /combatresetall:
+    permission: op
+    trigger:
+        loop all players:
+            remove loop-player from {global::combat::*}
+            set {combat::cooldown::%loop-player%} to 0

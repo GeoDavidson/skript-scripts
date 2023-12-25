@@ -5,23 +5,27 @@ local function set_armour(e: entity):
         set {_e}'s tool to wooden axe of sharpness 1
     else:
         set {_e}'s tool to stone sword
+    set {_chance} to a random integer between 1 and 2
     set {_item} to leather helmet
     if {_chance} is 1:
         dye {_item} red
     else:
         dye {_item} green
+    set {_chance} to a random integer between 1 and 2
     set {_e}'s helmet to {_item}
     set {_item} to leather chestplate
     if {_chance} is 1:
         dye {_item} red
     else:
         dye {_item} green
+    set {_chance} to a random integer between 1 and 2
     set {_e}'s chestplate to {_item}
     set {_item} to leather leggings
     if {_chance} is 1:
         dye {_item} red
     else:
         dye {_item} green
+    set {_chance} to a random integer between 1 and 2
     set {_e}'s leggings to {_item}
     set {_item} to leather boots
     if {_chance} is 1:
@@ -31,22 +35,15 @@ local function set_armour(e: entity):
     set {_e}'s boots to {_item}
 
 # -------------------- custome spawn -------------------- #
-on spawn:
+on spawn of a monster:
+    spawn reason is natural 
     if event-entity is a zombie:
-        chance of 15%:
-            execute console command "/disasters summon elf %event-entity's x-coordinate% %event-entity's y-coordinate% %event-entity's z-coordinate% test_flat"
         set_armour(event-entity)
     else if event-entity is a skeleton:
-        chance of 12%:
-            execute console command "/disasters summon frosty %event-entity's x-coordinate% %event-entity's y-coordinate% %event-entity's z-coordinate% test_flat"
         set_armour(event-entity)
     else if event-entity is a creeper:
-        chance of 10%:
-            execute console command "/disasters summon yeti %event-entity's x-coordinate% %event-entity's y-coordinate% %event-entity's z-coordinate% test_flat"
         cancel event
     else if event-entity is a spider:
-        chance of 8%:
-            execute console command "/disasters summon grinch %event-entity's x-coordinate% %event-entity's y-coordinate% %event-entity's z-coordinate% test_flat"
         cancel event
     else if event-entity is a enderman:
         cancel event

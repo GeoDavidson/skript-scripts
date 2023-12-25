@@ -1,0 +1,17 @@
+# -------------------- custome fether -------------------- #
+on rightclick:
+    if player is holding a feather:
+        if {feather::cooldown::*} does not contain player's uuid:
+            push player forwards at speed 1
+            add player's uuid to {feather::cooldown::*}
+            set {_n} to 10
+            set {_c} to {_n}
+            loop {_n} times:
+                send action bar "&c%{_c}%"
+                subtract 1 from {_c}
+                wait 1 second
+            send action bar ""
+            remove player's uuid from {feather::cooldown::*}
+
+# -------------------- custome bow -------------------- #
+
