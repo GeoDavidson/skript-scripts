@@ -1,9 +1,9 @@
-# -------------------- custome fether -------------------- #
+# -------------------- dash cane -------------------- #
 on rightclick:
-    if player is holding a feather:
-        if {feather::cooldown::*} does not contain player's uuid:
+    if player is holding a magma cream:
+        if {candycane::cooldown::*} does not contain player's uuid:
             push player forwards at speed 1
-            add player's uuid to {feather::cooldown::*}
+            add player's uuid to {candycane::cooldown::*}
             set {_n} to 10
             set {_c} to {_n}
             loop {_n} times:
@@ -11,7 +11,105 @@ on rightclick:
                 subtract 1 from {_c}
                 wait 1 second
             send action bar ""
-            remove player's uuid from {feather::cooldown::*}
+            remove player's uuid from {candycane::cooldown::*}
 
-# -------------------- custome bow -------------------- #
+# -------------------- ice sword functions -------------------- #
+local function sword_particle(p: player):
+    execute console command "/execute at %{_p}% run particle item minecraft:ice ~ ~1 ~ 0 0 0 0.4 500 normal"
+    execute console command "/execute at %{_p}% run particle minecraft:snowflake ~ ~1 ~ 0 0 0 0.5 1000 normal"
 
+local function sword_sound(p: player):
+    execute console command "/execute at %{_p}% run playsound minecraft:block.amethyst_block.break player @a ~ ~ ~ 1 0"
+
+# -------------------- ice sword -------------------- #
+on damage of player by player:
+    if attacker is holding a diamond sword:
+        chance of 10%:
+            sword_sound(victim)
+            sword_particle(victim)
+            damage victim by 1.5
+
+# -------------------- ice hammer functions -------------------- #
+local function hammer_particle(p: player):
+    # ring 1
+    execute console command "/execute at %{_p}% run particle item minecraft:ice ~ ~0.4 ~ 0 0 0 0.1 200 normal"
+    # ring 2
+    execute console command "/execute at %{_p}% run particle item minecraft:ice ~ ~0.4 ~1 0 0 0 0.1 100 normal"
+    execute console command "/execute at %{_p}% run particle item minecraft:light_blue_stained_glass ~ ~0.4 ~1 0 0 0 0.1 100 normal"
+    execute console command "/execute at %{_p}% run particle item minecraft:ice ~-1 ~0.4 ~1 0 0 0 0.1 100 normal"
+    execute console command "/execute at %{_p}% run particle item minecraft:light_blue_stained_glass ~-1 ~0.4 ~1 0 0 0 0.1 100 normal"
+    execute console command "/execute at %{_p}% run particle item minecraft:ice ~-1 ~0.4 ~ 0 0 0 0.1 100 normal"
+    execute console command "/execute at %{_p}% run particle item minecraft:light_blue_stained_glass ~-1 ~0.4 ~ 0 0 0 0.1 100 normal"
+    execute console command "/execute at %{_p}% run particle item minecraft:ice ~-1 ~0.4 ~-1 0 0 0 0.1 100 normal"
+    execute console command "/execute at %{_p}% run particle item minecraft:light_blue_stained_glass ~-1 ~0.4 ~-1 0 0 0 0.1 100 normal"
+    execute console command "/execute at %{_p}% run particle item minecraft:ice ~ ~0.4 ~-1 0 0 0 0.1 100 normal"
+    execute console command "/execute at %{_p}% run particle item minecraft:light_blue_stained_glass ~ ~0.4 ~-1 0 0 0 0.1 100 normal"
+    execute console command "/execute at %{_p}% run particle item minecraft:ice ~1 ~0.4 ~-1 0 0 0 0.1 100 normal"
+    execute console command "/execute at %{_p}% run particle item minecraft:light_blue_stained_glass ~1 ~0.4 ~-1 0 0 0 0.1 100 normal"
+    execute console command "/execute at %{_p}% run particle item minecraft:ice ~1 ~0.4 ~ 0 0 0 0.1 100 normal"
+    execute console command "/execute at %{_p}% run particle item minecraft:light_blue_stained_glass ~1 ~0.4 ~ 0 0 0 0.1 100 normal"
+    execute console command "/execute at %{_p}% run particle item minecraft:ice ~1 ~0.4 ~1 0 0 0 0.1 100 normal"
+    execute console command "/execute at %{_p}% run particle item minecraft:light_blue_stained_glass ~1 ~0.4 ~1 0 0 0 0.1 100 normal"
+    # ring 3
+    execute console command "/execute at %{_p}% run particle item minecraft:ice ~ ~0.4 ~3 0 0 0 0.1 100 normal"
+    execute console command "/execute at %{_p}% run particle item minecraft:light_blue_stained_glass ~ ~0.4 ~3 0 0 0 0.1 100 normal"
+    execute console command "/execute at %{_p}% run particle item minecraft:ice ~-2 ~0.4 ~2 0 0 0 0.1 100 normal"
+    execute console command "/execute at %{_p}% run particle item minecraft:light_blue_stained_glass ~-2 ~0.4 ~2 0 0 0 0.1 100 normal"
+    execute console command "/execute at %{_p}% run particle item minecraft:ice ~-3 ~0.4 ~ 0 0 0 0.1 100 normal"
+    execute console command "/execute at %{_p}% run particle item minecraft:light_blue_stained_glass ~-3 ~0.4 ~ 0 0 0 0.1 100 normal"
+    execute console command "/execute at %{_p}% run particle item minecraft:ice ~-2 ~0.4 ~-2 0 0 0 0.1 100 normal"
+    execute console command "/execute at %{_p}% run particle item minecraft:light_blue_stained_glass ~-2 ~0.4 ~-2 0 0 0 0.1 100 normal"
+    execute console command "/execute at %{_p}% run particle item minecraft:ice ~ ~0.4 ~-3 0 0 0 0.1 100 normal"
+    execute console command "/execute at %{_p}% run particle item minecraft:light_blue_stained_glass ~ ~0.4 ~-3 0 0 0 0.1 100 normal"
+    execute console command "/execute at %{_p}% run particle item minecraft:ice ~2 ~0.4 ~-2 0 0 0 0.1 100 normal"
+    execute console command "/execute at %{_p}% run particle item minecraft:light_blue_stained_glass ~2 ~0.4 ~-2 0 0 0 0.1 100 normal"
+    execute console command "/execute at %{_p}% run particle item minecraft:ice ~3 ~0.4 ~ 0 0 0 0.1 100 normal"
+    execute console command "/execute at %{_p}% run particle item minecraft:light_blue_stained_glass ~3 ~0.4 ~ 0 0 0 0.1 100 normal"
+    execute console command "/execute at %{_p}% run particle item minecraft:ice ~2 ~0.4 ~2 0 0 0 0.1 100 normal"
+    execute console command "/execute at %{_p}% run particle item minecraft:light_blue_stained_glass ~2 ~0.4 ~2 0 0 0 0.1 100 normal"
+    # ring 4
+    execute console command "/execute at %{_p}% run particle item minecraft:ice ~ ~0.4 ~4 0 0 0 0.1 100 normal"
+    execute console command "/execute at %{_p}% run particle item minecraft:light_blue_stained_glass ~ ~0.4 ~4 0 0 0 0.1 100 normal"
+    execute console command "/execute at %{_p}% run particle item minecraft:ice ~-3 ~0.4 ~3 0 0 0 0.1 100 normal"
+    execute console command "/execute at %{_p}% run particle item minecraft:light_blue_stained_glass ~-3 ~0.4 ~3 0 0 0 0.1 100 normal"
+    execute console command "/execute at %{_p}% run particle item minecraft:ice ~-4 ~0.4 ~ 0 0 0 0.1 100 normal"
+    execute console command "/execute at %{_p}% run particle item minecraft:light_blue_stained_glass ~-4 ~0.4 ~ 0 0 0 0.1 100 normal"
+    execute console command "/execute at %{_p}% run particle item minecraft:ice ~-3 ~0.4 ~-3 0 0 0 0.1 100 normal"
+    execute console command "/execute at %{_p}% run particle item minecraft:light_blue_stained_glass ~-3 ~0.4 ~-3 0 0 0 0.1 100 normal"
+    execute console command "/execute at %{_p}% run particle item minecraft:ice ~ ~0.4 ~-4 0 0 0 0.1 100 normal"
+    execute console command "/execute at %{_p}% run particle item minecraft:light_blue_stained_glass ~ ~0.4 ~-4 0 0 0 0.1 100 normal"
+    execute console command "/execute at %{_p}% run particle item minecraft:ice ~3 ~0.4 ~-3 0 0 0 0.1 100 normal"
+    execute console command "/execute at %{_p}% run particle item minecraft:light_blue_stained_glass ~3 ~0.4 ~-3 0 0 0 0.1 100 normal"
+    execute console command "/execute at %{_p}% run particle item minecraft:ice ~4 ~0.4 ~ 0 0 0 0.1 100 normal"
+    execute console command "/execute at %{_p}% run particle item minecraft:light_blue_stained_glass ~4 ~0.4 ~ 0 0 0 0.1 100 normal"
+    execute console command "/execute at %{_p}% run particle item minecraft:ice ~3 ~0.4 ~3 0 0 0 0.1 100 normal"
+    execute console command "/execute at %{_p}% run particle item minecraft:light_blue_stained_glass ~3 ~0.4 ~3 0 0 0 0.1 100 normal"
+
+local function hammer_sound(p: player):
+    execute console command "/execute at %{_p}% run playsound minecraft:block.vine.break player @a ~ ~ ~ 1 0.1"
+
+# -------------------- ice hammer -------------------- #
+on rightclick:
+    if player is holding a golden axe:
+        if {hammer::cooldown::*} does not contain player's uuid:
+            set {_p} to player
+            hammer_sound(player)
+            hammer_particle(player)
+            loop all entities in radius 5 around player:
+                if loop-entity isn't {_p}:
+                    damage loop-entity by 1.5
+            add player's uuid to {hammer::cooldown::*}
+            set {_n} to 20
+            set {_c} to {_n}
+            loop {_n} times:
+                send action bar "&c%{_c}%"
+                subtract 1 from {_c}
+                wait 1 second
+            send action bar ""
+            remove player's uuid from {hammer::cooldown::*}
+
+on shoot:
+    projectile is arrow:
+        while ground state of projectile is false:
+            play heart at projectile
+            wait 1 tick

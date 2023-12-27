@@ -50,12 +50,13 @@ on world change:
     clear scoreboard of player
 
 # -------------------- combat log -------------------- #
-on damage of player with priority highest:
+on damage of player by player with priority highest:
     combat(attacker)
     combat(victim)
 
 on death of player with priority highest:
     remove victim from {global::combat::*}
+    if {combat::cooldown::%victim%}
     set {combat::cooldown::%victim%} to 0
     send "&aYou Are No Longer In Combat" to victim
 
