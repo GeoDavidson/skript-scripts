@@ -18,12 +18,12 @@ on damage:
 		damage attacker by 2 hearts
 		wait 1 tick
 		execute attacker command "npc target %attacker% -a"
-        
+
 on damage:
 	if attacker's name is "&aRoman":
 		make attacker swing their main hand
 		damage victim by 1 heart
-        
+
 on death:
     if victim's name is "&aRoman":
         set {_drop} to random integer between 1 and 100

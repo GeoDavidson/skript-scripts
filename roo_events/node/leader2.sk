@@ -1,0 +1,441 @@
+command /leader-gui-2:
+    trigger:
+        {leader2::%player's uuid%} is not set
+        set metadata tag "LeaderGui2" of player to chest inventory with 6 rows named "&0&lＬＥＡＤＥＲ ＶＯＴＥ:"
+        wait 1 tick
+        loop all players:
+            set {loop-player2::*} to all players
+            if loop-player has permission "leader.team.2":
+                if loop-player is online:
+                    set slot 0,17,18,35,36 and 53 of metadata tag "LeaderGui2" of player to red stained glass pane named "&7"
+                    set slot 8,9,26,27,44 and 45 of metadata tag "LeaderGui2" of player to white stained glass pane named "&7"
+                    set slot 1,7,10,16,19,25,28,34,37,43,46 and 52 of metadata tag "LeaderGui2" of player to black stained glass pane named "&7"
+                    set slot 2 of metadata tag "LeaderGui2" of player to {loop-player2::1}'s skull
+                    set slot 3 of metadata tag "LeaderGui2" of player to {loop-player2::2}'s skull
+                    set slot 4 of metadata tag "LeaderGui2" of player to {loop-player2::3}'s skull
+                    set slot 5 of metadata tag "LeaderGui2" of player to {loop-player2::4}'s skull
+                    set slot 6 of metadata tag "LeaderGui2" of player to {loop-player2::5}'s skull
+                    set slot 11 of metadata tag "LeaderGui2" of player to {loop-player2::6}'s skull
+                    set slot 12 of metadata tag "LeaderGui2" of player to {loop-player2::7}'s skull
+                    set slot 13 of metadata tag "LeaderGui2" of player to {loop-player2::8}'s skull
+                    set slot 14 of metadata tag "LeaderGui2" of player to {loop-player2::9}'s skull
+                    set slot 15 of metadata tag "LeaderGui2" of player to {loop-player2::10}'s skull
+                    set slot 20 of metadata tag "LeaderGui2" of player to {loop-player2::11}'s skull
+                    set slot 21 of metadata tag "LeaderGui2" of player to {loop-player2::12}'s skull
+                    set slot 22 of metadata tag "LeaderGui2" of player to {loop-player2::13}'s skull
+                    set slot 23 of metadata tag "LeaderGui2" of player to {loop-player2::14}'s skull
+                    set slot 24 of metadata tag "LeaderGui2" of player to {loop-player2::15}'s skull
+                    set slot 29 of metadata tag "LeaderGui2" of player to {loop-player2::16}'s skull
+                    set slot 30 of metadata tag "LeaderGui2" of player to {loop-player2::17}'s skull
+                    set slot 31 of metadata tag "LeaderGui2" of player to {loop-player2::18}'s skull
+                    set slot 32 of metadata tag "LeaderGui2" of player to {loop-player2::19}'s skull
+                    set slot 33 of metadata tag "LeaderGui2" of player to {loop-player2::20}'s skull
+                    set slot 38 of metadata tag "LeaderGui2" of player to {loop-player2::21}'s skull
+                    set slot 39 of metadata tag "LeaderGui2" of player to {loop-player2::22}'s skull
+                    set slot 40 of metadata tag "LeaderGui2" of player to {loop-player2::23}'s skull
+                    set slot 41 of metadata tag "LeaderGui2" of player to {loop-player2::24}'s skull
+                    set slot 42 of metadata tag "LeaderGui2" of player to {loop-player2::25}'s skull
+                    set slot 47 of metadata tag "LeaderGui2" of player to {loop-player2::26}'s skull
+                    set slot 48 of metadata tag "LeaderGui2" of player to {loop-player2::27}'s skull
+                    set slot 49 of metadata tag "LeaderGui2" of player to {loop-player2::28}'s skull
+                    set slot 50 of metadata tag "LeaderGui2" of player to {loop-player2::29}'s skull
+                    set slot 51 of metadata tag "LeaderGui2" of player to {loop-player2::30}'s skull
+        loop all players:
+            if loop-player has permission "leader.team.2":
+                if loop-player is online:
+                    open (metadata tag "LeaderGui2" of player) to loop-player
+
+on inventory click:
+    if event-inventory = (metadata tag "LeaderGui2" of player):
+        cancel event 
+        if event-slot = 2:
+            if event-slot is {loop-player2::1}'s skull:
+                set {leader2::%player's uuid%} to "1"
+                add 1 to {leader2::loop-player::1}
+                send "&c&lRooEvents: &eYou Voted For %{loop-player2::1}%" to player
+                close player's inventory
+            else:
+                send "&c&lRooEvents: &4No Player In That Slot" to player
+                close player's inventory
+                wait 1 second
+                execute player command "/leader-gui-2"
+        if event-slot = 3:
+            if event-slot is {loop-player2::2}'s skull:
+                set {leader2::%player's uuid%} to "2"
+                add 1 to {leader2::loop-player::2}
+                send "&c&lRooEvents: &eYou Voted For %{loop-player2::2}%" to player
+                close player's inventory
+            else:
+                send "&c&lRooEvents: &4No Player In That Slot" to player
+                close player's inventory
+                wait 1 second
+                execute player command "/leader-gui-2"
+        if event-slot = 4:
+            if event-slot is {loop-player2::3}'s skull:
+                set {leader2::%player's uuid%} to "3"
+                add 1 to {leader2::loop-player::3}
+                send "&c&lRooEvents: &eYou Voted For %{loop-player2::3}%" to player
+                close player's inventory
+            else:
+                send "&c&lRooEvents: &4No Player In That Slot" to player
+                close player's inventory
+                wait 1 second
+                execute player command "/leader-gui-2"
+        if event-slot = 5:
+            if event-slot is {loop-player2::4}'s skull:
+                set {leader2::%player's uuid%} to "4"
+                add 1 to {leader2::loop-player::4}
+                send "&c&lRooEvents: &eYou Voted For %{loop-player2::4}%" to player
+                close player's inventory
+            else:
+                send "&c&lRooEvents: &4No Player In That Slot" to player
+                close player's inventory
+                wait 1 second
+                execute player command "/leader-gui-2"
+        if event-slot = 6:
+            if event-slot is {loop-player2::5}'s skull:
+                set {leader2::%player's uuid%} to "5"
+                add 1 to {leader2::loop-player::5}
+                send "&c&lRooEvents: &eYou Voted For %{loop-player2::5}%" to player
+                close player's inventory
+            else:
+                send "&c&lRooEvents: &4No Player In That Slot" to player
+                close player's inventory
+                wait 1 second
+                execute player command "/leader-gui-2"
+        if event-slot = 11:
+            if event-slot is {loop-player2::6}'s skull:
+                set {leader2::%player's uuid%} to "6"
+                add 1 to {leader2::loop-player::6}
+                send "&c&lRooEvents: &eYou Voted For %{loop-player2::6}%" to player
+                close player's inventory
+            else:
+                send "&c&lRooEvents: &4No Player In That Slot" to player
+                close player's inventory
+                wait 1 second
+                execute player command "/leader-gui-2"
+        if event-slot = 12:
+            if event-slot is {loop-player2::7}'s skull:
+                set {leader2::%player's uuid%} to "7"
+                add 1 to {leader2::loop-player::7}
+                send "&c&lRooEvents: &eYou Voted For %{loop-player2::7}%" to player
+                close player's inventory
+            else:
+                send "&c&lRooEvents: &4No Player In That Slot" to player
+                close player's inventory
+                wait 1 second
+                execute player command "/leader-gui-2"
+        if event-slot = 13:
+            if event-slot is {loop-player2::8}'s skull:
+                set {leader2::%player's uuid%} to "8"
+                add 1 to {leader2::loop-player::8}
+                send "&c&lRooEvents: &eYou Voted For %{loop-player2::8}%" to player
+                close player's inventory
+            else:
+                send "&c&lRooEvents: &4No Player In That Slot" to player
+                close player's inventory
+                wait 1 second
+                execute player command "/leader-gui-2"
+        if event-slot = 14:
+            if event-slot is {loop-player2::9}'s skull:
+                set {leader2::%player's uuid%} to "9"
+                add 1 to {leader2::loop-player::9}
+                send "&c&lRooEvents: &eYou Voted For %{loop-player2::9}%" to player
+                close player's inventory
+            else:
+                send "&c&lRooEvents: &4No Player In That Slot" to player
+                close player's inventory
+                wait 1 second
+                execute player command "/leader-gui-2"
+        if event-slot = 15:
+            if event-slot is {loop-player2::10}'s skull:
+                set {leader2::%player's uuid%} to "10"
+                add 1 to {leader2::loop-player::10}
+                send "&c&lRooEvents: &eYou Voted For %{loop-player2::10}%" to player
+                close player's inventory
+            else:
+                send "&c&lRooEvents: &4No Player In That Slot" to player
+                close player's inventory
+                wait 1 second
+                execute player command "/leader-gui-2"
+        if event-slot = 20:
+            if event-slot is {loop-player2::11}'s skull:
+                set {leader2::%player's uuid%} to "11"
+                add 1 to {leader2::loop-player::11}
+                send "&c&lRooEvents: &eYou Voted For %{loop-player2::11}%" to player
+                close player's inventory
+            else:
+                send "&c&lRooEvents: &4No Player In That Slot" to player
+                close player's inventory
+                wait 1 second
+                execute player command "/leader-gui-2"
+        if event-slot = 21:
+            if event-slot is {loop-player2::12}'s skull:
+                set {leader2::%player's uuid%} to "12"
+                add 1 to {leader2::loop-player::12}
+                send "&c&lRooEvents: &eYou Voted For %{loop-player2::12}%" to player
+                close player's inventory
+            else:
+                send "&c&lRooEvents: &4No Player In That Slot" to player
+                close player's inventory
+                wait 1 second
+                execute player command "/leader-gui-2"
+        if event-slot = 22:
+            if event-slot is {loop-player2::13}'s skull:
+                set {leader2::%player's uuid%} to "13"
+                add 1 to {leader2::loop-player::13}
+                send "&c&lRooEvents: &eYou Voted For %{loop-player2::13}%" to player
+                close player's inventory
+            else:
+                send "&c&lRooEvents: &4No Player In That Slot" to player
+                close player's inventory
+                wait 1 second
+                execute player command "/leader-gui-2"
+        if event-slot = 23:
+            if event-slot is {loop-player2::14}'s skull:
+                set {leader2::%player's uuid%} to "14"
+                add 1 to {leader2::loop-player::14}
+                send "&c&lRooEvents: &eYou Voted For %{loop-player2::14}%" to player
+                close player's inventory
+            else:
+                send "&c&lRooEvents: &4No Player In That Slot" to player
+                close player's inventory
+                wait 1 second
+                execute player command "/leader-gui-2"
+        if event-slot = 24:
+            if event-slot is {loop-player2::15}'s skull:
+                set {leader2::%player's uuid%} to "15"
+                add 1 to {leader2::loop-player::15}
+                send "&c&lRooEvents: &eYou Voted For %{loop-player2::15}%" to player
+                close player's inventory
+            else:
+                send "&c&lRooEvents: &4No Player In That Slot" to player
+                close player's inventory
+                wait 1 second
+                execute player command "/leader-gui-2"
+        if event-slot = 29:
+            if event-slot is {loop-player2::16}'s skull:
+                set {leader2::%player's uuid%} to "16"
+                add 1 to {leader2::loop-player::16}
+                send "&c&lRooEvents: &eYou Voted For %{loop-player2::16}%" to player
+                close player's inventory
+            else:
+                send "&c&lRooEvents: &4No Player In That Slot" to player
+                close player's inventory
+                wait 1 second
+                execute player command "/leader-gui-2"
+        if event-slot = 30:
+            if event-slot is {loop-player2::17}'s skull:
+                set {leader2::%player's uuid%} to "17"
+                add 1 to {leader2::loop-player::17}
+                send "&c&lRooEvents: &eYou Voted For %{loop-player2::17}%" to player
+                close player's inventory
+            else:
+                send "&c&lRooEvents: &4No Player In That Slot" to player
+                close player's inventory
+                wait 1 second
+                execute player command "/leader-gui-2"
+        if event-slot = 31:
+            if event-slot is {loop-player2::18}'s skull:
+                set {leader2::%player's uuid%} to "18"
+                add 1 to {leader2::loop-player::18}
+                send "&c&lRooEvents: &eYou Voted For %{loop-player2::18}%" to player
+                close player's inventory
+            else:
+                send "&c&lRooEvents: &4No Player In That Slot" to player
+                close player's inventory
+                wait 1 second
+                execute player command "/leader-gui-2"
+        if event-slot = 32:
+            if event-slot is {loop-player2::19}'s skull:
+                set {leader2::%player's uuid%} to "19"
+                add 1 to {leade2::loop-player::19}
+                send "&c&lRooEvents: &eYou Voted For %{loop-player2::19}%" to player
+                close player's inventory
+            else:
+                send "&c&lRooEvents: &4No Player In That Slot" to player
+                close player's inventory
+                wait 1 second
+                execute player command "/leader-gui-2"
+        if event-slot = 33:
+            if event-slot is {loop-player2::20}'s skull:
+                set {leader2::%player's uuid%} to "20"
+                add 1 to {leader2::loop-player::20}
+                send "&c&lRooEvents: &eYou Voted For %{loop-player2::20}%" to player
+                close player's inventory
+            else:
+                send "&c&lRooEvents: &4No Player In That Slot" to player
+                close player's inventory
+                wait 1 second
+                execute player command "/leader-gui-2"
+        if event-slot = 38:
+            if event-slot is {loop-player2::21}'s skull:
+                set {leader2::%player's uuid%} to "21"
+                add 1 to {leader2::loop-player::21}
+                send "&c&lRooEvents: &eYou Voted For %{loop-player2::21}%" to player
+                close player's inventory
+            else:
+                send "&c&lRooEvents: &4No Player In That Slot" to player
+                close player's inventory
+                wait 1 second
+                execute player command "/leader-gui-2"
+        if event-slot = 39:
+            if event-slot is {loop-player2::22}'s skull:
+                set {leader2::%player's uuid%} to "22"
+                add 1 to {leader2::loop-player::22}
+                send "&c&lRooEvents: &eYou Voted For %{loop-player2::22}%" to player
+                close player's inventory
+            else:
+                send "&c&lRooEvents: &4No Player In That Slot" to player
+                close player's inventory
+                wait 1 second
+                execute player command "/leader-gui-2"
+        if event-slot = 40:
+            if event-slot is {loop-player2::23}'s skull:
+                set {leader2::%player's uuid%} to "23"
+                add 1 to {leader2::loop-player::23}
+                send "&c&lRooEvents: &eYou Voted For %{loop-player2::23}%" to player
+                close player's inventory
+            else:
+                send "&c&lRooEvents: &4No Player In That Slot" to player
+                close player's inventory
+                wait 1 second
+                execute player command "/leader-gui-2"
+        if event-slot = 41:
+            if event-slot is {loop-player2::24}'s skull:
+                set {leader2::%player's uuid%} to "24"
+                add 1 to {leader2::loop-player::24}
+                send "&c&lRooEvents: &eYou Voted For %{loop-player2::24}%" to player
+                close player's inventory
+            else:
+                send "&c&lRooEvents: &4No Player In That Slot" to player
+                close player's inventory
+                wait 1 second
+                execute player command "/leader-gui-2"
+        if event-slot = 42:
+            if event-slot is {loop-player2::25}'s skull:
+                set {leader2::%player's uuid%} to "25"
+                add 1 to {leader2::loop-player::25}
+                send "&c&lRooEvents: &eYou Voted For %{loop-player2::25}%" to player
+                close player's inventory
+            else:
+                send "&c&lRooEvents: &4No Player In That Slot" to player
+                close player's inventory
+                wait 1 second
+                execute player command "/leader-gui-2"
+        if event-slot = 47:
+            if event-slot is {loop-player2::26}'s skull:
+                set {leader2::%player's uuid%} to "26"
+                add 1 to {leader2::loop-player::26}
+                send "&c&lRooEvents: &eYou Voted For %{loop-player2::26}%" to player
+                close player's inventory
+            else:
+                send "&c&lRooEvents: &4No Player In That Slot" to player
+                close player's inventory
+                wait 1 second
+                execute player command "/leader-gui-2"
+        if event-slot = 48:
+            if event-slot is {loop-player2::27}'s skull:
+                set {leader2::%player's uuid%} to "27"
+                add 1 to {leader2::loop-player::27}
+                send "&c&lRooEvents: &eYou Voted For %{loop-player2::27}%" to player
+                close player's inventory
+            else:
+                send "&c&lRooEvents: &4No Player In That Slot" to player
+                close player's inventory
+                wait 1 second
+                execute player command "/leader-gui-2"
+        if event-slot = 49:
+            if event-slot is {loop-player2::28}'s skull:
+                set {leader2::%player's uuid%} to "28"
+                add 1 to {leader2::loop-player::28}
+                send "&c&lRooEvents: &eYou Voted For %{loop-player2::28}%" to player
+                close player's inventory
+            else:
+                send "&c&lRooEvents: &4No Player In That Slot" to player
+                close player's inventory
+                wait 1 second
+                execute player command "/leader-gui-2"
+        if event-slot = 51:
+            if event-slot is {loop-player2::29}'s skull:
+                set {leader2::%player's uuid%} to "29"
+                add 1 to {leader2::loop-player::29}
+                send "&c&lRooEvents: &eYou Voted For %{loop-player2::29}%" to player
+                close player's inventory
+            else:
+                send "&c&lRooEvents: &4No Player In That Slot" to player
+                close player's inventory
+                wait 1 second
+                execute player command "/leader-gui-2"
+        if event-slot = 52:
+            if event-slot is {loop-player2::30}'s skull:
+                set {leader2::%player's uuid%} to "30"
+                add 1 to {leader2::loop-player::30}
+                send "&c&lRooEvents: &eYou Voted For %{loop-player2::30}%" to player
+                close player's inventory
+            else:
+                send "&c&lRooEvents: &4No Player In That Slot" to player
+                close player's inventory
+                wait 1 second
+                execute player command "/leader-gui-2"
+
+on inventory close:
+    if player is not op:
+        if player has permission "leader.team.2":
+            if player is online:
+                {leader2::%player's uuid%} is not set
+                wait 1 tick
+                execute player command "/leader-gui-2"
+
+command /leader-top2:
+    permission: op
+    trigger:
+        send "&0&m                             &0" to player
+        send "&6&lＬＥＡＤＥＲ ＶＯＴＥＳ:" to player
+        send "&0&m                             &0" to player
+        send "&6&l1:&f %{loop-player2::1}% - %{leader2::loop-player::1}%" to player
+        send "&6&l2:&f %{loop-player2::2}% - %{leader2::loop-player::2}%" to player
+        send "&6&l3:&f %{loop-player2::3}% - %{leader2::loop-player::3}%" to player
+        send "&6&l4:&f %{loop-player2::4}% - %{leader2::loop-player::4}%" to player
+        send "&6&l5:&f %{loop-player2::5}% - %{leader2::loop-player::5}%" to player
+        send "&6&l6:&f %{loop-player2::6}% - %{leader2::loop-player::6}%" to player
+        send "&6&l7:&f %{loop-player2::7}% - %{leader2::loop-player::7}%" to player
+        send "&6&l8:&f %{loop-player2::8}% - %{leader2::loop-player::8}%" to player
+        send "&6&l9:&f %{loop-player2::9}% - %{leader2::loop-player::9}%" to player
+        send "&6&l10:&f %{loop-player2::10}% - %{leader2::loop-player::10}%" to player
+        send "&6&l11:&f %{loop-player2::11}% - %{leader2::loop-player::11}%" to player
+        send "&6&l12:&f %{loop-player2::12}% - %{leader2::loop-player::12}%" to player
+        send "&6&l13:&f %{loop-player2::13}% - %{leader2::loop-player::13}%" to player
+        send "&6&l14:&f %{loop-player2::14}% - %{leader2::loop-player::14}%" to player
+        send "&6&l15:&f %{loop-player2::15}% - %{leader2::loop-player::15}%" to player
+        send "&6&l16:&f %{loop-player2::16}% - %{leader2::loop-player::16}%" to player
+        send "&6&l17:&f %{loop-player2::17}% - %{leader2::loop-player::17}%" to player
+        send "&6&l18:&f %{loop-player2::18}% - %{leader2::loop-player::18}%" to player
+        send "&6&l19:&f %{loop-player2::19}% - %{leader2::loop-player::19}%" to player
+        send "&6&l20:&f %{loop-player2::20}% - %{leader2::loop-player::20}%" to player
+        send "&6&l21:&f %{loop-player2::21}% - %{leader2::loop-player::21}%" to player
+        send "&6&l22:&f %{loop-player2::22}% - %{leader2::loop-player::22}%" to player
+        send "&6&l23:&f %{loop-player2::23}% - %{leader2::loop-player::23}%" to player
+        send "&6&l24:&f %{loop-player2::24}% - %{leader2::loop-player::24}%" to player
+        send "&6&l25:&f %{loop-player2::25}% - %{leader2::loop-player::25}%" to player
+        send "&6&l26:&f %{loop-player2::26}% - %{leader2::loop-player::26}%" to player
+        send "&6&l27:&f %{loop-player2::27}% - %{leader2::loop-player::27}%" to player
+        send "&6&l28:&f %{loop-player2::28}% - %{leader2::loop-player::28}%" to player
+        send "&6&l29:&f %{loop-player2::29}% - %{leader2::loop-player::29}%" to player
+        send "&6&l30:&f %{loop-player2::30}% - %{leader2::loop-player::30}%" to player
+        send "&0&m                             &0" to player
+
+command /leader-clear-gui2 [<offline player>]:
+    permission: op
+    trigger:
+        if arg-1 is set:
+            clear {leader2::%arg-1's uuid%}
+            send "&c&lRooEvent: &aYou Cleared The Gui Use For &6< %arg-1% >" to player
+        else:
+            send "&c&lRooEvent: &4Select A Player" to player
+
+command /leader-clear-votes2:
+    permission: op
+    trigger:
+        clear {leader2::loop-player::*}
+        send "&c&lRooEvent: &aYou Cleared The Votes" to player
