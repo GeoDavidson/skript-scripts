@@ -1,6 +1,6 @@
 # -------------------- dash cane -------------------- #
 on rightclick:
-    if player is holding a magma cream:
+    if custom model data of shooter's tool is 10980:
         if {candycane::cooldown::*} does not contain player's uuid:
             push player forwards at speed 1
             add player's uuid to {candycane::cooldown::*}
@@ -14,12 +14,12 @@ on rightclick:
             remove player's uuid from {candycane::cooldown::*}
 
 # -------------------- ice sword functions -------------------- #
+local function sword_sound(p: player):
+    execute console command "/execute at %{_p}% run playsound minecraft:block.amethyst_block.break player @a ~ ~ ~ 1 1"
+
 local function sword_particle(p: player):
     execute console command "/execute at %{_p}% run particle item minecraft:ice ~ ~1 ~ 0 0 0 0.4 500 normal"
     execute console command "/execute at %{_p}% run particle minecraft:snowflake ~ ~1 ~ 0 0 0 0.5 1000 normal"
-
-local function sword_sound(p: player):
-    execute console command "/execute at %{_p}% run playsound minecraft:block.amethyst_block.break player @a ~ ~ ~ 1 0"
 
 # -------------------- ice sword -------------------- #
 on damage of player by player:
@@ -108,8 +108,36 @@ on rightclick:
             send action bar ""
             remove player's uuid from {hammer::cooldown::*}
 
+# -------------------- snow bow functions -------------------- #
+local function bow_sound_global(p: player):
+    execute console command "/execute at %{_p}% run playsound minecraft:block.amethyst_block.break player @a ~ ~ ~ 1 1"
+
+local function bow_sound_local(p: player):
+    execute console command "/execute at %{_p}% run playsound minecraft:block.amethyst_block.break player %{_p}% ~ ~ ~ 1 1"
+
+local function bow_particle(p: player):
+    execute console command "/execute at %{_p}% run particle item minecraft:ice ~ ~1 ~ 0 0 0 0.4 500 normal"
+    execute console command "/execute at %{_p}% run particle minecraft:snowflake ~ ~1 ~ 0 0 0 0.5 1000 normal"
+
+# -------------------- snow bow -------------------- #
+on damage:
+    if custom model data of attacker's tool is 10980:
+        if "%damage cause%" is "projectile":
+            bow_sound_global(victim)
+            bow_sound_local(attacker)
+            bow_particle(victim)
+
 on shoot:
-    projectile is arrow:
-        while ground state of projectile is false:
-            play heart at projectile
-            wait 1 tick
+    if custom model data of shooter's tool is 10980:
+        if {bow::cooldown::*} does not contain shooter's uuid:
+            add shooter's uuid to {bow::cooldown::*}
+            set {_n} to 5
+            set {_c} to {_n}
+            loop {_n} times:
+                send action bar "&c%{_c}%" to shooter
+                subtract 1 from {_c}
+                wait 1 second
+            send action bar "" to shooter
+            remove shooter's uuid from {bow::cooldown::*}
+        else:
+            cancel event

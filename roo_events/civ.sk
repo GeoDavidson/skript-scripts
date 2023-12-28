@@ -24,16 +24,16 @@ local function team_choosing_spawn() :: object:
     return location(0.5, -62, 0.5, world "cc", 0, 0)
 
 local function red_spawn() :: object:
-    return location(12.5, -62, 5.5, world "cc", 180, 0)
+    return location(-385, 44, 503, world "cc", 147, 0)
 
 local function green_spawn() :: object:
-    return location(16.5, -62, 5.5, world "cc", 180, 0)
+    return location(345, 90, -343, world "cc", -131, 0)
 
 local function blue_spawn() :: object:
-    return location(14.5, -62, 5.5, world "cc", 180, 0)
+    return location(-459, 40, -455, world "cc", -96, 0)
 
 local function yellow_spawn() :: object:
-    return location(10.5, -62, 5.5, world "cc", 180, 0)
+    return location(450, 68, 353, world "cc", 66, 0)
 
 # -------------------- command function -------------------- #
 local function set_gamemode(p: player, m: text):
@@ -41,6 +41,25 @@ local function set_gamemode(p: player, m: text):
 
 local function set_lp(p: player, n: text):
     execute console command "/luckperms user %{_p}% parent set %{_n}%"
+
+local function send_brodcast(t: text):
+    execute console command "/broadcast %{_t}%" 
+
+local function send_title(t: text, n: text):
+    execute console command "/minecraft:title @a title ""%{_t}%"""
+    execute console command "/minecraft:title @a subtitle ""%{_n}%"""
+
+local function give_item(w: text, p: player, i: text, n: number):
+    execute console command "/execute in minecraft:%{_w}% run give %{_p}% %{_i}% %{_n}%"
+
+local function set_time(w: text, t: text):
+    execute console command "/execute in minecraft:%{_w}% run time set %{_t}%"
+
+local function play_sound(s: text):
+    execute console command "/execute at @a run playsound minecraft:%{_s}% player @p ~ ~ ~ 0.5 1"
+
+local function set_mod_spawning(w: text, t: text):
+    execute console command "/execute in minecraft:%{_w}% run gamerule doMobSpawning %{_t}%"
 
 # -------------------- helper function -------------------- #
 local function remove_from_team(p: player):
@@ -65,6 +84,10 @@ local function is_on_team(p: player) :: boolean:
     else if {yellow::team::*} contains {_p}:
         return true
     return false
+
+local function set_score_board(p: text, t: number):
+    set {phase} to {_p}
+    set {game::time} to {_t}
 
 local function clean_up():
     delete {red::team::*}
@@ -164,6 +187,7 @@ on region enter:
                 remove_from_team(player)
                 remove_from_alive(player)
                 set_lp(player, "reindeer")
+                give_item("cc", player, "cooked_beef", 3)
                 add player to {red::team::*}
                 add player to {red::alive::*}
                 teleport player to red_spawn()
@@ -176,6 +200,7 @@ on region enter:
                 remove_from_team(player)
                 remove_from_alive(player)
                 set_lp(player, "grinch")
+                give_item("cc", player, "cooked_beef", 3)
                 add player to {green::team::*}
                 add player to {green::alive::*}
                 teleport player to green_spawn()
@@ -188,6 +213,7 @@ on region enter:
                 remove_from_team(player)
                 remove_from_alive(player)
                 set_lp(player, "snowman")
+                give_item("cc", player, "cooked_beef", 3)
                 add player to {blue::team::*}
                 add player to {blue::alive::*}
                 teleport player to blue_spawn()
@@ -200,6 +226,7 @@ on region enter:
                 remove_from_team(player)
                 remove_from_alive(player)
                 set_lp(player, "elf")
+                give_item("cc", player, "cooked_beef", 3)
                 add player to {yellow::team::*}
                 add player to {yellow::alive::*}
                 teleport player to yellow_spawn()
@@ -358,6 +385,7 @@ command /civreviveplayer <player>:
                     add arg-1 to {blue::alive::*}
                 else if {yellow::team::*} contains arg-1:
                     add arg-1 to {yellow::alive::*}
+                teleport arg-1 to player
                 set_gamemode(arg-1, "survival")
 
 command /civend:
@@ -368,9 +396,103 @@ command /civend:
             set_lp(loop-player, "default")
             teleport loop-player to lobby_spawn()
 
+command /civbarriersdown:
+    permission: op
+    trigger:
+        fill("cc", 18, -56, -6, -18, -62, -6, "air")
+
+command /civcbarriersup:
+    permission: op
+    trigger:
+        fill("cc", 18, -56, -6, -18, -62, -6, "barrier")
+
+command /civprep:
+    permission: op
+    trigger:
+        send_title("", "&b&lPreparation")
+        send_brodcast("&b&lPreparation")
+        set_score_board("&b&lPreparation", 3600)
+        play_sound("block.note_block.chime")
+        play_sound("block.note_block.flute")
+        play_sound("block.note_block.bell")
+        set_time("cc", "noon")
+        fill("cc", -388, 48, 500, -382, 44, 506, "air")
+        fill("cc", 342, 94, -346, 348, 90, -340, "air")
+        fill("cc", -462, 44, -452, -456, 40, -458, "air")
+        fill("cc", 447, 72, 350, 453, 68, 356, "air")
+        set {respawn} to true # just in case
+
+command /civeve:
+    permission: op
+    trigger:
+        send_title("", "&c&lChristmas Eve")
+        send_brodcast("&c&lChristmas Eve")
+        set_score_board("&c&lChristmas Eve", 720)
+        play_sound("entity.hoglin.converted_to_zombified")
+        set_time("cc", "midnight")
+        set_mod_spawning("cc", "true")
+
+command /civdropin6:
+    permission: op
+    trigger:
+        send_title("", "&c&lWalls Drop in &a&l6:00 Minutes")
+        send_brodcast("&c&lWalls Drop in &a&l6:00 Minutes")
+        set_score_board("&c&lWalls Drop in", 360)
+        play_sound("entity.ender_eye.death")
+        play_sound("entity.ender_eye.launch")
+        set_time("cc", "noon")
+        set_mod_spawning("cc", "false")
+        execute console command "/killall hostile cc"
+        execute console command "/execute in minecraft:cc run kill @e[type=minecraft:skeleton]"
+        execute console command "/execute in minecraft:cc run kill @e[type=minecraft:zombie]"
+        execute console command "/execute in minecraft:cc run kill @e[type=minecraft:iron_golem]"
+        execute console command "/execute in minecraft:cc run kill @e[type=minecraft:snow_golem]"
+
+command /civsrinkboarder:
+    permission: op
+    trigger:
+        send_title("", "&c&lBorder Shrinking to Center")
+        send_brodcast("&c&lBorder Shrinking to Center &a&lGET OUT OF CAVES!!!")
+        set_score_board("&c&lBorder Shrinking", 1200)
+        play_sound("entity.ender_dragon.flap")
+        execute console command "/execute in minecraft:cc run worldborder set 300 1200"
+
+command /civboxopen:
+    permission: op
+    trigger:
+        # red
+        fill("cc", -388, 48, 500, -382, 44, 506, "air")
+        # green
+        fill("cc", 342, 94, -346, 348, 90, -340, "air")
+        # blue
+        fill("cc", -462, 44, -452, -456, 40, -458, "air")
+        # yellow
+        fill("cc", 447, 72, 350, 453, 68, 356, "air")
+
+command /civboxclose:
+    permission: op
+    trigger:
+        # red
+        fill("cc", -388, 48, 500, -382, 44, 506, "red_stained_glass")
+        fill("cc", -387, 47, 501, -383, 44, 505, "air")
+        # green
+        fill("cc", 342, 94, -346, 348, 90, -340, "lime_stained_glass")
+        fill("cc", 343, 93, -345, 347, 90, -341, "air")
+        # blue
+        fill("cc", -462, 44, -452, -456, 40, -458, "light_blue_stained_glass")
+        fill("cc", -461, 43, -453, -457, 40, -457, "air")
+        # yellow
+        fill("cc", 447, 72, 350, 453, 68, 356, "yellow_stained_glass")
+        fill("cc", 452, 68, 351, 448, 71, 355, "air")
+
 command /civwallsdown:
     permission: op
     trigger:
+        send_title("&c&lWalls Dropped", "&6&lRESPAWN OFF")
+        send_brodcast("&c&lThe Walls Have Been Dropped &6You can no longer respawn")
+        set_score_board("&c&lWalls Dropped", 0)
+        play_sound("entity.ender_dragon.growl")
+        set {respawn} to false
         # center
         wait 5 ticks
         fill("cc", -159, 113, 161, -159, 27, -158, "air")

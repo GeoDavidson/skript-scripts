@@ -23,8 +23,8 @@ variables:
 function lobby_spawn() :: object:
     return location(0.5, 0, 0.5, world "rooevents", 90, 0)
 
-function ctf1_red_spawn() :: object:
-    return location(0, 0, 0, world "ctf1", 0, 0)
+function ctf1_red_spawn() :: object: # near flag
+    return location(0, 0, 0, world "ctf1", 0, 0) 
 
 function ctf1_blue_spawn() :: object:
     return location(0, 0, 0, world "ctf1", 180, 0)
@@ -58,363 +58,362 @@ function red_spawn() :: object:
     if "%{world}%" is "ctf1":
         if not {game::state}:
             return ctf1_red_spawn()
-        return location(ctf1_desert_team(1), ctf1_desert_team(2), ctf1_desert_team(3), ctf1_desert_team(4), ctf1_desert_team(5), ctf1_desert_team(6))
+        return location(ctf1_red_team(1), ctf1_red_team(2), ctf1_red_team(3), ctf1_red_team(4), ctf1_red_team(5), ctf1_red_team(6))
     else if "%{world}%" is "ctf2":
         if not {game::state}:
             return ctf2_red_spawn()
-        return location(ctf2_jungle_team(1), ctf2_jungle_team(2), ctf2_jungle_team(3), ctf2_jungle_team(4), ctf2_jungle_team(5), ctf2_jungle_team(6))
+        return location(ctf2_red_team(1), ctf2_red_team(2), ctf2_red_team(3), ctf2_red_team(4), ctf2_red_team(5), ctf2_red_team(6))
     else if "%{world}%" is "ctf3":
         if not {game::state}:
             return ctf3_red_spawn()
-        return location(ctf3_crimson_team(1), ctf3_crimson_team(2), ctf3_crimson_team(3), ctf3_crimson_team(4), ctf3_crimson_team(5), ctf3_crimson_team(6))
+        return location(ctf3_red_team(1), ctf3_red_team(2), ctf3_red_team(3), ctf3_red_team(4), ctf3_red_team(5), ctf3_red_team(6))
     else if "%{world}%" is "ctf4":
         if not {game::state}:
             return ctf4_red_spawn()
-        return location(ctf4_spruce_team(1), ctf4_spruce_team(2), ctf4_spruce_team(3), ctf4_spruce_team(4), ctf4_spruce_team(5), ctf4_spruce_team(6))
+        return location(ctf4_red_team(1), ctf4_red_team(2), ctf4_red_team(3), ctf4_red_team(4), ctf4_red_team(5), ctf4_red_team(6))
     else if "%{world}%" is "ctf5":
         if not {game::state}:
             return ctf5_red_spawn()
-        return location(ctf5_muchroom_team(1), ctf5_muchroom_team(2), ctf5_muchroom_team(3), ctf5_muchroom_team(4), ctf5_muchroom_team(5), ctf5_muchroom_team(6))
+        return location(ctf5_red_team(1), ctf5_red_team(2), ctf5_red_team(3), ctf5_red_team(4), ctf5_red_team(5), ctf5_red_team(6))
 
 function blue_spawn() :: object:
     if "%{world}%" is "ctf1":
         if not {game::state}:
             return ctf1_blue_spawn()
-        return location(ctf1_plains_team(1), ctf1_plains_team(2), ctf1_plains_team(3), ctf1_plains_team(4), ctf1_plains_team(5), ctf1_plains_team(6))
+        return location(ctf1_blue_team(1), ctf1_blue_team(2), ctf1_blue_team(3), ctf1_blue_team(4), ctf1_blue_team(5), ctf1_blue_team(6))
     else if "%{world}%" is "ctf2":
         if not {game::state}:
             return ctf2_blue_spawn()
-        return location(ctf2_cherry_team(1), ctf2_cherry_team(2), ctf2_cherry_team(3), ctf2_cherry_team(4), ctf2_cherry_team(5), ctf2_cherry_team(6))
+        return location(ctf2_blue_team(1), ctf2_blue_team(2), ctf2_blue_team(3), ctf2_blue_team(4), ctf2_blue_team(5), ctf2_blue_team(6))
     else if "%{world}%" is "ctf3":
         if not {game::state}:
             return ctf3_blue_spawn()
-        return location(ctf3_warped_team(1), ctf3_warped_team(2), ctf3_warped_team(3), ctf3_warped_team(4), ctf3_warped_team(5), ctf3_warped_team(6))
+        return location(ctf3_blue_team(1), ctf3_blue_team(2), ctf3_blue_team(3), ctf3_blue_team(4), ctf3_blue_team(5), ctf3_blue_team(6))
     else if "%{world}%" is "ctf4":
         if not {game::state}:
             return ctf5_blue_spawn()
-        return location(ctf4_snow_team(1), ctf4_snow_team(2), ctf4_snow_team(3), ctf4_snow_team(4), ctf4_snow_team(5), ctf4_snow_team(6))
+        return location(ctf4_blue_team(1), ctf4_blue_team(2), ctf4_blue_team(3), ctf4_blue_team(4), ctf4_blue_team(5), ctf4_blue_team(6))
     else if "%{world}%" is "ctf5":
         if not {game::state}:
             return ctf5_blue_spawn()
-        return location(ctf5_savanna_team(1), ctf5_savanna_team(2), ctf5_savanna_team(3), ctf5_savanna_team(4), ctf5_savanna_team(5), ctf5_savanna_team(6))
+        return location(ctf5_blue_team(1), ctf5_blue_team(2), ctf5_blue_team(3), ctf5_blue_team(4), ctf5_blue_team(5), ctf5_blue_team(6))
 
 # -------------------- team constants -------------------- #
 # -------------------- ctf1 -------------------- #
-function ctf1_desert_team(i: number) :: object: # red
-    set {_x} to -42
-    set {_y} to 50
-    set {_z} to -727
+function ctf1_red_team(i: number) :: object: # red
+    set {_x} to 0
+    set {_y} to 0
+    set {_z} to 0
     set {_world} to "ctf1"
     set {_pitch} to 0
     set {_yaw} to 0
-    set {_team} to "&6&lDesert"
-    set {_lp} to "desert"
+    set {_team} to ""
+    set {_lp} to ""
     set {_list::*} to {_x}, {_y}, {_z}, {_world}, {_pitch}, {_yaw}, {_team} and {_lp}
     return {_list::%{_i}%}
 
-function ctf1_plains_team(i: number) :: object: # blue
-    set {_x} to -60
-    set {_y} to 51
-    set {_z} to 855
+function ctf1_blue_team(i: number) :: object: # blue
+    set {_x} to 0
+    set {_y} to 0
+    set {_z} to 0
     set {_world} to "ctf1"
     set {_pitch} to 180
     set {_yaw} to 0
-    set {_team} to "&2&lPlains"
-    set {_lp} to "plains"
+    set {_team} to ""
+    set {_lp} to ""
     set {_list::*} to {_x}, {_y}, {_z}, {_world}, {_pitch}, {_yaw}, {_team} and {_lp}
     return {_list::%{_i}%}
 
 # -------------------- ctf2 -------------------- #
-function ctf2_jungle_team(i: number) :: object: # red
-    set {_x} to -67
-    set {_y} to 51
-    set {_z} to -713
+function ctf2_red_team(i: number) :: object: # red
+    set {_x} to 0
+    set {_y} to 0
+    set {_z} to 0
     set {_world} to "ctf2"
     set {_pitch} to 0
     set {_yaw} to 0
-    set {_team} to "&a&lJungle"
-    set {_lp} to "jungle"
+    set {_team} to ""
+    set {_lp} to ""
     set {_list::*} to {_x}, {_y}, {_z}, {_world}, {_pitch}, {_yaw}, {_team} and {_lp}
     return {_list::%{_i}%}
 
-function ctf2_cherry_team(i: number) :: object: # blue
-    set {_x} to -67
-    set {_y} to 51
-    set {_z} to 829
+function ctf2_blue_team(i: number) :: object: # blue
+    set {_x} to 0
+    set {_y} to 0
+    set {_z} to 0
     set {_world} to "ctf2"
     set {_pitch} to 180
     set {_yaw} to 0
-    set {_team} to "&d&lCherry"
-    set {_lp} to "cherry"
+    set {_team} to ""
+    set {_lp} to ""
     set {_list::*} to {_x}, {_y}, {_z}, {_world}, {_pitch}, {_yaw}, {_team} and {_lp}
     return {_list::%{_i}%}
 
 # -------------------- ctf3 -------------------- #
-function ctf3_crimson_team(i: number) :: object: # red
-    set {_x} to -62
-    set {_y} to 51
-    set {_z} to -693
+function ctf3_red_team(i: number) :: object: # red
+    set {_x} to 0
+    set {_y} to 0
+    set {_z} to 0
     set {_world} to "ctf3"
     set {_pitch} to 0
     set {_yaw} to 0
-    set {_team} to "&c&lCrimson"
-    set {_lp} to "crimson"
+    set {_team} to ""
+    set {_lp} to ""
     set {_list::*} to {_x}, {_y}, {_z}, {_world}, {_pitch}, {_yaw}, {_team} and {_lp}
     return {_list::%{_i}%}
 
-function ctf3_warped_team(i: number) :: object: # blue
+function ctf3_blue_team(i: number) :: object: # blue
     set {_x} to -65
     set {_y} to 51
     set {_z} to 852
     set {_world} to "ctf3"
     set {_pitch} to 180
     set {_yaw} to 0
-    set {_team} to "&3&lWarped"
-    set {_lp} to "warped"
+    set {_team} to ""
+    set {_lp} to ""
     set {_list::*} to {_x}, {_y}, {_z}, {_world}, {_pitch}, {_yaw}, {_team} and {_lp}
     return {_list::%{_i}%}
 
 # -------------------- ctf4 -------------------- #
-function ctf4_spruce_team(i: number) :: object: # red
-    set {_x} to -64
-    set {_y} to 52
-    set {_z} to -684
+function ctf4_red_team(i: number) :: object: # red
+    set {_x} to 0
+    set {_y} to 0
+    set {_z} to 0
     set {_world} to "ctf4"
     set {_pitch} to 0
     set {_yaw} to 0
-    set {_team} to "&d&lSpruce"
-    set {_lp} to "spruce"
+    set {_team} to ""
+    set {_lp} to ""
     set {_list::*} to {_x}, {_y}, {_z}, {_world}, {_pitch}, {_yaw}, {_team} and {_lp}
     return {_list::%{_i}%}
 
-function ctf4_snow_team(i: number) :: object: # blue
-    set {_x} to -57
-    set {_y} to 52
-    set {_z} to 804
+function ctf4_blue_team(i: number) :: object: # blue
+    set {_x} to 0
+    set {_y} to 0
+    set {_z} to 0
     set {_world} to "ctf4"
     set {_pitch} to 180
     set {_yaw} to 0
-    set {_team} to "&b&lSnow"
-    set {_lp} to "snow"
+    set {_team} to ""
+    set {_lp} to ""
     set {_list::*} to {_x}, {_y}, {_z}, {_world}, {_pitch}, {_yaw}, {_team} and {_lp}
     return {_list::%{_i}%}
 
 # -------------------- ctf5 -------------------- #
-function ctf5_muchroom_team(i: number) :: object: # red
-    set {_x} to -74
-    set {_y} to 51
-    set {_z} to -664
+function ctf5_red_team(i: number) :: object: # red
+    set {_x} to 0
+    set {_y} to 0
+    set {_z} to 0
     set {_world} to "ctf5"
     set {_pitch} to 0
     set {_yaw} to 0
-    set {_team} to "&b&lMushroom"
-    set {_lp} to "mushroom"
+    set {_team} to ""
+    set {_lp} to ""
     set {_list::*} to {_x}, {_y}, {_z}, {_world}, {_pitch}, {_yaw}, {_team} and {_lp}
     return {_list::%{_i}%}
 
-function ctf5_savanna_team(i: number) :: object: # blue
-    set {_x} to -51
-    set {_y} to 52
-    set {_z} to 794
+function ctf5_blue_team(i: number) :: object: # blue
+    set {_x} to 0
+    set {_y} to 0
+    set {_z} to 0
     set {_world} to "ctf5"
     set {_pitch} to 180
     set {_yaw} to 0
-    set {_team} to "&6&lSavanna"
-    set {_lp} to "savanna"
+    set {_team} to ""
+    set {_lp} to ""
     set {_list::*} to {_x}, {_y}, {_z}, {_world}, {_pitch}, {_yaw}, {_team} and {_lp}
     return {_list::%{_i}%}
 
 # -------------------- team dynamics -------------------- #
 function red_team(i: number) :: object:
     if {world} is "ctf1":
-        set {_x} to ctf1_desert_team(1)
-        set {_y} to ctf1_desert_team(2)
-        set {_z} to ctf1_desert_team(3)
-        set {_world} to ctf1_desert_team(4)
-        set {_pitch} to ctf1_desert_team(5)
-        set {_yaw} to ctf1_desert_team(6)
-        set {_team} to ctf1_desert_team(7)
-        set {_lp} to ctf1_desert_team(8)
+        set {_x} to ctf1_red_team(1)
+        set {_y} to ctf1_red_team(2)
+        set {_z} to ctf1_red_team(3)
+        set {_world} to ctf1_red_team(4)
+        set {_pitch} to ctf1_red_team(5)
+        set {_yaw} to ctf1_red_team(6)
+        set {_team} to ctf1_red_team(7)
+        set {_lp} to ctf1_red_team(8)
     else if {world} is "ctf2":
-        set {_x} to ctf2_jungle_team(1)
-        set {_y} to ctf2_jungle_team(2)
-        set {_z} to ctf2_jungle_team(3)
-        set {_world} to ctf2_jungle_team(4)
-        set {_pitch} to ctf2_jungle_team(5)
-        set {_yaw} to ctf2_jungle_team(6)
-        set {_team} to ctf2_jungle_team(7)
-        set {_lp} to ctf2_jungle_team(8)
+        set {_x} to ctf2_red_team(1)
+        set {_y} to ctf2_red_team(2)
+        set {_z} to ctf2_red_team(3)
+        set {_world} to ctf2_red_team(4)
+        set {_pitch} to ctf2_red_team(5)
+        set {_yaw} to ctf2_red_team(6)
+        set {_team} to ctf2_red_team(7)
+        set {_lp} to ctf2_red_team(8)
     else if {world} is "ctf3":
-        set {_x} to ctf3_crimson_team(1)
-        set {_y} to ctf3_crimson_team(2)
-        set {_z} to ctf3_crimson_team(3)
-        set {_world} to ctf3_crimson_team(4)
-        set {_pitch} to ctf3_crimson_team(5)
-        set {_yaw} to ctf3_crimson_team(6)
-        set {_team} to ctf3_crimson_team(7)
-        set {_lp} to ctf3_crimson_team(8)
+        set {_x} to ctf3_red_team(1)
+        set {_y} to ctf3_red_team(2)
+        set {_z} to ctf3_red_team(3)
+        set {_world} to ctf3_red_team(4)
+        set {_pitch} to ctf3_red_team(5)
+        set {_yaw} to ctf3_red_team(6)
+        set {_team} to ctf3_red_team(7)
+        set {_lp} to ctf3_red_team(8)
     else if {world} is "ctf4":
-        set {_x} to ctf4_spruce_team(1)
-        set {_y} to ctf4_spruce_team(2)
-        set {_z} to ctf4_spruce_team(3)
-        set {_world} to ctf4_spruce_team(4)
-        set {_pitch} to ctf4_spruce_team(5)
-        set {_yaw} to ctf4_spruce_team(6)
-        set {_team} to ctf4_spruce_team(7)
-        set {_lp} to ctf4_spruce_team(8)
+        set {_x} to ctf4_red_team(1)
+        set {_y} to ctf4_red_team(2)
+        set {_z} to ctf4_red_team(3)
+        set {_world} to ctf4_red_team(4)
+        set {_pitch} to ctf4_red_team(5)
+        set {_yaw} to ctf4_red_team(6)
+        set {_team} to ctf4_red_team(7)
+        set {_lp} to ctf4_red_team(8)
     else if {world} is "ctf5":
-        set {_x} to ctf5_muchroom_team(1)
-        set {_y} to ctf5_muchroom_team(2)
-        set {_z} to ctf5_muchroom_team(3)
-        set {_world} to ctf5_muchroom_team(4)
-        set {_pitch} to ctf5_muchroom_team(5)
-        set {_yaw} to ctf5_muchroom_team(6)
-        set {_team} to ctf5_muchroom_team(7)
-        set {_lp} to ctf5_muchroom_team(8)
+        set {_x} to ctf5_red_team(1)
+        set {_y} to ctf5_red_team(2)
+        set {_z} to ctf5_red_team(3)
+        set {_world} to ctf5_red_team(4)
+        set {_pitch} to ctf5_red_team(5)
+        set {_yaw} to ctf5_red_team(6)
+        set {_team} to ctf5_red_team(7)
+        set {_lp} to ctf5_red_team(8)
     set {_list::*} to {_x}, {_y}, {_z}, {_world}, {_pitch}, {_yaw}, {_team} and {_lp}
     return {_list::%{_i}%}
 
 function blue_team(i: number) :: object:
     if {world} is "ctf1":
-        set {_x} to ctf1_plains_team(1)
-        set {_y} to ctf1_plains_team(2)
-        set {_z} to ctf1_plains_team(3)
-        set {_world} to ctf1_plains_team(4)
-        set {_pitch} to ctf1_plains_team(5)
-        set {_yaw} to ctf1_plains_team(6)
-        set {_team} to ctf1_plains_team(7)
-        set {_lp} to ctf1_plains_team(8)
+        set {_x} to ctf1_blue_team(1)
+        set {_y} to ctf1_blue_team(2)
+        set {_z} to ctf1_blue_team(3)
+        set {_world} to ctf1_blue_team(4)
+        set {_pitch} to ctf1_blue_team(5)
+        set {_yaw} to ctf1_blue_team(6)
+        set {_team} to ctf1_blue_team(7)
+        set {_lp} to ctf1_blue_team(8)
     else if {world} is "ctf2":
-        set {_x} to ctf2_cherry_team(1)
-        set {_y} to ctf2_cherry_team(2)
-        set {_z} to ctf2_cherry_team(3)
-        set {_world} to ctf2_cherry_team(4)
-        set {_pitch} to ctf2_cherry_team(5)
-        set {_yaw} to ctf2_cherry_team(6)
-        set {_team} to ctf2_cherry_team(7)
-        set {_lp} to ctf2_cherry_team(8)
+        set {_x} to ctf2_blue_team(1)
+        set {_y} to ctf2_blue_team(2)
+        set {_z} to ctf2_blue_team(3)
+        set {_world} to ctf2_blue_team(4)
+        set {_pitch} to ctf2_blue_team(5)
+        set {_yaw} to ctf2_blue_team(6)
+        set {_team} to ctf2_blue_team(7)
+        set {_lp} to ctf2_blue_team(8)
     else if {world} is "ctf3":
-        set {_x} to ctf3_warped_team(1)
-        set {_y} to ctf3_warped_team(2)
-        set {_z} to ctf3_warped_team(3)
-        set {_world} to ctf3_warped_team(4)
-        set {_pitch} to ctf3_warped_team(5)
-        set {_yaw} to ctf3_warped_team(6)
-        set {_team} to ctf3_warped_team(7)
-        set {_lp} to ctf3_warped_team(8)
+        set {_x} to ctf3_blue_team(1)
+        set {_y} to ctf3_blue_team(2)
+        set {_z} to ctf3_blue_team(3)
+        set {_world} to ctf3_blue_team(4)
+        set {_pitch} to ctf3_blue_team(5)
+        set {_yaw} to ctf3_blue_team(6)
+        set {_team} to ctf3_blue_team(7)
+        set {_lp} to ctf3_blue_team(8)
     else if {world} is "ctf4":
-        set {_x} to ctf4_snow_team(1)
-        set {_y} to ctf4_snow_team(2)
-        set {_z} to ctf4_snow_team(3)
-        set {_world} to ctf4_snow_team(4)
-        set {_pitch} to ctf4_snow_team(5)
-        set {_yaw} to ctf4_snow_team(6)
-        set {_team} to ctf4_snow_team(7)
-        set {_lp} to ctf4_snow_team(8)
+        set {_x} to ctf4_blue_team(1)
+        set {_y} to ctf4_blue_team(2)
+        set {_z} to ctf4_blue_team(3)
+        set {_world} to ctf4_blue_team(4)
+        set {_pitch} to ctf4_blue_team(5)
+        set {_yaw} to ctf4_blue_team(6)
+        set {_team} to ctf4_blue_team(7)
+        set {_lp} to ctf4_blue_team(8)
     else if {world} is "ctf5":
-        set {_x} to ctf5_savanna_team(1)
-        set {_y} to ctf5_savanna_team(2)
-        set {_z} to ctf5_savanna_team(3)
-        set {_world} to ctf5_savanna_team(4)
-        set {_pitch} to ctf5_savanna_team(5)
-        set {_yaw} to ctf5_savanna_team(6)
-        set {_team} to ctf5_savanna_team(7)
-        set {_lp} to ctf5_savanna_team(8)
+        set {_x} to ctf5_blue_team(1)
+        set {_y} to ctf5_blue_team(2)
+        set {_z} to ctf5_blue_team(3)
+        set {_world} to ctf5_blue_team(4)
+        set {_pitch} to ctf5_blue_team(5)
+        set {_yaw} to ctf5_blue_team(6)
+        set {_team} to ctf5_blue_team(7)
+        set {_lp} to ctf5_blue_team(8)
     set {_list::*} to {_x}, {_y}, {_z}, {_world}, {_pitch}, {_yaw}, {_team} and {_lp}
     return {_list::%{_i}%}
 
-# -------------------- flag constants -------------------- #
 # -------------------- ctf1 -------------------- #
-function ctf1_desert_flag(i: number) :: object:
-    set {_x} to -36
-    set {_y} to 52
-    set {_z} to -684
-    set {_name} to "orange_banner"
-    set {_rotation} to 0
+function ctf1_red_flag(i: number) :: object:
+    set {_x} to 0                   # x pos
+    set {_y} to 0                   # y pos
+    set {_z} to 0                   # z pos
+    set {_name} to ""  # banner name
+    set {_rotation} to 0            # banner rotation
     set {_list::*} to {_x}, {_y}, {_z}, {_name} and {_rotation}
     return {_list::%{_i}%}
 
-function ctf1_plains_flag(i: number) :: object:
-    set {_x} to -57
-    set {_y} to 52
-    set {_z} to 807
-    set {_name} to "green_banner"
+function ctf1_blue_flag(i: number) :: object:
+    set {_x} to 0
+    set {_y} to 0
+    set {_z} to 0
+    set {_name} to ""
     set {_rotation} to 8
     set {_list::*} to {_x}, {_y}, {_z}, {_name} and {_rotation}
     return {_list::%{_i}%}
 
 # -------------------- ctf2 -------------------- #
-function ctf2_jungle_flag(i: number) :: object:
-    set {_x} to -66
-    set {_y} to 52
-    set {_z} to -688
-    set {_name} to "lime_banner"
+function ctf2_red_flag(i: number) :: object:
+    set {_x} to 0
+    set {_y} to 0
+    set {_z} to 0
+    set {_name} to ""
     set {_rotation} to 0
     set {_list::*} to {_x}, {_y}, {_z}, {_name} and {_rotation}
     return {_list::%{_i}%}
 
-function ctf2_cherry_flag(i: number) :: object:
-    set {_x} to -67
-    set {_y} to 52
-    set {_z} to 803
-    set {_name} to "pink_banner"
+function ctf2_blue_flag(i: number) :: object:
+    set {_x} to 0
+    set {_y} to 0
+    set {_z} to 0
+    set {_name} to ""
     set {_rotation} to 8
     set {_list::*} to {_x}, {_y}, {_z}, {_name} and {_rotation}
     return {_list::%{_i}%}
 
 # -------------------- ctf3 -------------------- #
-function ctf3_crimson_flag(i: number) :: object:
-    set {_x} to -62
-    set {_y} to 52
-    set {_z} to -668
-    set {_name} to "red_banner"
+function ctf3_red_flag(i: number) :: object:
+    set {_x} to 0
+    set {_y} to 0
+    set {_z} to 0
+    set {_name} to ""
     set {_rotation} to 0
     set {_list::*} to {_x}, {_y}, {_z}, {_name} and {_rotation}
     return {_list::%{_i}%}
 
-function ctf3_warped_flag(i: number) :: object:
-    set {_x} to -65
-    set {_y} to 52
-    set {_z} to 822
-    set {_name} to "cyan_banner"
+function ctf3_blue_flag(i: number) :: object:
+    set {_x} to 0
+    set {_y} to 0
+    set {_z} to 0
+    set {_name} to ""
     set {_rotation} to 8
     set {_list::*} to {_x}, {_y}, {_z}, {_name} and {_rotation}
     return {_list::%{_i}%}
 
 # -------------------- ctf4 -------------------- #
-function ctf4_spruce_flag(i: number) :: object:
-    set {_x} to -74
-    set {_y} to 52
-    set {_z} to -647
-    set {_name} to "purple_banner"
+function ctf4_red_flag(i: number) :: object:
+    set {_x} to 0
+    set {_y} to 0
+    set {_z} to 0
+    set {_name} to ""
     set {_rotation} to 0
     set {_list::*} to {_x}, {_y}, {_z}, {_name} and {_rotation}
     return {_list::%{_i}%}
 
-function ctf4_snow_flag(i: number) :: object:
-    set {_x} to -57
-    set {_y} to 52
-    set {_z} to 770
-    set {_name} to "white_banner"
+function ctf4_blue_flag(i: number) :: object:
+    set {_x} to 0
+    set {_y} to 0
+    set {_z} to 0
+    set {_name} to ""
     set {_rotation} to 8
     set {_list::*} to {_x}, {_y}, {_z}, {_name} and {_rotation}
     return {_list::%{_i}%}
 
 # -------------------- ctf5 -------------------- #
-function ctf5_muchroom_flag(i: number) :: object:
-    set {_x} to -99
-    set {_y} to 52
-    set {_z} to -645
-    set {_name} to "light_blue_banner"
+function ctf5_red_flag(i: number) :: object:
+    set {_x} to 0
+    set {_y} to 0
+    set {_z} to 0
+    set {_name} to ""
     set {_rotation} to 0
     set {_list::*} to {_x}, {_y}, {_z}, {_name} and {_rotation}
     return {_list::%{_i}%}
 
-function ctf5_savanna_flag(i: number) :: object:
-    set {_x} to -48
-    set {_y} to 52
-    set {_z} to 764
-    set {_name} to "orange_banner"
+function ctf5_blue_flag(i: number) :: object:
+    set {_x} to 0
+    set {_y} to 0
+    set {_z} to 0
+    set {_name} to ""
     set {_rotation} to 8
     set {_list::*} to {_x}, {_y}, {_z}, {_name} and {_rotation}
     return {_list::%{_i}%}
@@ -422,69 +421,69 @@ function ctf5_savanna_flag(i: number) :: object:
 # -------------------- flag dynamics -------------------- #
 function red_flag(i: number) :: object:
     if "%{world}%" is "ctf1":
-        set {_x} to ctf1_desert_flag(1)
-        set {_y} to ctf1_desert_flag(2)
-        set {_z} to ctf1_desert_flag(3)
-        set {_name} to ctf1_desert_flag(4)
-        set {_rotation} to ctf1_desert_flag(5)
+        set {_x} to ctf1_red_flag(1)
+        set {_y} to ctf1_red_flag(2)
+        set {_z} to ctf1_red_flag(3)
+        set {_name} to ctf1_red_flag(4)
+        set {_rotation} to ctf1_red_flag(5)
     else if "%{world}%" is "ctf2":
-        set {_x} to ctf2_jungle_flag(1)
-        set {_y} to ctf2_jungle_flag(2)
-        set {_z} to ctf2_jungle_flag(3)
-        set {_name} to ctf2_jungle_flag(4)
-        set {_rotation} to ctf2_jungle_flag(5)
+        set {_x} to ctf2_red_flag(1)
+        set {_y} to ctf2_red_flag(2)
+        set {_z} to ctf2_red_flag(3)
+        set {_name} to ctf2_red_flag(4)
+        set {_rotation} to ctf2_red_flag(5)
     else if "%{world}%" is "ctf3":
-        set {_x} to ctf3_crimson_flag(1)
-        set {_y} to ctf3_crimson_flag(2)
-        set {_z} to ctf3_crimson_flag(3)
-        set {_name} to ctf3_crimson_flag(4)
-        set {_rotation} to ctf3_crimson_flag(5)
+        set {_x} to ctf3_red_flag(1)
+        set {_y} to ctf3_red_flag(2)
+        set {_z} to ctf3_red_flag(3)
+        set {_name} to ctf3_red_flag(4)
+        set {_rotation} to ctf3_red_flag(5)
     else if "%{world}%" is "ctf4":
-        set {_x} to ctf4_spruce_flag(1)
-        set {_y} to ctf4_spruce_flag(2)
-        set {_z} to ctf4_spruce_flag(3)
-        set {_name} to ctf4_spruce_flag(4)
-        set {_rotation} to ctf4_spruce_flag(5)
+        set {_x} to ctf4_red_flag(1)
+        set {_y} to ctf4_red_flag(2)
+        set {_z} to ctf4_red_flag(3)
+        set {_name} to ctf4_red_flag(4)
+        set {_rotation} to ctf4_red_flag(5)
     else if "%{world}%" is "ctf5":
-        set {_x} to ctf5_muchroom_flag(1)
-        set {_y} to ctf5_muchroom_flag(2)
-        set {_z} to ctf5_muchroom_flag(3)
-        set {_name} to ctf5_muchroom_flag(4)
-        set {_rotation} to ctf5_muchroom_flag(5)
+        set {_x} to ctf5_red_flag(1)
+        set {_y} to ctf5_red_flag(2)
+        set {_z} to ctf5_red_flag(3)
+        set {_name} to ctf5_red_flag(4)
+        set {_rotation} to ctf5_red_flag(5)
     set {_list::*} to {_x}, {_y}, {_z}, {_name} and {_rotation}
     return {_list::%{_i}%}
 
 function blue_flag(i: number) :: object:
     if "%{world}%" is "ctf1":
-        set {_x} to ctf1_plains_flag(1)
-        set {_y} to ctf1_plains_flag(2)
-        set {_z} to ctf1_plains_flag(3)
-        set {_name} to ctf1_plains_flag(4)
-        set {_rotation} to ctf1_plains_flag(5)
+        set {_x} to ctf1_blue_flag(1)
+        set {_y} to ctf1_blue_flag(2)
+        set {_z} to ctf1_blue_flag(3)
+        set {_name} to ctf1_blue_flag(4)
+        set {_rotation} to ctf1_blue_flag(5)
     else if "%{world}%" is "ctf2":
-        set {_x} to ctf2_cherry_flag(1)
-        set {_y} to ctf2_cherry_flag(2)
-        set {_z} to ctf2_cherry_flag(3)
-        set {_name} to ctf2_cherry_flag(4)
-        set {_rotation} to ctf2_cherry_flag(5)
+        set {_x} to ctf2_blue_flag(1)
+        set {_y} to ctf2_blue_flag(2)
+        set {_z} to ctf2_blue_flag(3)
+        set {_name} to ctf2_blue_flag(4)
+        set {_rotation} to ctf2_blue_flag(5)
     else if "%{world}%" is "ctf3":
-        set {_x} to ctf3_warped_flag(1)
-        set {_y} to ctf3_warped_flag(2)
-        set {_z} to ctf3_warped_flag(3)
-        set {_name} to ctf3_warped_flag(4)
-        set {_rotation} to ctf3_warped_flag(5)
+        set {_x} to ctf3_blue_flag(1)
+        set {_y} to ctf3_blue_flag(2)
+        set {_z} to ctf3_blue_flag(3)
+        set {_name} to ctf3_blue_flag(4)
+        set {_rotation} to ctf3_blue_flag(5)
     else if "%{world}%" is "ctf4":
-        set {_x} to ctf4_snow_flag(1)
-        set {_y} to ctf4_snow_flag(2)
-        set {_z} to ctf4_snow_flag(3)
-        set {_name} to ctf4_snow_flag(4)
-        set {_rotation} to ctf4_snow_flag(5)
+        set {_x} to ctf4_blue_flag(1)
+        set {_y} to ctf4_blue_flag(2)
+        set {_z} to ctf4_blue_flag(3)
+        set {_name} to ctf4_blue_flag(4)
+        set {_rotation} to ctf4_blue_flag(5)
     else if "%{world}%" is "ctf5":
-        set {_x} to ctf5_savanna_flag(1)
-        set {_y} to ctf5_savanna_flag(2)
-        set {_z} to ctf5_savanna_flag(3)
-        set {_name} to ctf5_savanna_flag(4)
-        set {_rotation} to ctf5_savanna_flag(5)
+        set {_x} to ctf5_blue_flag(1)
+        set {_y} to ctf5_blue_flag(2)
+        set {_z} to ctf5_blue_flag(3)
+        set {_name} to ctf5_blue_flag(4)
+        set {_rotation} to ctf5_blue_flag(5)
     set {_list::*} to {_x}, {_y}, {_z}, {_name} and {_rotation}
     return {_list::%{_i}%}
 
