@@ -354,21 +354,9 @@ command /civreviveall:
     trigger:
         loop {is::dead::*}:
             if is_on_team(loop-value):
-                remove_from_alive(loop-value)
                 remove loop-value from {is::dead::*}
-                if {red::team::*} contains loop-value:
-                    add loop-value to {red::alive::*}
-                    teleport loop-value to red_spawn()
-                else if {green::team::*} contains loop-value:
-                    add loop-value to {green::alive::*}
-                    teleport loop-value to green_spawn()
-                else if {blue::team::*} contains loop-value:
-                    add loop-value to {blue::alive::*}
-                    teleport loop-value to blue_spawn()
-                else if {yellow::team::*} contains loop-value:
-                    add loop-value to {yellow::alive::*}
-                    teleport loop-value to yellow_spawn()
                 set_gamemode(loop-value, "survival")
+                teleport all players to player
 
 command /civreviveplayer <player>:
     permission: op
@@ -388,20 +376,13 @@ command /civreviveplayer <player>:
                 teleport arg-1 to player
                 set_gamemode(arg-1, "survival")
 
-command /civend:
+command /civteamchoosing:
     permission: op
     trigger:
-        clean_up()
-        loop all players:
-            set_lp(loop-player, "default")
-            teleport loop-player to lobby_spawn()
-
-command /civbarriersdown:
-    permission: op
-    trigger:
+        send_title("&a&lPick a Team", "")
         fill("cc", 18, -56, -6, -18, -62, -6, "air")
 
-command /civcbarriersup:
+command /civbarriersup:
     permission: op
     trigger:
         fill("cc", 18, -56, -6, -18, -62, -6, "barrier")
@@ -448,7 +429,7 @@ command /civdropin6:
         execute console command "/execute in minecraft:cc run kill @e[type=minecraft:iron_golem]"
         execute console command "/execute in minecraft:cc run kill @e[type=minecraft:snow_golem]"
 
-command /civsrinkboarder:
+command /civshrinkboarder:
     permission: op
     trigger:
         send_title("", "&c&lBorder Shrinking to Center")
@@ -631,3 +612,11 @@ command /civwallsup:
         fill("cc", 159, 200, -158, 159, 114, 161, "barrier")
         wait 5 ticks
         fill("cc", 159, 114, 161, -159, 200, 161, "barrier")
+
+command /civend: # last
+    permission: op
+    trigger:
+        clean_up()
+        loop all players:
+            set_lp(loop-player, "default")
+            teleport loop-player to lobby_spawn()
