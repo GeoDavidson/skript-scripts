@@ -51,14 +51,26 @@ on world change:
 
 # -------------------- combat log -------------------- #
 on damage of player by player with priority highest:
+    if {red::team::*} contains attacker:
+        if {red::team::*} contains victim:
+            cancel event
+    else if {green::team::*} contains attacker:
+        if {green::team::*} contains victim:
+            cancel event
+    else if {blue::team::*} contains attacker:
+        if {blue::team::*} contains victim:
+            cancel event
+    else if {yellow::team::*} contains attacker:
+        if {yellow::team::*} contains victim:
+            cancel event
     combat(attacker)
     combat(victim)
 
 on death of player with priority highest:
     remove victim from {global::combat::*}
-    if {combat::cooldown::%victim%}
-    set {combat::cooldown::%victim%} to 0
-    send "&aYou Are No Longer In Combat" to victim
+    if {combat::cooldown::%victim%} > 0:
+        set {combat::cooldown::%victim%} to 0
+        send "&aYou Are No Longer In Combat" to victim
 
 on quit:
     if {combat::cooldown::%player%} > 0:
@@ -121,3 +133,11 @@ command /combatresetall:
         loop all players:
             remove loop-player from {global::combat::*}
             set {combat::cooldown::%loop-player%} to 0
+
+command /crafts:
+    trigger:
+        execute player command "/oraxen recipes show all"
+
+command /recipes:
+    trigger:
+        execute player command "/oraxen recipes show all"

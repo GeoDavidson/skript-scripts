@@ -24,7 +24,7 @@ local function sword_sound(p: player):
 # -------------------- ice sword -------------------- #
 on damage:
     if custom model data of attacker's tool is 101293:
-        chance of 100%:
+        chance of 19%:
             sword_sound(attacker)
             # sword_particle(victim)
             make 500 of item particle using ice at location of victim with offset vector(0, 2, 0) 

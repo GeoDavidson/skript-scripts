@@ -257,6 +257,10 @@ on death of player with priority highest:
     if victim is in world "cc":
         if is_on_team(victim):
             cancel event
+            set {_p} to victim
+            loop all items in {_p}'s inventory:
+                drop loop-value at {_p}
+                set slot index of loop-value of {_p} to air
             set_gamemode(victim, "spectator")
             if {respawn}:
                 set {_n} to 5
