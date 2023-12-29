@@ -44,15 +44,19 @@ on join:
         send title "&x&f&f&2&6&2&6&lR&x&f&f&3&a&2&1&lo&x&f&f&4&e&1&6&lo &x&f&f&6&2&1&8&lE&x&f&f&7&7&1&3&lv&x&f&f&8&b&0&e&le&x&f&f&9&f&0&a&ln&x&f&f&b&3&0&5&lt&x&f&f&c&7&0&0&ls" with subtitle "<light green><bold>Welcome %player%" to player for 4 seconds
     while player is online:
         if player is in world "rooevents":
-            set line 1 of player's scoreboard to "&6&m                            "
-            set line 2 of player's scoreboard to "%colored {phase}%:&r %game_time()%"
-            set line 3 of player's scoreboard to "&6&m                            "
+            set line 1 of player's scoreboard to "&6&m                                "
+            set line 2 of player's scoreboard to ""
+            set line 3 of player's scoreboard to "&6&l/crafts&r&a for item recipes"
             set line 4 of player's scoreboard to ""
-            set line 5 of player's scoreboard to player_status(player)
-            set line 6 of player's scoreboard to ""
-            set line 7 of player's scoreboard to "&6&l<< Kill Streak: %{player_kills::%player%}% >>"
+            set line 5 of player's scoreboard to "&6&m                                "
+            set line 6 of player's scoreboard to "%colored {phase}%:&r %game_time()%"
+            set line 7 of player's scoreboard to "&6&m                                "
             set line 8 of player's scoreboard to ""
-            set line 9 of player's scoreboard to "&6&m                            "
+            set line 9 of player's scoreboard to player_status(player)
+            set line 10 of player's scoreboard to ""
+            set line 11 of player's scoreboard to "&6&l<< Kill Streak: %{player_kills::%player%}% >>"
+            set line 12 of player's scoreboard to ""
+            set line 13 of player's scoreboard to "&6&m                                "
             set title of player's scoreboard to "&x&f&f&2&6&2&6&lR&x&f&f&3&a&2&1&lo&x&f&f&4&e&1&6&lo &x&f&f&6&2&1&8&lE&x&f&f&7&7&1&3&lv&x&f&f&8&b&0&e&le&x&f&f&9&f&0&a&ln&x&f&f&b&3&0&5&lt&x&f&f&c&7&0&0&ls"
         wait 1 second
 

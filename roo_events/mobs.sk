@@ -1,46 +1,43 @@
-# -------------------- on spawn function -------------------- #
-local function set_armour(e: entity):
-    set {_chance} to a random integer between 1 and 2
-    if {_chance} is 1:
-        set {_e}'s tool to wooden axe of sharpness 1
-    else:
-        set {_e}'s tool to stone sword
-    set {_chance} to a random integer between 1 and 2
-    set {_item} to leather helmet
-    if {_chance} is 1:
-        dye {_item} red
-    else:
-        dye {_item} green
-    set {_chance} to a random integer between 1 and 2
-    set {_e}'s helmet to {_item}
-    set {_item} to leather chestplate
-    if {_chance} is 1:
-        dye {_item} red
-    else:
-        dye {_item} green
-    set {_chance} to a random integer between 1 and 2
-    set {_e}'s chestplate to {_item}
-    set {_item} to leather leggings
-    if {_chance} is 1:
-        dye {_item} red
-    else:
-        dye {_item} green
-    set {_chance} to a random integer between 1 and 2
-    set {_e}'s leggings to {_item}
-    set {_item} to leather boots
-    if {_chance} is 1:
-        dye {_item} red
-    else:
-        dye {_item} green
-    set {_e}'s boots to {_item}
-
 # -------------------- custome spawn -------------------- #
 on spawn of a monster:
-    spawn reason is natural 
+    # spawn reason is natural
     if event-entity is a zombie:
-        set_armour(event-entity)
+        set event-entity's tool to stone sword
+        set {_item} to ("grinch" parsed as an offline player)'s skull
+        dye {_item} lime
+        set event-entity's helmet to {_item}
+        set {_item} to leather chestplate of protection 2
+        dye {_item} lime
+        set event-entity's chestplate to {_item}
+        set {_item} to leather leggings of protection 2
+        dye {_item} green
+        set event-entity's leggings to {_item}
+        set {_item} to leather boots of protection 2
+        dye {_item} lime
+        set event-entity's boots to {_item}
     else if event-entity is a skeleton:
-        set_armour(event-entity)
+        set event-entity's tool to stone sword
+        set {_chance} to a random integer between 1 and 2
+        if {_chance} is 1:
+            set event-entity's helmet to ("santa" parsed as an offline player)'s skull
+            set {_item} to leather chestplate of protection 2
+            dye {_item} red
+            set event-entity's chestplate to {_item}
+            set {_item} to leather leggings of protection 2
+            dye {_item} green
+            set event-entity's leggings to {_item}
+            set {_item} to leather boots of protection 2
+            dye {_item} red
+            set event-entity's boots to {_item}
+        else:
+            set event-entity's helmet to ("flgw" parsed as an offline player)'s skull
+            set event-entity's chestplate to leather chestplate of protection 2
+            set {_item} to leather leggings of protection 2
+            dye {_item} red
+            set event-entity's leggings to {_item}
+            set {_item} to leather boots of protection 2
+            dye {_item} green
+            set event-entity's boots to {_item}
     else if event-entity is a creeper:
         cancel event
     else if event-entity is a spider:
