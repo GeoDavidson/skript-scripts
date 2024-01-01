@@ -424,9 +424,9 @@ command /civeve:
 command /civdropin6:
     permission: op
     trigger:
-        send_title("", "&c&lWalls Drop in &a&l6:00 Minutes")
-        send_brodcast("&c&lWalls Drop in &a&l6:00 Minutes")
-        set_score_board("&c&lWalls Drop in", 360)
+        send_title("", "&c&lWalls Drop in &a&l10:00 Minutes")
+        send_brodcast("&c&lWalls Drop in &a&l10:00 Minutes")
+        set_score_board("&c&lWalls Drop in", 600)
         play_sound("entity.ender_eye.death")
         play_sound("entity.ender_eye.launch")
         set_time("cc", "noon")

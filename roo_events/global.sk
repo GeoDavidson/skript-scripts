@@ -51,18 +51,6 @@ on world change:
 
 # -------------------- combat log -------------------- #
 on damage of player by player with priority highest:
-    if {red::team::*} contains attacker:
-        if {red::team::*} contains victim:
-            cancel event
-    else if {green::team::*} contains attacker:
-        if {green::team::*} contains victim:
-            cancel event
-    else if {blue::team::*} contains attacker:
-        if {blue::team::*} contains victim:
-            cancel event
-    else if {yellow::team::*} contains attacker:
-        if {yellow::team::*} contains victim:
-            cancel event
     combat(attacker)
     combat(victim)
 
@@ -126,14 +114,6 @@ command /eventsettime <number>:
     trigger:
         set {game::time} to arg-1
 
-# -------------------- testing commands -------------------- #
-command /combatresetall:
-    permission: op
-    trigger:
-        loop all players:
-            remove loop-player from {global::combat::*}
-            set {combat::cooldown::%loop-player%} to 0
-
 command /crafts:
     trigger:
         execute player command "/oraxen recipes show all"
@@ -141,3 +121,12 @@ command /crafts:
 command /recipes:
     trigger:
         execute player command "/oraxen recipes show all"
+
+# -------------------- testing commands -------------------- #
+command /combatresetall:
+    permission: op
+    trigger:
+        loop all players:
+            remove loop-player from {global::combat::*}
+            set {combat::cooldown::%loop-player%} to 0
+            remove loop-player from {civ::combat::*}
