@@ -1,3 +1,15 @@
+# -------------------- README -------------------- #
+# global.sk defines any variable/function that
+# is accesed globaly (in other files). It also
+# contains any logic/command called on global scale.
+#
+# last modified by : DrDingleDucky
+# last modification: 2024/01/03
+#
+# -------------------- last modification -------------------- #
+# [-] /crafts and /recipes commands for civ event
+# [-] {civ::combat::*} from /combatresetall
+
 # -------------------- global state variables (don't modify) -------------------- #
 variables:
     # ----- unnecessary initialization ----- #
@@ -114,19 +126,10 @@ command /eventsettime <number>:
     trigger:
         set {game::time} to arg-1
 
-command /crafts:
-    trigger:
-        execute player command "/oraxen recipes show all"
-
-command /recipes:
-    trigger:
-        execute player command "/oraxen recipes show all"
-
-# -------------------- testing commands -------------------- #
+# -------------------- reset commands -------------------- #
 command /combatresetall:
     permission: op
     trigger:
         loop all players:
             remove loop-player from {global::combat::*}
             set {combat::cooldown::%loop-player%} to 0
-            remove loop-player from {civ::combat::*}

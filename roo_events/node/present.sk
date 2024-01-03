@@ -1,0 +1,28 @@
+on break:
+    if event-block is barrier:
+        chance of 5%:
+            execute player command "/disasters summon elf"
+
+on break:
+    if event-block is barrier:
+        chance of 25%:
+            cancel event
+            set {_radius} to 1
+            set event-block to air
+            wait 1 tick
+            kill all entities in radius {_radius} of event-location
+            drop a diamond
+        else if chance of 25%:
+            cancel event
+            set {_radius} to 1
+            set event-block to air
+            wait 1 tick
+            kill all entities in radius {_radius} of event-location
+            drop a diamond sword
+        else:
+            cancel event
+            set {_radius} to 1
+            set event-block to air
+            wait 1 tick
+            kill all entities in radius {_radius} of event-location
+            drop an apple
