@@ -147,7 +147,7 @@ on damage of player:
         if {event::dead::*} doesn't contain victim's uuid:
             cancel event
             set victim's gamemode to spectator
-            heal victim   #Heal the player just in case they need to be revived
+            heal victim   # Heal the player just in case they need to be revived
             set {_p} to victim
             drop all items in {_p}'s inventory
             execute console command "/minecraft:clear %victim%"   #No duping

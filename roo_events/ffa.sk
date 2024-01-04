@@ -1,0 +1,181 @@
+variables:
+    # ----- unnecessary initialization ----- #
+    # {alive::*}
+    # {dead::*}
+    # {left::*}
+    {game::state} = false
+    {auto::team} = false
+    {round} = 1
+
+# -------------------- spawns -------------------- #
+local function lobby_spawn() :: object:
+    return location(0.5, 0, 0.5, world "rooevents", 90, 0)
+
+local function event_spawn() :: object:
+    return location(0.5, -49, 0.5, world "test_flat", 0, 0)
+
+local function ground_spawn() :: object:
+    return location(0.5, -60, 0.5, world "test_flat", 0, 0)
+
+# -------------------- command function -------------------- #
+local function set_gamemode(p: player, m: text):
+    execute console command "/minecraft:gamemode %{_m}% %{_p}%"
+
+local function send_brodcast(t: text):
+    execute console command "/broadcast %{_t}%" 
+
+local function give_effect(p: player):
+    execute console command "/minecraft:effect give %{_p}% minecraft:slow_falling 10 1 true"
+
+local function send_title(t: text, n: text):
+    execute console command "/minecraft:title @a title ""%{_t}%"""
+    execute console command "/minecraft:title @a subtitle ""%{_n}%"""
+
+local function give_item(w: text, p: player, i: text, n: number):
+    execute console command "/execute in minecraft:%{_w}% run give %{_p}% %{_i}% %{_n}%"
+
+local function play_sound(s: text):
+    execute console command "/execute at @a run playsound minecraft:%{_s}% player @p ~ ~ ~ 0.5 1"
+
+# -------------------- scoreboard function -------------------- #
+function get_round() :: text:
+    if {round} is 1:
+        return "&a&l1&7 - 2 - 3"
+    else if {round} is 2:
+        return "&71 - &r&a&l2&r&7 - 3"
+    else if {round} is 3:
+        return "&71 - 2 - &r&a&l3&r&7"
+    return ""
+
+# -------------------- scoreboard -------------------- #
+on join:
+    wait 20 tick
+    if {dead::*} contains player's uuid:
+        set_gamemode(player, "spectator")
+    else if not {auto::join}:
+        if {game::state}:
+            if {left::*} does not contain player's uuid:
+                set_gamemode(player, "spectator")
+                remove player's uuid from {left::*}
+            else:
+                add player's uuid to {alive::*}
+    else if {left::*} contains player' uuid:
+        add player's uuid to {alive::*}
+    else if {game::state}:
+        add player's uuid to {alive::*}
+        teleport player to ground_spawn()
+    else if {auto::join}:
+        teleport player to event_spawn()
+    while player is online:
+        if player is not in world "rooevents":
+            set line 1 of player's scoreboard to "&6&m                                "
+            set line 2 of player's scoreboard to "%colored {phase}%:&r %game_time()%"
+            set line 3 of player's scoreboard to "&6&m                                "
+            set line 4 of player's scoreboard to ""
+            set line 5 of player's scoreboard to "&a&lAlive:&r %size of {alive::*}%"
+            set line 6 of player's scoreboard to ""
+            set line 7 of player's scoreboard to "&6&m                               "
+            set line 8 of player's scoreboard to "Round: %get_round()%"
+            set line 9 of player's scoreboard to "&6&m                               "
+            set title of player's scoreboard to "&x&f&f&2&6&2&6&lR&x&f&f&3&a&2&1&lo&x&f&f&4&e&1&6&lo &x&f&f&6&2&1&8&lE&x&f&f&7&7&1&3&lv&x&f&f&8&b&0&e&le&x&f&f&9&f&0&a&ln&x&f&f&b&3&0&5&lt&x&f&f&c&7&0&0&ls"
+        wait 1 second
+
+on quit:
+    remove player's uuid from {alive::*}
+    if player is not in world "rooevents":
+        if {game::state}:
+            add player's uuid to {left::*}
+
+# -------------------- on death logic -------------------- #
+on death of player with priority highest:
+    if victim is not in world "rooevents":
+        cancel event
+        set {_p} to victim
+        loop all items in {_p}'s inventory:
+            drop loop-value at {_p}
+            set slot index of loop-value of {_p} to air
+        set_gamemode(victim, "spectator")
+        add victim's uuid to {dead::*}
+        remove victim's uuid from {alive::*}
+        strike lightning effect at the victim
+
+command /ffaresetall:
+    permission: op
+    trigger:
+        delete {alive::*}
+        delete {dead::*}
+        delete {left::*}
+        set {game::state} to false
+        set {auto::team} to false
+        set {round} to 1
+
+command /ffasetround <number>:
+    permission: op
+    trigger:
+        set {round} to arg-1
+
+command /ffaround <number>:
+    permission: op
+    trigger:
+        set {round} to arg-1
+        set {auto::join} to true
+        loop all players:
+            # if loop-player is not "AjosWhip":
+            teleport loop-player to event_spawn()
+
+command /ffastart:
+    permission: op
+    trigger:
+        set {game::state} to true
+        set {_n} to 10
+        set {_c} to {_n}
+        loop {_n} times:
+            send title "&a%{_c}%" to all players
+            play_sound("block.note_block.pling")
+            subtract 1 from {_c}
+            wait 1 second
+        send title "&aGO" to all players
+        play_sound("block.note_block.harp")
+        loop all players:
+            # if loop-player is not "DrDingleDucky":
+            #     if loop-player is not "AjosWhip":
+            add loop-player's uuid to {alive::*}
+            give_effect(loop-player)
+            fill("test_flat", 4, -45, 4, -4, -50, -4, "air")
+
+command /ffashrinkboarder:
+    permission: op
+    trigger:
+        set {auto::join} to false
+        send_title("", "&c&lBorder Shrinking to &r&6160 -100")
+        send_brodcast("&c&lBorder Shrinking to &r&6160 -100&r &a&lGET OUT OF CAVES!!!")
+        execute console command "/execute in minecraft:test_flat run worldborder set 50 10"
+
+command /ffaend:
+    permission: op
+    trigger:
+        delete {alive::*}
+        delete {dead::*}
+        delete {left::*}
+        set {game::state} to false
+        set {auto::join} to false
+        teleport all players to lobby_spawn()
+
+command /ffaboxopen:
+    permission: op
+    trigger:
+        fill("test_flat", 4, -45, 4, -4, -50, -4, "air")
+
+command /ffaboxclose:
+    permission: op
+    trigger:
+        fill("test_flat", 4, -45, 4, -4, -50, -4, "glass")
+        fill("test_flat", 3, -46, 3, -3, -49, -3, "air")
+
+command /ffareviveplayer <player>:
+    permission: op
+    trigger:
+        teleport arg-1 to player
+        add arg-1's uuid to {alive::*}
+        remove arg-1's uuid from {dead::*}
+        set_gamemode(arg-1, "survival")
