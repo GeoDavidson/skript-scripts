@@ -6,10 +6,6 @@
 # last modified by : DrDingleDucky
 # last modification: 2024/01/03
 #
-# -------------------- last modification -------------------- #
-# [-] /crafts and /recipes commands for civ event
-# [-] {civ::combat::*} from /combatresetall
-
 # -------------------- global state variables (don't modify) -------------------- #
 variables:
     # ----- unnecessary initialization ----- #
