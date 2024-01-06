@@ -5,6 +5,8 @@ variables:
     # {left::*}
     {game::state} = false
     {auto::team} = false
+    {pos::x} = 0
+    {pos::z} = 0
     {round} = 1
     {world} = ""
 
@@ -23,7 +25,7 @@ local function set_gamemode(p: player, m: text):
     execute console command "/minecraft:gamemode %{_m}% %{_p}%"
 
 local function send_brodcast(t: text):
-    execute console command "/broadcast %{_t}%" 
+    execute console command "/broadcast %{_t}%"
 
 local function give_effect(p: player):
     execute console command "/minecraft:effect give %{_p}% minecraft:slow_falling 10 1 true"
@@ -67,20 +69,23 @@ on join:
         teleport player to ground_spawn()
     else if {auto::join}:
         teleport player to event_spawn()
+        give_item({world}, player, "cooked_beef", 16)
     while player is online:
         if player is not in world "rooevents":
             set line 1 of player's scoreboard to "&6&m                                "
-            set line 2 of player's scoreboard to "%colored {phase}%:&r %game_time()%"
+            set line 2 of player's scoreboard to "&e&lDrop: X&r&6 %{pos::x}%&r&e&l Z&r&6 %{pos::z}%"
             set line 3 of player's scoreboard to "&6&m                                "
-            set line 4 of player's scoreboard to ""
-            set line 5 of player's scoreboard to "&a&lAlive:&r %size of {alive::*}%"
+            set line 4 of player's scoreboard to "%colored {phase}%:&r %game_time()%"
+            set line 5 of player's scoreboard to "&6&m                                "
             set line 6 of player's scoreboard to ""
-            set line 7 of player's scoreboard to "&6&m                               "
-            set line 8 of player's scoreboard to "Round: %get_round()%"
+            set line 7 of player's scoreboard to "&a&lAlive:&r %size of {alive::*}%"
+            set line 8 of player's scoreboard to ""
             set line 9 of player's scoreboard to "&6&m                               "
+            set line 10 of player's scoreboard to "Round: %get_round()%"
+            set line 11 of player's scoreboard to "&6&m                               "
             set title of player's scoreboard to "&x&f&f&2&6&2&6&lR&x&f&f&3&a&2&1&lo&x&f&f&4&e&1&6&lo &x&f&f&6&2&1&8&lE&x&f&f&7&7&1&3&lv&x&f&f&8&b&0&e&le&x&f&f&9&f&0&a&ln&x&f&f&b&3&0&5&lt&x&f&f&c&7&0&0&ls"
         wait 1 second
- 
+
 on quit:
     remove player's uuid from {alive::*}
     if player is not in world "rooevents":
@@ -133,7 +138,6 @@ command /ffaround <number>:
         set {round} to arg-1
         set {auto::join} to true
         loop all players:
-            # if loop-player is not "AjosWhip":
             teleport loop-player to event_spawn()
 
 command /ffastart:
@@ -153,8 +157,13 @@ command /ffastart:
             # if loop-player is not "DrDingleDucky":
             #     if loop-player is not "AjosWhip":
             add loop-player's uuid to {alive::*}
+            give_item({world}, loop-player, "cooked_beef", 16)
             give_effect(loop-player)
-            fill("%{world}%", -204, 69, 278, -240, 80, 314, "air")
+        fill("%{world}%", -204, 69, 278, -240, 80, 314, "air")
+        wait 10 seconds
+        send_title("", "&c&lPvP on in &r&a3:00&r&c&l minutes")
+        set {phase} to "&6&lPvP on in:"
+        set {game::time} to 180
 
 command /ffashrinkboarder:
     permission: op
@@ -186,3 +195,11 @@ command /ffareviveplayer <player>:
         add arg-1's uuid to {alive::*}
         remove arg-1's uuid from {dead::*}
         set_gamemode(arg-1, "survival")
+
+command /ffadrop:
+    permission: op
+    trigger:
+        set {pos::x} to round(player's x-coordinate)
+        set {pos::z} to round(player's z-coordinate)
+        send_title("&c&lSupply Drop", "&eX:&r&6 %{pos::x}% &r&eZ:&r&6 %{pos::z}%")
+        send_brodcast("Supply Drop at &c&lx &6&l%{pos::x}% &c&lz &6&l%{pos::z}%")
