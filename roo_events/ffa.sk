@@ -4,7 +4,8 @@ variables:
     # {dead::*}
     # {left::*}
     {game::state} = false
-    {auto::team} = false
+    {auto::join} = false
+    {drop} = true
     {pos::x} = 0
     {pos::z} = 0
     {round} = 1
@@ -20,6 +21,9 @@ local function event_spawn() :: object:
 local function ground_spawn() :: object:
     return location(-222, 32, 296, world "%{world}%", 0, 0)
 
+local function center_spawn() :: object:
+    return location(138, 38, -111, world "%{world}%", 0, 0)
+
 # -------------------- command function -------------------- #
 local function set_gamemode(p: player, m: text):
     execute console command "/minecraft:gamemode %{_m}% %{_p}%"
@@ -28,7 +32,7 @@ local function send_brodcast(t: text):
     execute console command "/broadcast %{_t}%"
 
 local function give_effect(p: player):
-    execute console command "/minecraft:effect give %{_p}% minecraft:slow_falling 10 1 true"
+    execute console command "/minecraft:effect give %{_p}% minecraft:slow_falling 7 1 true"
 
 local function send_title(t: text, n: text):
     execute console command "/minecraft:title @a title ""%{_t}%"""
@@ -41,13 +45,23 @@ local function play_sound(s: text):
     execute console command "/execute at @a run playsound minecraft:%{_s}% player @p ~ ~ ~ 0.5 1"
 
 # -------------------- scoreboard function -------------------- #
-function get_round() :: text:
+local function get_round() :: text:
     if {round} is 1:
         return "&a&l1&7 - 2 - 3"
     else if {round} is 2:
         return "&71 - &r&a&l2&r&7 - 3"
     else if {round} is 3:
         return "&71 - 2 - &r&a&l3&r&7"
+    return ""
+
+local function is_drop() :: text:
+    if {drop}:
+        return "&e&lDrop: X&r&6 %{pos::x}%&r&e&l Z&r&6 %{pos::z}%"
+    return ""
+
+local function is_line() :: text:
+    if {drop}:
+        return "&6&m                                "
     return ""
 
 # -------------------- scoreboard -------------------- #
@@ -58,8 +72,9 @@ on join:
     else if not {auto::join}:
         if {game::state}:
             if {left::*} does not contain player's uuid:
+                teleport player to center_spawn()
+                wait 10 tick
                 set_gamemode(player, "spectator")
-                remove player's uuid from {left::*}
             else:
                 add player's uuid to {alive::*}
     else if {left::*} contains player' uuid:
@@ -67,13 +82,13 @@ on join:
     else if {game::state}:
         add player's uuid to {alive::*}
         teleport player to ground_spawn()
+        give_item({world}, player, "cooked_beef", 16)
     else if {auto::join}:
         teleport player to event_spawn()
-        give_item({world}, player, "cooked_beef", 16)
     while player is online:
         if player is not in world "rooevents":
-            set line 1 of player's scoreboard to "&6&m                                "
-            set line 2 of player's scoreboard to "&e&lDrop: X&r&6 %{pos::x}%&r&e&l Z&r&6 %{pos::z}%"
+            set line 1 of player's scoreboard to is_line()
+            set line 2 of player's scoreboard to is_drop()
             set line 3 of player's scoreboard to "&6&m                                "
             set line 4 of player's scoreboard to "%colored {phase}%:&r %game_time()%"
             set line 5 of player's scoreboard to "&6&m                                "
@@ -113,7 +128,7 @@ command /ffaresetall:
         delete {dead::*}
         delete {left::*}
         set {game::state} to false
-        set {auto::team} to false
+        set {auto::join} to false
         set {round} to 1
 
 command /ffasetround <number>:
@@ -138,7 +153,10 @@ command /ffaround <number>:
         set {round} to arg-1
         set {auto::join} to true
         loop all players:
+            # if loop-player is "DrDingleDucky":
             teleport loop-player to event_spawn()
+            # if loop-player is "FuNNy_BuNNy_0o0":
+            # teleport loop-player to event_spawn()
 
 command /ffastart:
     permission: op
@@ -154,15 +172,18 @@ command /ffastart:
         send title "&aGO" to all players
         play_sound("block.note_block.harp")
         loop all players:
-            # if loop-player is not "DrDingleDucky":
-            #     if loop-player is not "AjosWhip":
+            # if loop-player is "DrDingleDucky":
             add loop-player's uuid to {alive::*}
             give_item({world}, loop-player, "cooked_beef", 16)
             give_effect(loop-player)
+            # if loop-player is "FuNNy_BuNNy_0o0":
+                # add loop-player's uuid to {alive::*}
+                # give_item({world}, loop-player, "cooked_beef", 16)
+                # give_effect(loop-player)
         fill("%{world}%", -204, 69, 278, -240, 80, 314, "air")
-        wait 10 seconds
+        wait 8 seconds
         send_title("", "&c&lPvP on in &r&a3:00&r&c&l minutes")
-        set {phase} to "&6&lPvP on in:"
+        set {phase} to "&c&lPvP on in"
         set {game::time} to 180
 
 command /ffashrinkboarder:
@@ -171,7 +192,9 @@ command /ffashrinkboarder:
         set {auto::join} to false
         send_title("", "&c&lBorder Shrinking to &r&6160 -100")
         send_brodcast("&c&lBorder Shrinking to &r&6160 -100&r &a&lGET OUT OF CAVES!!!")
-        execute console command "/execute in minecraft:%{world}% run worldborder set 50 10"
+        execute console command "/execute in minecraft:%{world}% run worldborder set 200 780"
+        set {phase} to "&c&lBorder Shrinking"
+        set {game::time} to 780
 
 command /ffaend:
     permission: op
@@ -182,11 +205,8 @@ command /ffaend:
         set {game::state} to false
         set {auto::join} to false
         teleport all players to lobby_spawn()
-
-command /ffaboxopen:
-    permission: op
-    trigger:
-        fill("%{world}%", -204, 69, 278, -240, 80, 314, "air")
+        set {phase} to "&b&lStarting in"
+        set {game::time} to 60
 
 command /ffareviveplayer <player>:
     permission: op
@@ -199,7 +219,13 @@ command /ffareviveplayer <player>:
 command /ffadrop:
     permission: op
     trigger:
+        set {drop} to true
         set {pos::x} to round(player's x-coordinate)
         set {pos::z} to round(player's z-coordinate)
         send_title("&c&lSupply Drop", "&eX:&r&6 %{pos::x}% &r&eZ:&r&6 %{pos::z}%")
         send_brodcast("Supply Drop at &c&lx &6&l%{pos::x}% &c&lz &6&l%{pos::z}%")
+
+command /ffacleardrop:
+    permission: op
+    trigger:
+        set {drop} to false
