@@ -4,7 +4,7 @@
 # contains any logic/command called on global scale.
 #
 # last modified by : DrDingleDucky
-# last modification: 2024/01/03
+# last modification: 2024/01/07
 #
 # -------------------- global state variables (don't modify) -------------------- #
 variables:
@@ -75,8 +75,11 @@ on quit:
         set {combat::cooldown::%player%} to 0
 
 # -------------------- chat cooldown -------------------- #
-on chat with priority highest:
-    if {chat::cooldown::*} does not contain player's uuid:
+on chat:
+    if gamemode of player is spectator:
+        if player is not op:
+            cancel event
+    else if {chat::cooldown::*} does not contain player's uuid:
         add player's uuid to {chat::cooldown::*}
         wait 3 second
         remove player's uuid from {chat::cooldown::*}

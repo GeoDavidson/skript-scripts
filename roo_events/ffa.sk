@@ -44,6 +44,9 @@ local function give_item(w: text, p: player, i: text, n: number):
 local function play_sound(s: text):
     execute console command "/execute at @a run playsound minecraft:%{_s}% player @p ~ ~ ~ 0.5 1"
 
+function set_lp(p: player, n: text):
+    execute console command "/luckperms user %{_p}% parent set %{_n}%"
+
 # -------------------- scoreboard function -------------------- #
 local function get_round() :: text:
     if {round} is 1:
@@ -67,6 +70,7 @@ local function is_line() :: text:
 # -------------------- scoreboard -------------------- #
 on join:
     wait 20 tick
+    set_lp(player, "default")
     if {dead::*} contains player's uuid:
         set_gamemode(player, "spectator")
     else if not {auto::join}:
@@ -119,7 +123,7 @@ on death of player with priority highest:
             set_gamemode(victim, "spectator")
             add victim's uuid to {dead::*}
             remove victim's uuid from {alive::*}
-            strike lightning effect at the victim
+            # strike lightning effect at the victim
 
 command /ffaresetall:
     permission: op
@@ -153,10 +157,9 @@ command /ffaround <number>:
         set {round} to arg-1
         set {auto::join} to true
         loop all players:
-            # if loop-player is "DrDingleDucky":
-            teleport loop-player to event_spawn()
-            # if loop-player is "FuNNy_BuNNy_0o0":
-            # teleport loop-player to event_spawn()
+            if loop-player is not "DrDingleDucky":
+                if loop-player is not "AjosWhip":
+                    teleport loop-player to event_spawn()
 
 command /ffastart:
     permission: op
@@ -172,19 +175,16 @@ command /ffastart:
         send title "&aGO" to all players
         play_sound("block.note_block.harp")
         loop all players:
-            # if loop-player is "DrDingleDucky":
-            add loop-player's uuid to {alive::*}
-            give_item({world}, loop-player, "cooked_beef", 16)
-            give_effect(loop-player)
-            # if loop-player is "FuNNy_BuNNy_0o0":
-                # add loop-player's uuid to {alive::*}
-                # give_item({world}, loop-player, "cooked_beef", 16)
-                # give_effect(loop-player)
+            if loop-player is not "DrDingleDucky":
+                if loop-player is not "AjosWhip":
+                    add loop-player's uuid to {alive::*}
+                    give_item({world}, loop-player, "cooked_beef", 16)
+                    give_effect(loop-player)
         fill("%{world}%", -204, 69, 278, -240, 80, 314, "air")
         wait 8 seconds
-        send_title("", "&c&lPvP on in &r&a3:00&r&c&l minutes")
+        send_title("", "&c&lPvP on in &r&a5:00&r&c&l minutes")
         set {phase} to "&c&lPvP on in"
-        set {game::time} to 180
+        set {game::time} to 300
 
 command /ffashrinkboarder:
     permission: op
