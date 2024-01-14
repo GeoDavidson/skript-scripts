@@ -42,21 +42,27 @@ aliases:
 function makeMenu(name: text, rows: number) :: inventory:
     set {_gui} to a new chest inventory with {_rows} rows with name {_name}
     loop {_rows} * 9 times: # Fill the inventory with random items.
-        set slot loop-number - 1 of {_gui} to random item out of menu items
+        set slot loop-number - 1 of {_gui} to {test::team::%loop-number%}'s skull
     return {_gui}
 
-command /fancymenu:
-    permission: skript.example.menu
+command /civleader:
+    permission: op
     trigger:
-        set {_menu} to makeMenu("hello", 4)
-        add {_menu} to {my inventories::*} # Prepare to listen to this inventory.
+        set {_menu} to makeMenu("LeaderGui", 4)
+        add {_menu} to {my_inventories::*} # Prepare to listen to this inventory.
         open {_menu} to player
 
 on inventory click: # Listen for players clicking in any inventory.
-    if {my inventories::*} contains event-inventory: # Make sure it's our menu.
+    if {my_inventories::*} contains event-inventory: # Make sure it's our menu.
         cancel event
         send "You clicked slot %index of event-slot%!"
 
 on inventory close: # No longer need to listen to this inventory.
-    {my inventories::*} contains event-inventory
-    remove event-inventory from {my inventories::*}
+    {my_inventories::*} contains event-inventory
+    remove event-inventory from {my_inventories::*}
+
+command /guisetteam:
+    permission: op
+    trigger:
+        loop all players:
+            add player to {test::team::*}

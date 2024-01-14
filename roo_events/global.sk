@@ -1,7 +1,4 @@
-# -------------------- README -------------------- #
-# global.sk defines any variable/function that
-# is accesed globaly (in other files). It also
-# contains any logic/command called on global scale.
+# -------------------- Log -------------------- #
 #
 # last modified by : DrDingleDucky
 # last modification: 2024/01/07
@@ -35,7 +32,7 @@ function game_time() :: string:
         return "%{timer::min}%:0%{timer::sec}%"
     return "%{timer::min}%:%{timer::sec}%"
 
-# -------------------- local functions -------------------- #
+# -------------------- local helper functions -------------------- #
 local function combat(p: player):
     if {global::combat::*} does not contain {_p}:
         add {_p} to {global::combat::*}
@@ -75,17 +72,17 @@ on quit:
         set {combat::cooldown::%player%} to 0
 
 # -------------------- chat cooldown -------------------- #
-on chat:
-    if gamemode of player is spectator:
-        if player is not op:
+on chat with priority highest:
+    if player is not op:
+        if player's gamemode is spectator:
             cancel event
-    else if {chat::cooldown::*} does not contain player's uuid:
-        add player's uuid to {chat::cooldown::*}
-        wait 3 second
-        remove player's uuid from {chat::cooldown::*}
-    else:
-        cancel event
-        message "&cYou must wait 3 seconds before chatting again!"
+        else if {chat::cooldown::*} does not contain player's uuid:
+            add player's uuid to {chat::cooldown::*}
+            wait 3 second
+            remove player's uuid from {chat::cooldown::*}
+        else:
+            cancel event
+            message "&cYou must wait 3 seconds before chatting again!"
 
 # -------------------- 1 lava only -------------------- #
 on inventory slot change:

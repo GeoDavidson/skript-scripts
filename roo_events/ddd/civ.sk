@@ -1,4 +1,4 @@
-# -------------------- state variables (don't modify) -------------------- #
+# -------------------- state variables -------------------- #
 variables:
     # ----- unnecessary initialization ----- #
     # {red::team::*}
@@ -21,19 +21,19 @@ local function lobby_spawn() :: object:
     return location(0.5, 0, 0.5, world "rooevents", 90, 0)
 
 local function team_choosing_spawn() :: object:
-    return location(0.5, -62, 0.5, world "cc", 0, 0)
+    return location(0, -44, 0, world "test_flat", 0, 0)
 
 local function red_spawn() :: object:
-    return location(-385, 44, 503, world "cc", 147, 0)
+    return location(4, -60, 4, world "test_flat", 135, 0)
 
 local function green_spawn() :: object:
-    return location(345, 90, -343, world "cc", -131, 0)
+    return location(-4, -60, 4, world "test_flat", -135, 0)
 
 local function blue_spawn() :: object:
-    return location(-459, 40, -455, world "cc", -96, 0)
+    return location(-4, -60, -4, world "test_flat", -40, 0)
 
 local function yellow_spawn() :: object:
-    return location(450, 68, 353, world "cc", 66, 0)
+    return location(4, -60, -4, world "test_flat", 40, 0)
 
 # -------------------- command function -------------------- #
 local function set_gamemode(p: player, m: text):
@@ -85,6 +85,21 @@ local function is_on_team(p: player) :: boolean:
         return true
     return false
 
+local function return_to_spawn(p: player):
+    if {red::team::*} contains {_p}:
+        add {_p} to {red::alive::*}
+        teleport {_p} to red_spawn()
+    else if {green::team::*} contains {_p}:
+        add {_p} to {green::alive::*}
+        teleport {_p} to green_spawn()
+    else if {blue::team::*} contains {_p}:
+        add {_p} to {blue::alive::*}
+        teleport {_p} to blue_spawn()
+    else if {yellow::team::*} contains {_p}:
+        add {_p} to {yellow::alive::*}
+        teleport {_p} to yellow_spawn()
+    remove {_p} from {in::spec::*}
+
 local function set_score_board(p: text, t: number):
     set {phase} to {_p}
     set {game::time} to {_t}
@@ -100,52 +115,32 @@ local function clean_up():
     delete {yellow::alive::*}
     delete {is::dead::*}
     delete {in::spec::*}
+    delete {civ::combat::*}
     set {respawn} to true
 
 # -------------------- scoreboard function -------------------- #
 local function get_team(p: player) :: text:
     if {red::team::*} contains {_p}:
-        return "&c&lReindeer"
+        return "&c&lRed"
     else if {green::team::*} contains {_p}:
-        return "&a&lGrinches"
+        return "&a&lGreen"
     else if {blue::team::*} contains {_p}:
-        return "&b&lSnowmen"
+        return "&b&lBlue"
     else if {yellow::team::*} contains {_p}:
-        return "&e&lElves"
+        return "&e&lYellow"
     return ""
 
 # -------------------- scoreboard -------------------- #
 on join:
-    if {is::dead::*} contains player: # if not {respawn}:
-        wait 1 tick
+    remove player from {civ::combat::*}
+    if {is::dead::*} contains player:
+        wait 10 tick
         set_gamemode(player, "spectator")
     else if {in::spec::*} contains player:
-        if {red::team::*} contains player:
-            add player to {red::alive::*}
-            teleport player to red_spawn()
-        else if {green::team::*} contains player:
-            add player to {green::alive::*}
-            teleport player to green_spawn()
-        else if {blue::team::*} contains player:
-            add player to {blue::alive::*}
-            teleport player to blue_spawn()
-        else if {yellow::team::*} contains player:
-            add player to {yellow::alive::*}
-            teleport player to yellow_spawn()
+        return_to_spawn(player)
         remove player from {in::spec::*}
     else if {civ::combat::*} contain player:
-        if {red::team::*} contains player:
-            add player to {red::alive::*}
-            teleport player to red_spawn()
-        else if {green::team::*} contains player:
-            add player to {green::alive::*}
-            teleport player to green_spawn()
-        else if {blue::team::*} contains player:
-            add player to {blue::alive::*}
-            teleport player to blue_spawn()
-        else if {yellow::team::*} contains player:
-            add player to {yellow::alive::*}
-            teleport player to yellow_spawn() 
+        return_to_spawn(player)
     else:
         if {red::team::*} contains player:
             add player to {red::alive::*}
@@ -155,23 +150,18 @@ on join:
             add player to {blue::alive::*}
         else if {yellow::team::*} contains player:
             add player to {yellow::alive::*}
-    remove player from {civ::combat::*}
     while player is online:
-        if player is in world "cc":
+        if player is in world "test_flat":
             set line 1 of player's scoreboard to "&6&m                                 "
-            set line 2 of player's scoreboard to ""
-            set line 3 of player's scoreboard to "&6&l/crafts&r&a for item recipes"
-            set line 4 of player's scoreboard to ""
-            set line 5 of player's scoreboard to "&6&m                                 "
-            set line 6 of player's scoreboard to "%colored {phase}%:&r %game_time()%"
-            set line 7 of player's scoreboard to "&6&m                                 "
-            set line 8 of player's scoreboard to "&e&lElves Alive: %size of {yellow::alive::*}%"
-            set line 9 of player's scoreboard to "&b&lSnowmen Alive: %size of {blue::alive::*}%"
-            set line 10 of player's scoreboard to "&a&lGrinches Alive: %size of {green::alive::*}%"
-            set line 11 of player's scoreboard to "&c&lReindeer Alive: %size of {red::alive::*}%"
-            set line 12 of player's scoreboard to ""
-            set line 13 of player's scoreboard to "&lTeam:&r %get_team(player)%"
-            set line 14 of player's scoreboard to "&6&m                                 "
+            set line 2 of player's scoreboard to "%colored {phase}%:&r %game_time()%"
+            set line 3 of player's scoreboard to "&6&m                                 "
+            set line 4 of player's scoreboard to "&e&lYellow Alive: %size of {yellow::alive::*}%"
+            set line 5 of player's scoreboard to "&b&lBlue Alive: %size of {blue::alive::*}%"
+            set line 6 of player's scoreboard to "&a&lGreen Alive: %size of {green::alive::*}%"
+            set line 7 of player's scoreboard to "&c&lRed Alive: %size of {red::alive::*}%"
+            set line 8 of player's scoreboard to ""
+            set line 9 of player's scoreboard to "&lTeam:&r %get_team(player)%"
+            set line 10 of player's scoreboard to "&6&m                                 "
             set title of player's scoreboard to "&x&f&f&2&6&2&6&lR&x&f&f&3&a&2&1&lo&x&f&f&4&e&1&6&lo &x&f&f&6&2&1&8&lE&x&f&f&7&7&1&3&lv&x&f&f&8&b&0&e&le&x&f&f&9&f&0&a&ln&x&f&f&b&3&0&5&lt&x&f&f&c&7&0&0&ls"
         wait 1 second
 
@@ -184,53 +174,53 @@ on region enter:
                 if size of {blue::team::*} >= {_max::team::size} - 1:
                     if size of {yellow::team::*} >= {_max::team::size} - 1:
                         add 1 to {_max::team::size}
-        if "%region%" is "red in world cc":
+        if "%region%" is "red_team in world test_flat":
             if {red::team::*} contains player:
                 teleport player to red_spawn()
             else if size of {red::team::*} < {_max::team::size}:
                 remove_from_team(player)
                 remove_from_alive(player)
-                set_lp(player, "reindeer")
-                give_item("cc", player, "cooked_beef", 3)
+                set_lp(player, "red")
+                # give_item("test_flat", player, "cooked_beef", 3)
                 add player to {red::team::*}
                 add player to {red::alive::*}
                 teleport player to red_spawn()
             else:
                 teleport player to team_choosing_spawn()
-        else if "%region%" is "green in world cc":
+        else if "%region%" is "green_team in world test_flat":
             if {green::team::*} contains player:
                 teleport player to green_spawn()
             else if size of {green::team::*} < {_max::team::size}:
                 remove_from_team(player)
                 remove_from_alive(player)
-                set_lp(player, "grinch")
-                give_item("cc", player, "cooked_beef", 3)
+                set_lp(player, "green")
+                # give_item("test_flat", player, "cooked_beef", 3)
                 add player to {green::team::*}
                 add player to {green::alive::*}
                 teleport player to green_spawn()
             else:
                 teleport player to team_choosing_spawn()
-        else if "%region%" is "blue in world cc":
+        else if "%region%" is "blue_team in world test_flat":
             if {blue::team::*} contains player:
                 teleport player to blue_spawn()
             else if size of {blue::team::*} < {_max::team::size}:
                 remove_from_team(player)
                 remove_from_alive(player)
-                set_lp(player, "snowman")
-                give_item("cc", player, "cooked_beef", 3)
+                set_lp(player, "blue")
+                # give_item("test_flat", player, "cooked_beef", 3)
                 add player to {blue::team::*}
                 add player to {blue::alive::*}
                 teleport player to blue_spawn()
             else:
                 teleport player to team_choosing_spawn()
-        else if "%region%" is "yellow in world cc":
+        else if "%region%" is "yellow_team in world test_flat":
             if {yellow::team::*} contains player:
                 teleport player to yellow_spawn()
             else if size of {yellow::team::*} < {_max::team::size}:
                 remove_from_team(player)
                 remove_from_alive(player)
-                set_lp(player, "elf")
-                give_item("cc", player, "cooked_beef", 3)
+                set_lp(player, "yellow")
+                # give_item("test_flat", player, "cooked_beef", 3)
                 add player to {yellow::team::*}
                 add player to {yellow::alive::*}
                 teleport player to yellow_spawn()
@@ -254,7 +244,7 @@ on damage of player with priority highest:
 
 # -------------------- on death logic -------------------- #
 on death of player with priority highest:
-    if victim is in world "cc":
+    if victim is in world "test_flat":
         if is_on_team(victim):
             cancel event
             set {_p} to victim
@@ -294,12 +284,6 @@ on quit:
     if gamemode of player is spectator:
         add player to {in::spec::*}
 
-# -------------------- no chat -------------------- #
-on chat with priority highest:
-    if player's gamemode is spectator:
-        if player is not op:
-            cancel event
-
 # -------------------- commands -------------------- #
 command /civresetall:
     permission: op
@@ -316,44 +300,44 @@ command /civrespawn <boolean>:
 command /civsetteam <player> <text>:
     permission: op
     trigger:
-        if arg-2 is "reindeer":
+        if arg-2 is "red":
             remove_from_team(arg-1)
             remove_from_alive(arg-1)
             add arg-1 to {red::team::*}
             add arg-1 to {red::alive::*}
-            set_lp(arg-1, arg-2)
-        else if arg-2 is "grinches":
+            # set_lp(arg-1, arg-2)
+        else if arg-2 is "green":
             remove_from_team(arg-1)
             remove_from_alive(arg-1)
             add arg-1 to {green::team::*}
             add arg-1 to {green::alive::*}
-            set_lp(arg-1, arg-2)
-        else if arg-2 is "snowman":
+            # set_lp(arg-1, arg-2)
+        else if arg-2 is "blue":
             remove_from_team(arg-1)
             remove_from_alive(arg-1)
             add arg-1 to {blue::team::*}
             add arg-1 to {blue::alive::*}
-            set_lp(arg-1, arg-2)
-        else if arg-2 is "elves":
+            # set_lp(arg-1, arg-2)
+        else if arg-2 is "yellow":
             remove_from_team(arg-1)
             remove_from_alive(arg-1)
             add arg-1 to {yellow::team::*}
             add arg-1 to {yellow::alive::*}
-            set_lp(arg-1, arg-2)
+            # set_lp(arg-1, arg-2)
 
 command /civtpteam <text>:
     permission: op
     trigger:
-        if arg-1 is "reindeer":
+        if arg-1 is "red":
             loop {red::team::*}:
                 teleport loop-value to player
-        else if arg-1 is "grinches":
+        else if arg-1 is "green":
             loop {green::team::*}:
                 teleport loop-value to player
-        else if arg-1 is "snowman":
+        else if arg-1 is "blue":
             loop {blue::team::*}:
                 teleport loop-value to player
-        else if arg-1 is "elves":
+        else if arg-1 is "yellow":
             loop {yellow::team::*}:
                 teleport loop-value to player
 
@@ -388,12 +372,12 @@ command /civteamchoosing:
     permission: op
     trigger:
         send_title("&a&lPick a Team", "")
-        fill("cc", 18, -56, -6, -18, -62, -6, "air")
+        fill("test_flat", 0, 0, 0, 0, 0, 0, "air")
 
 command /civbarriersup:
     permission: op
     trigger:
-        fill("cc", 18, -56, -6, -18, -62, -6, "barrier")
+        fill("test_flat", 0, 0, 0, 0, 0, 0, "barrier")
 
 command /civprep:
     permission: op
@@ -404,24 +388,24 @@ command /civprep:
         play_sound("block.note_block.chime")
         play_sound("block.note_block.flute")
         play_sound("block.note_block.bell")
-        set_time("cc", "noon")
-        fill("cc", -388, 48, 500, -382, 44, 506, "air")
-        fill("cc", 342, 94, -346, 348, 90, -340, "air")
-        fill("cc", -462, 44, -452, -456, 40, -458, "air")
-        fill("cc", 447, 72, 350, 453, 68, 356, "air")
+        set_time("test_flat", "noon")
+        fill("test_flat", 0, 0, 0, 0, 0, 0, "air")
+        fill("test_flat", 0, 0, 0, 0, 0, 0, "air")
+        fill("test_flat", 0, 0, 0, 0, 0, 0, "air")
+        fill("test_flat", 0, 0, 0, 0, 0, 0, "air")
         set {respawn} to true # just in case
 
-command /civeve:
+command /civblood:
     permission: op
     trigger:
-        send_title("", "&c&lChristmas Eve")
-        send_brodcast("&c&lChristmas Eve")
-        set_score_board("&c&lChristmas Eve", 720)
+        send_title("", "&c&lBlood Moon")
+        send_brodcast("&c&lBlood Moon")
+        set_score_board("&c&lBlood Moon", 720)
         play_sound("entity.hoglin.converted_to_zombified")
-        set_time("cc", "midnight")
-        set_mod_spawning("cc", "true")
+        set_time("test_flat", "midnight")
+        set_mod_spawning("test_flat", "true")
 
-command /civdropin6:
+command /civdroping:
     permission: op
     trigger:
         send_title("", "&c&lWalls Drop in &a&l10:00 Minutes")
@@ -429,13 +413,13 @@ command /civdropin6:
         set_score_board("&c&lWalls Drop in", 600)
         play_sound("entity.ender_eye.death")
         play_sound("entity.ender_eye.launch")
-        set_time("cc", "noon")
-        set_mod_spawning("cc", "false")
-        execute console command "/killall hostile cc"
-        execute console command "/execute in minecraft:cc run kill @e[type=minecraft:skeleton]"
-        execute console command "/execute in minecraft:cc run kill @e[type=minecraft:zombie]"
-        execute console command "/execute in minecraft:cc run kill @e[type=minecraft:iron_golem]"
-        execute console command "/execute in minecraft:cc run kill @e[type=minecraft:snow_golem]"
+        set_time("test_flat", "noon")
+        set_mod_spawning("test_flat", "false")
+        execute console command "/killall hostile test_flat"
+        execute console command "/execute in minecraft:test_flat run kill @e[type=minecraft:skeleton]"
+        execute console command "/execute in minecraft:test_flat run kill @e[type=minecraft:zombie]"
+        execute console command "/execute in minecraft:test_flat run kill @e[type=minecraft:iron_golem]"
+        execute console command "/execute in minecraft:test_flat run kill @e[type=minecraft:snow_golem]"
 
 command /civshrinkboarder:
     permission: op
@@ -444,35 +428,35 @@ command /civshrinkboarder:
         send_brodcast("&c&lBorder Shrinking to Center &a&lGET OUT OF CAVES!!!")
         set_score_board("&c&lBorder Shrinking", 1200)
         play_sound("entity.ender_dragon.flap")
-        execute console command "/execute in minecraft:cc run worldborder set 300 1200"
+        execute console command "/execute in minecraft:test_flat run worldborder set 300 1200"
 
 command /civboxopen:
     permission: op
     trigger:
         # red
-        fill("cc", -388, 48, 500, -382, 44, 506, "air")
+        fill("test_flat", 0, 0, 0, 0, 0, 0, "air")
         # green
-        fill("cc", 342, 94, -346, 348, 90, -340, "air")
+        fill("test_flat", 0, 0, 0, 0, 0, 0, "air")
         # blue
-        fill("cc", -462, 44, -452, -456, 40, -458, "air")
+        fill("test_flat", 0, 0, 0, 0, 0, 0, "air")
         # yellow
-        fill("cc", 447, 72, 350, 453, 68, 356, "air")
+        fill("test_flat", 0, 0, 0, 0, 0, 0, "air")
 
 command /civboxclose:
     permission: op
     trigger:
         # red
-        fill("cc", -388, 48, 500, -382, 44, 506, "red_stained_glass")
-        fill("cc", -387, 47, 501, -383, 44, 505, "air")
+        fill("test_flat", 0, 0, 0, 0, 0, 0, "red_stained_glass")
+        fill("test_flat", 0, 0, 0, 0, 0, 0, "air")
         # green
-        fill("cc", 342, 94, -346, 348, 90, -340, "lime_stained_glass")
-        fill("cc", 343, 93, -345, 347, 90, -341, "air")
+        fill("test_flat", 0, 0, 0, 0, 0, 0, "lime_stained_glass")
+        fill("test_flat", 0, 0, 0, 0, 0, 0, "air")
         # blue
-        fill("cc", -462, 44, -452, -456, 40, -458, "light_blue_stained_glass")
-        fill("cc", -461, 43, -453, -457, 40, -457, "air")
+        fill("test_flat", 0, 0, 0, 0, 0, 0, "light_blue_stained_glass")
+        fill("test_flat", 0, 0, 0, 0, 0, 0, "air")
         # yellow
-        fill("cc", 447, 72, 350, 453, 68, 356, "yellow_stained_glass")
-        fill("cc", 452, 68, 351, 448, 71, 355, "air")
+        fill("test_flat", 0, 0, 0, 0, 0, 0, "yellow_stained_glass")
+        fill("test_flat", 0, 0, 0, 0, 0, 0, "air")
 
 command /civwallsdown:
     permission: op
@@ -482,146 +466,15 @@ command /civwallsdown:
         set_score_board("&c&lWalls Dropped", 0)
         play_sound("entity.ender_dragon.growl")
         set {respawn} to false
-        # center
-        wait 5 ticks
-        fill("cc", -159, 113, 161, -159, 27, -158, "air")
-        wait 5 ticks
-        fill("cc", -159, 27, -158, 159, 113, -158, "air")
-        wait 5 ticks
-        fill("cc", 159, 113, -158, 159, 27, 161, "air")
-        wait 5 ticks
-        fill("cc", 159, 27, 161, -159, 113, 161, "air")
-        # outer
-        wait 5 ticks
-        fill("cc", 0, 27, 162, 0, 58, 1000, "air")
-        wait 5 ticks
-        fill("cc", -160, 27, 0, -1000, 58, 0, "air")
-        wait 5 ticks
-        fill("cc", 0, 27, -159, 0, 58, -1000, "air")
-        wait 5 ticks
-        fill("cc", 160, 27, 0, 1000, 58, 0, "air")
-        wait 5 ticks
-        fill("cc", 0, 59, 162, 0, 90, 1000, "air")
-        wait 5 ticks
-        fill("cc", -160, 59, 0, -1000, 90, 0, "air")
-        wait 5 ticks
-        fill("cc", 0, 59, -159, 0, 90, -1000, "air")
-        wait 5 ticks
-        fill("cc", 160, 59, 0, 1000, 90, 0, "air")
-        wait 5 ticks
-        fill("cc", 0, 91, 162, 0, 122, 1000, "air")
-        wait 5 ticks
-        fill("cc", -160, 91, 0, -1000, 122, 0, "air")
-        wait 5 ticks
-        fill("cc", 0, 91, -159, 0, 122, -1000, "air")
-        wait 5 ticks
-        fill("cc", 160, 91, 0, 1000, 122, 0, "air")
-        wait 5 ticks
-        fill("cc", 0, 123, 162, 0, 154, 1000, "air")
-        wait 5 ticks
-        fill("cc", -160, 123, 0, -1000, 154, 0, "air")
-        wait 5 ticks
-        fill("cc", 0, 123, -159, 0, 154, -1000, "air")
-        wait 5 ticks
-        fill("cc", 160, 123, 0, 1000, 154, 0, "air")
-        wait 5 ticks
-        fill("cc", 0, 155, 162, 0, 186, 1000, "air")
-        wait 5 ticks
-        fill("cc", -160, 155, 0, -1000, 186, 0, "air")
-        wait 5 ticks
-        fill("cc", 0, 155, -159, 0, 186, -1000, "air")
-        wait 5 ticks
-        fill("cc", 160, 155, 0, 1000, 186, 0, "air")
-        wait 5 ticks
-        fill("cc", 0, 187, 162, 0, 200, 1000, "air")
-        wait 5 ticks
-        fill("cc", -160, 187, 0, -1000, 200, 0, "air")
-        wait 5 ticks
-        fill("cc", 0, 187, -159, 0, 200, -1000, "air")
-        wait 5 ticks
-        fill("cc", 160, 187, 0, 1000, 200, 0, "air")
-        # center
-        wait 5 ticks
-        fill("cc", -159, 200, 161, -159, 114, -158, "air")
-        wait 5 ticks
-        fill("cc", -159, 114, -158, 159, 200, -158, "air")
-        wait 5 ticks
-        fill("cc", 159, 200, -158, 159, 114, 161, "air")
-        wait 5 ticks
-        fill("cc", 159, 114, 161, -159, 200, 161, "air")
+        # drop walls
+        fill("test_flat", 0, 0, 0, 0, 0, 0, "air")
 
 command /civwallsup:
     permission: op
     trigger:
-        # center
-        wait 5 ticks
-        fill("cc", -159, 113, 161, -159, 27, -158, "barrier")
-        wait 5 ticks
-        fill("cc", -159, 27, -158, 159, 113, -158, "barrier")
-        wait 5 ticks
-        fill("cc", 159, 113, -158, 159, 27, 161, "barrier")
-        wait 5 ticks
-        fill("cc", 159, 27, 161, -159, 113, 161, "barrier")
-        # outer
-        wait 5 ticks
-        fill("cc", 0, 27, 162, 0, 58, 1000, "barrier")
-        wait 5 ticks
-        fill("cc", -160, 27, 0, -1000, 58, 0, "barrier")
-        wait 5 ticks
-        fill("cc", 0, 27, -159, 0, 58, -1000, "barrier")
-        wait 5 ticks
-        fill("cc", 160, 27, 0, 1000, 58, 0, "barrier")
-        wait 5 ticks
-        fill("cc", 0, 59, 162, 0, 90, 1000, "barrier")
-        wait 5 ticks
-        fill("cc", -160, 59, 0, -1000, 90, 0, "barrier")
-        wait 5 ticks
-        fill("cc", 0, 59, -159, 0, 90, -1000, "barrier")
-        wait 5 ticks
-        fill("cc", 160, 59, 0, 1000, 90, 0, "barrier")
-        wait 5 ticks
-        fill("cc", 0, 91, 162, 0, 122, 1000, "barrier")
-        wait 5 ticks
-        fill("cc", -160, 91, 0, -1000, 122, 0, "barrier")
-        wait 5 ticks
-        fill("cc", 0, 91, -159, 0, 122, -1000, "barrier")
-        wait 5 ticks
-        fill("cc", 160, 91, 0, 1000, 122, 0, "barrier")
-        wait 5 ticks
-        fill("cc", 0, 123, 162, 0, 154, 1000, "barrier")
-        wait 5 ticks
-        fill("cc", -160, 123, 0, -1000, 154, 0, "barrier")
-        wait 5 ticks
-        fill("cc", 0, 123, -159, 0, 154, -1000, "barrier")
-        wait 5 ticks
-        fill("cc", 160, 123, 0, 1000, 154, 0, "barrier")
-        wait 5 ticks
-        fill("cc", 0, 155, 162, 0, 186, 1000, "barrier")
-        wait 5 ticks
-        fill("cc", -160, 155, 0, -1000, 186, 0, "barrier")
-        wait 5 ticks
-        fill("cc", 0, 155, -159, 0, 186, -1000, "barrier")
-        wait 5 ticks
-        fill("cc", 160, 155, 0, 1000, 186, 0, "barrier")
-        wait 5 ticks
-        fill("cc", 0, 187, 162, 0, 200, 1000, "barrier")
-        wait 5 ticks
-        fill("cc", -160, 187, 0, -1000, 200, 0, "barrier")
-        wait 5 ticks
-        fill("cc", 0, 187, -159, 0, 200, -1000, "barrier")
-        wait 5 ticks
-        fill("cc", 160, 187, 0, 1000, 200, 0, "barrier")
-        # center
-        wait 5 ticks
-        fill("cc", -159, 200, 161, -159, 114, -158, "barrier")
-        wait 5 ticks
-        fill("cc", -159, 114, -158, 159, 200, -158, "barrier")
-        wait 5 ticks
-        fill("cc", 159, 200, -158, 159, 114, 161, "barrier")
-        wait 5 ticks
-        fill("cc", 159, 114, 161, -159, 200, 161, "barrier")
+        fill("test_flat", 0, 0, 0, 0, 0, 0, "barrier")
 
-command /civend: # last
+command /civend:
     permission: op
     trigger:
         clean_up()

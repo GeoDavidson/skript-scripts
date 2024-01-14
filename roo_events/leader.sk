@@ -1,0 +1,84 @@
+function makeMenu(name: text, rows: number, team: text) :: inventory:
+    set {_gui} to a new chest inventory with {_rows} rows with name {_name}
+    loop {_rows} * 9 times:
+        if {_team} is "red":
+            set slot loop-number - 1 of {_gui} to {red::team::%loop-number%}'s skull
+        else if {_team} is "green":
+            set slot loop-number - 1 of {_gui} to {green::team::%loop-number%}'s skull
+        else if {_team} is "blue":
+            set slot loop-number - 1 of {_gui} to {blue::team::%loop-number%}'s skull
+        else if {_team} is "yellow":
+            set slot loop-number - 1 of {_gui} to {yellow::team::%loop-number%}'s skull
+    return {_gui}
+
+command /civvote:
+    permission: op
+    trigger:
+        delete {red::votes::*}
+        delete {green::votes::*}
+        delete {blue::votes::*}
+        delete {yellow::votes::*}
+        loop {red::team::*}:
+            add 0 to {red::votes::*}
+            open makeMenu("Leader Vote", 4, "red") to loop-value
+        loop {green::team::*}:
+            add 0 to {green::votes::*}
+            open makeMenu("Leader Vote", 4, "green") to loop-value
+        loop {blue::team::*}:
+            add 0 to {blue::votes::*}
+            open makeMenu("Leader Vote", 4, "blue") to loop-value
+        loop {yellow::team::*}:
+            add 0 to {yellow::votes::*}
+            open makeMenu("Leader Vote", 4, "yellow") to loop-value
+
+on inventory click:
+    if inventory name of player's current inventory contains "Leader Vote":
+        cancel event
+        if {red::team::*} contains player:
+            add 1 to {red::votes::%index of event-slot + 1%}
+            send "you voted for %{red::team::%index of event-slot + 1%}%"
+            close player's inventory
+        else if {green::team::*} contains player:
+            add 1 to {green::votes::%index of event-slot + 1%}
+            send "you voted for %{green::team::%index of event-slot + 1%}%"
+            close player's inventory
+        else if {blue::team::*} contains player:
+            add 1 to {blue::votes::%index of event-slot + 1%}
+            send "you voted for %{blue::team::%index of event-slot + 1%}%"
+            close player's inventory
+        else if {yellow::team::*} contains player:
+            add 1 to {yellow::votes::%index of event-slot + 1%}
+            send "you voted for %{yellow::team::%index of event-slot + 1%}%"
+            close player's inventory
+
+command /civleader:
+    permission: op
+    trigger: 
+        set {_top} to 0
+        set {_index} to 1
+        loop {red::votes::*}:
+            if loop-value > {_top}:
+                set {_top} to loop-value
+                set {_index} to loop-index
+        send "%{red::team::%{_index}%}%" to player
+        set {_top} to 0
+        set {_index} to 1
+        loop {green::votes::*}:
+            if loop-value > {_top}:
+                set {_top} to loop-value
+                set {_index} to loop-index
+        send "%{green::team::%{_index}%}%" to player
+        set {_top} to 0
+        set {_index} to 1
+        loop {blue::votes::*}:
+            if loop-value > {_top}:
+                set {_top} to loop-value
+                set {_index} to loop-index
+        send "%{blue::team::%{_index}%}%" to player
+        set {_top} to 0
+        set {_index} to 1
+        loop {yellow::votes::*}:
+            if loop-value > {_top}:
+                set {_top} to loop-value
+                set {_index} to loop-index
+        send "%{yellow::team::%{_index}%}%" to player
