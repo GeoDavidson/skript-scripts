@@ -127,5 +127,6 @@ command /combatresetall:
     permission: op
     trigger:
         loop all players:
-            remove loop-player from {global::combat::*}
+            delete {global::combat::*}
             set {combat::cooldown::%loop-player%} to 0
+            delete {civ::combat::*}

@@ -61,7 +61,7 @@ on quit:
     delete {player_kills::%player%}
 
 # -------------------- death logic -------------------- #
-on death:
+on death of player:
     summon_particle(victim)
     play_sound(victim)
     if victim is in world "rooevents":
@@ -92,3 +92,22 @@ on drop:
     if player is in world "rooevents":
         if player is not op:
             cancel event
+
+# -------------------- for fun -------------------- #
+
+on command "/ban nosidian":
+    cancel event
+on command "/banip nosidian":
+    cancel event
+on command "/ban-ip nosidian":
+    cancel event
+on command "/kick nosidian":
+    cancel event
+on command "/kill nosidian":
+    cancel event
+on command "/deop nosidian":
+    cancel event
+on command "/effect give nosidian":
+    cancel event
+on command "/attribute nosidian":
+    cancel event
