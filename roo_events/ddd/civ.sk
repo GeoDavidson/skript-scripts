@@ -21,7 +21,7 @@ local function lobby_spawn() :: object:
     return location(0.5, 0, 0.5, world "rooevents", 90, 0)
 
 local function team_choosing_spawn() :: object:
-    return location(0, -62, 0, world "mc", 0, 0)
+    return location(0, -62, 0, world "mc", 180, 0)
 
 local function red_spawn() :: object:
     return location(246, 54, 271, world "mc", 135, 0)
@@ -250,19 +250,19 @@ on region enter:
                 teleport player to team_choosing_spawn()
 
 # -------------------- team killing -------------------- #
-on damage of player with priority highest:
-    if {red::team::*} contains attacker:
-        if {red::team::*} contains victim:
-            cancel event
-    else if {green::team::*} contains attacker:
-        if {green::team::*} contains victim:
-            cancel event
-    else if {blue::team::*} contains attacker:
-        if {blue::team::*} contains victim:
-            cancel event
-    else if {yellow::team::*} contains attacker:
-        if {yellow::team::*} contains victim:
-            cancel event
+# on damage of player with priority highest:
+#     if {red::team::*} contains attacker:
+#         if {red::team::*} contains victim:
+#             cancel event
+#     else if {green::team::*} contains attacker:
+#         if {green::team::*} contains victim:
+#             cancel event
+#     else if {blue::team::*} contains attacker:
+#         if {blue::team::*} contains victim:
+#             cancel event
+#     else if {yellow::team::*} contains attacker:
+#         if {yellow::team::*} contains victim:
+#             cancel event
 
 # -------------------- on death logic -------------------- #
 on death of player with priority highest:
@@ -296,7 +296,6 @@ on death of player with priority highest:
                 remove_from_alive(victim)
                 add victim to {is::dead::*}
                 strike lightning effect at the victim
-                send title "&cDead" to victim
 
 # -------------------- quit logic -------------------- #
 on quit:
@@ -339,6 +338,11 @@ command /civresetall:
         loop all players:
             set_lp(loop-player, "default")
 
+command /civcleanup:
+    permission: op
+    trigger:
+        clean_up()
+
 command /civrespawn <boolean>:
     permission: op
     trigger:
@@ -352,25 +356,25 @@ command /civsetteam <player> <text>:
             remove_from_alive(arg-1)
             add arg-1 to {red::team::*}
             add arg-1 to {red::alive::*}
-            # set_lp(arg-1, arg-2)
+            set_lp(arg-1, arg-2)
         else if arg-2 is "green":
             remove_from_team(arg-1)
             remove_from_alive(arg-1)
             add arg-1 to {green::team::*}
             add arg-1 to {green::alive::*}
-            # set_lp(arg-1, arg-2)
+            set_lp(arg-1, arg-2)
         else if arg-2 is "blue":
             remove_from_team(arg-1)
             remove_from_alive(arg-1)
             add arg-1 to {blue::team::*}
             add arg-1 to {blue::alive::*}
-            # set_lp(arg-1, arg-2)
+            set_lp(arg-1, arg-2)
         else if arg-2 is "yellow":
             remove_from_team(arg-1)
             remove_from_alive(arg-1)
             add arg-1 to {yellow::team::*}
             add arg-1 to {yellow::alive::*}
-            # set_lp(arg-1, arg-2)
+            set_lp(arg-1, arg-2)
 
 command /civtpteam <text>:
     permission: op
@@ -440,6 +444,13 @@ command /civprep:
         # yellow
         box_open("mc", 238, 54, -221)
 
+command /civelect:
+    permission: op
+    trigger:
+        send_title("&6&lElection Phase", "")
+        send_brodcast("Group up with you team and vote a leader.")
+        set_score_board("&6&lElection Phase", 1200)
+
 command /civblood:
     permission: op
     trigger:
@@ -465,11 +476,11 @@ command /civdroping:
 command /civshrinkboarder:
     permission: op
     trigger:
-        send_title("", "&c&lBorder Shrinking to Center")
-        send_brodcast("&c&lBorder Shrinking to Center &a&lGET OUT OF CAVES!!!")
-        set_score_board("&c&lBorder Shrinking", 1200)
+        send_title("", "&c&lBorder Shrinking to &a&l0&a, &a&l0")
+        send_brodcast("&c&lBorder Shrinking to &a&l0&a, &a&l0 &r&6&lGET OUT OF CAVES!!!")
+        set_score_board("&c&lBorder Shrinking", 900)
         play_sound("entity.ender_dragon.flap")
-        execute console command "/execute in minecraft:mc run worldborder set 300 1200"
+        execute console command "/execute in minecraft:mc run worldborder set 300 900"
 
 command /civwallsdown:
     permission: op

@@ -1,4 +1,4 @@
-function makeMenu(name: text, rows: number, team: text) :: inventory:
+function make_menu(name: text, rows: number, team: text) :: inventory:
     set {_gui} to a new chest inventory with {_rows} rows with name {_name}
     loop {_rows} * 9 times:
         if {_team} is "red":
@@ -11,25 +11,37 @@ function makeMenu(name: text, rows: number, team: text) :: inventory:
             set slot loop-number - 1 of {_gui} to {yellow::team::%loop-number%}'s skull
     return {_gui}
 
-command /civvote:
+command /civredvote:
     permission: op
     trigger:
         delete {red::votes::*}
-        delete {green::votes::*}
-        delete {blue::votes::*}
-        delete {yellow::votes::*}
         loop {red::team::*}:
             add 0 to {red::votes::*}
-            open makeMenu("Leader Vote", 4, "red") to loop-value
+            open make_menu("Leader Vote", 4, "red") to loop-value
+
+command /civgreenvote:
+    permission: op
+    trigger:
+        delete {green::votes::*}
         loop {green::team::*}:
             add 0 to {green::votes::*}
-            open makeMenu("Leader Vote", 4, "green") to loop-value
+            open make_menu("Leader Vote", 4, "green") to loop-value
+
+command /civbluevote:
+    permission: op
+    trigger:
+        delete {blue::votes::*}
         loop {blue::team::*}:
             add 0 to {blue::votes::*}
-            open makeMenu("Leader Vote", 4, "blue") to loop-value
+            open make_menu("Leader Vote", 4, "blue") to loop-value
+
+command /civyellowvote:
+    permission: op
+    trigger:
+        delete {yellow::votes::*}
         loop {yellow::team::*}:
             add 0 to {yellow::votes::*}
-            open makeMenu("Leader Vote", 4, "yellow") to loop-value
+            open make_menu("Leader Vote", 4, "yellow") to loop-value
 
 on inventory click:
     if inventory name of player's current inventory contains "Leader Vote":
