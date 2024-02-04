@@ -10,7 +10,7 @@ variables:
     {red::points} = 0
     {blue::points} = 0
     {red::flag::taker} = ""
-    {blue:flag::taker} = ""
+    {blue::flag::taker} = ""
     {world} = ""
     {red::x} = 0
     {red::y} = 0
