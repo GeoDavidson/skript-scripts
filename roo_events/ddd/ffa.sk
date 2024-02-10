@@ -1,5 +1,4 @@
 variables:
-    # ----- unnecessary initialization ----- #
     # {alive::*}
     # {dead::*}
     # {left::*}
@@ -13,16 +12,13 @@ variables:
 
 # -------------------- spawns -------------------- #
 local function lobby_spawn() :: object:
-    return location(0.5, 0, 0.5, world "rooevents", 90, 0)
+    return location(0.5, -32, 0.5, world "eventlobby", 90, 0)
 
 local function event_spawn() :: object:
-    return location(-222, 72, 296, world "%{world}%", 0, 0)
+    return location(2, 61, 27, world "%{world}%", 0, 0)
 
 local function ground_spawn() :: object:
-    return location(-222, 32, 296, world "%{world}%", 0, 0)
-
-local function center_spawn() :: object:
-    return location(138, 38, -111, world "%{world}%", 0, 0)
+    return location(2, 34, 27, world "%{world}%", 0, 0)
 
 # -------------------- command function -------------------- #
 local function set_gamemode(p: player, m: text):
@@ -58,39 +54,42 @@ local function get_round() :: text:
     return ""
 
 local function is_drop() :: text:
-    if {drop}:
+    if {drop} is true:
         return "&e&lDrop: X&r&6 %{pos::x}%&r&e&l Z&r&6 %{pos::z}%"
     return ""
 
 local function is_line() :: text:
-    if {drop}:
+    if {drop} is true:
         return "&6&m                                "
     return ""
 
 # -------------------- scoreboard -------------------- #
 on join:
-    wait 20 tick
-    set_lp(player, "default")
+    wait 20 ticks
     if {dead::*} contains player's uuid:
         set_gamemode(player, "spectator")
-    else if not {auto::join}:
-        if {game::state}:
+    else if {auto::join} is false:
+        if {game::state} is true:
             if {left::*} does not contain player's uuid:
-                teleport player to center_spawn()
+                teleport player to ground_spawn()
                 wait 10 tick
                 set_gamemode(player, "spectator")
+                add player's uuid to {dead::*}
             else:
                 add player's uuid to {alive::*}
     else if {left::*} contains player' uuid:
         add player's uuid to {alive::*}
-    else if {game::state}:
+    else if {game::state} is true:
         add player's uuid to {alive::*}
         teleport player to ground_spawn()
         give_item({world}, player, "cooked_beef", 16)
-    else if {auto::join}:
+        set_gamemode(player, "survival")
+    else if {auto::join} is true:
         teleport player to event_spawn()
+        wait 5 ticks
+        set_gamemode(player, "survival")
     while player is online:
-        if player is not in world "rooevents":
+        if player is not in world "eventlobby":
             set line 1 of player's scoreboard to is_line()
             set line 2 of player's scoreboard to is_drop()
             set line 3 of player's scoreboard to "&6&m                                "
@@ -105,16 +104,18 @@ on join:
             set title of player's scoreboard to "&x&f&f&2&6&2&6&lR&x&f&f&3&a&2&1&lo&x&f&f&4&e&1&6&lo &x&f&f&6&2&1&8&lE&x&f&f&7&7&1&3&lv&x&f&f&8&b&0&e&le&x&f&f&9&f&0&a&ln&x&f&f&b&3&0&5&lt&x&f&f&c&7&0&0&ls"
         wait 1 second
 
+# -------------------- quit logic -------------------- #
 on quit:
-    remove player's uuid from {alive::*}
-    if player is not in world "rooevents":
-        if {game::state}:
+    if player is not in world "eventlobby":
+        if {game::state} is true:
             add player's uuid to {left::*}
+    wait 7 ticks
+    remove player's uuid from {alive::*}
 
 # -------------------- on death logic -------------------- #
 on death of player with priority highest:
-    if victim is not in world "rooevents":
-        if {game::state}:
+    if victim is not in world "eventlobby":
+        if {game::state} is true:
             cancel event
             set {_p} to victim
             loop all items in {_p}'s inventory:
@@ -122,8 +123,9 @@ on death of player with priority highest:
                 set slot index of loop-value of {_p} to air
             set_gamemode(victim, "spectator")
             add victim's uuid to {dead::*}
+            if {alive::*} contains victim's uuid:
+                strike lightning effect at the victim
             remove victim's uuid from {alive::*}
-            # strike lightning effect at the victim
 
 command /ffaresetall:
     permission: op
@@ -149,17 +151,22 @@ command /ffaround <number>:
     permission: op
     trigger:
         if arg-1 is 1:
-            set {world} to "ffa1"
+            set {world} to "br1"
         else if arg-1 is 2:
-            set {world} to "ffa2"
+            set {world} to "br2"
         else if arg-1 is 3:
-            set {world} to "ffa3"
+            set {world} to "br3"
         set {round} to arg-1
         set {auto::join} to true
         loop all players:
-            if loop-player is not "DrDingleDucky":
-                if loop-player is not "AjosWhip":
-                    teleport loop-player to event_spawn()
+            wait 2 ticks
+            # if loop-player is not "DrDingleDucky":
+            #     if loop-player is not "AjosWhip":
+            teleport loop-player to event_spawn()
+            # if loop-player is "DrDingleDucky":
+            #     teleport loop-player to event_spawn()
+            # else if loop-player is "FuNNy_BuNNy_0o0":
+            #     teleport loop-player to event_spawn()
 
 command /ffastart:
     permission: op
@@ -175,12 +182,23 @@ command /ffastart:
         send title "&aGO" to all players
         play_sound("block.note_block.harp")
         loop all players:
-            if loop-player is not "DrDingleDucky":
-                if loop-player is not "AjosWhip":
-                    add loop-player's uuid to {alive::*}
-                    give_item({world}, loop-player, "cooked_beef", 16)
-                    give_effect(loop-player)
-        fill("%{world}%", -204, 69, 278, -240, 80, 314, "air")
+            # if loop-player is not "DrDingleDucky":
+            #     if loop-player is not "AjosWhip":
+            add loop-player's uuid to {alive::*}
+            give_item({world}, loop-player, "cooked_beef", 16)
+            give_effect(loop-player)
+            # if loop-player is "DrDingleDucky":
+            #     add loop-player's uuid to {alive::*}
+            #     give_item({world}, loop-player, "cooked_beef", 16)
+            #     give_effect(loop-player)
+            #     teleport loop-player to event_spawn()
+            # else if loop-player is "FuNNy_BuNNy_0o0":
+            #     teleport loop-player to event_spawn()
+            #     add loop-player's uuid to {alive::*}
+            #     give_item({world}, loop-player, "cooked_beef", 16)
+            #     give_effect(loop-player)
+
+        fill("%{world}%", 21, 69, 47, -17, 56, 7, "air")
         wait 8 seconds
         send_title("", "&c&lPvP on in &r&a5:00&r&c&l minutes")
         set {phase} to "&c&lPvP on in"
@@ -190,11 +208,11 @@ command /ffashrinkboarder:
     permission: op
     trigger:
         set {auto::join} to false
-        send_title("", "&c&lBorder Shrinking to &r&6160 -100")
-        send_brodcast("&c&lBorder Shrinking to &r&6160 -100&r &a&lGET OUT OF CAVES!!!")
-        execute console command "/execute in minecraft:%{world}% run worldborder set 200 780"
+        send_title("", "&c&lBorder Shrinking to &r&60, 0")
+        send_brodcast("&c&lBorder Shrinking to &r&60, 0&r &a&lGET OUT OF CAVES!!!")
+        execute console command "/execute in minecraft:%{world}% run worldborder set 400 900"
         set {phase} to "&c&lBorder Shrinking"
-        set {game::time} to 780
+        set {game::time} to 900
 
 command /ffaend:
     permission: op
@@ -204,9 +222,15 @@ command /ffaend:
         delete {left::*}
         set {game::state} to false
         set {auto::join} to false
-        teleport all players to lobby_spawn()
+        loop all players:
+            wait 2 ticks
+            # if loop-player is "DrDingleDucky":
+            #     teleport loop-player to lobby_spawn()
+            # else if loop-player is "FuNNy_BuNNy_0o0":
+            #     teleport loop-player to lobby_spawn()
+            teleport loop-player to lobby_spawn()
         set {phase} to "&b&lStarting in"
-        set {game::time} to 60
+        set {game::time} to 30
 
 command /ffareviveplayer <player>:
     permission: op
@@ -229,3 +253,13 @@ command /ffacleardrop:
     permission: op
     trigger:
         set {drop} to false
+
+command /ffasetsurvival:
+    permission: op
+    trigger:
+        loop all players:
+            wait 2 ticks
+            if gamemode of player is spectator:
+                teleport loop-player to event_spawn()
+                wait 2 ticks
+                set_gamemode(loop-player, "survival")

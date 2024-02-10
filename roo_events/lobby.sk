@@ -1,7 +1,6 @@
 # -------------------- state variables (don't modify) -------------------- #
 variables:
-    # ----- global initialization ----- #
-    # {combat::cooldown::%player%} = 0
+    # {combat::*}
     {player_kills::%player%} = 0
 
 # -------------------- command function -------------------- #
@@ -15,7 +14,7 @@ local function give_kit(p: player):
     execute console command "/minecraft:item replace entity %{_p}% armor.feet with minecraft:diamond_boots"
     execute console command "/minecraft:item replace entity %{_p}% weapon.offhand with minecraft:shield"
 
-local function clear_kit(p: player):
+function clear_kit(p: player):
     execute console command "/minecraft:clear %{_p}% minecraft:diamond_sword"
     execute console command "/minecraft:clear %{_p}% minecraft:diamond_axe"
     execute console command "/minecraft:clear %{_p}% minecraft:cooked_beef"
@@ -31,57 +30,67 @@ local function summon_particle(p: player):
 local function play_sound(p: player):
     execute console command "/execute at %{_p}% run playsound minecraft:entity.dragon_fireball.explode player @a ~ ~ ~ 0.5 2"
 
-# -------------------- scoreboard functions -------------------- #
-local function player_status(p: player) :: string:
-    if {combat::cooldown::%{_p}%} > 0:
-        return "&c&l<< In Combat &6&l(%{combat::cooldown::%{_p}%}%)&r&c&l >>"
-    else:
-        return "&a&l<< Not In Combat >>"
+local function set_lp(p: player, n: text):
+    execute console command "/luckperms user %{_p}% parent set %{_n}%"
+
+# -------------------- def -------------------- #
+on first join:
+    set_lp(player, "default")
 
 # -------------------- scoreboard -------------------- #
 on join:
-    if player is in world "rooevents":
+    set join message to ""
+    if player is in world "eventlobby":
         send title "&x&f&f&2&6&2&6&lR&x&f&f&3&a&2&1&lo&x&f&f&4&e&1&6&lo &x&f&f&6&2&1&8&lE&x&f&f&7&7&1&3&lv&x&f&f&8&b&0&e&le&x&f&f&9&f&0&a&ln&x&f&f&b&3&0&5&lt&x&f&f&c&7&0&0&ls" with subtitle "<light green><bold>Welcome %player%" to player for 4 seconds
     while player is online:
-        if player is in world "rooevents":
+        if player is in world "eventlobby":
             set line 1 of player's scoreboard to "&6&m                                "
             set line 2 of player's scoreboard to "%colored {phase}%:&r %game_time()%"
             set line 3 of player's scoreboard to "&6&m                                "
             set line 4 of player's scoreboard to ""
-            set line 5 of player's scoreboard to player_status(player)
+            set line 5 of player's scoreboard to "&6&l<< Kill Streak: %{player_kills::%player%}% >>"
             set line 6 of player's scoreboard to ""
-            set line 7 of player's scoreboard to "&6&l<< Kill Streak: %{player_kills::%player%}% >>"
-            set line 8 of player's scoreboard to ""
-            set line 9 of player's scoreboard to "&6&m                                "
+            set line 7 of player's scoreboard to "&6&m                                "
             set title of player's scoreboard to "&x&f&f&2&6&2&6&lR&x&f&f&3&a&2&1&lo&x&f&f&4&e&1&6&lo &x&f&f&6&2&1&8&lE&x&f&f&7&7&1&3&lv&x&f&f&8&b&0&e&le&x&f&f&9&f&0&a&ln&x&f&f&b&3&0&5&lt&x&f&f&c&7&0&0&ls"
         wait 1 second
 
 # -------------------- quit logic -------------------- #
 on quit:
+    set quit message to ""
     delete {player_kills::%player%}
+    # remove player's uuid from {combat::*}
+
+# on damage of a player:
+#     add victim's uuid to {combat::*}
+#     add attacker's uuid to {combat::*}
+#     wait 10 seconds
+#     remove victim's uuid from {combat::*}
+#     remove attacker's uuid from {combat::*}
 
 # -------------------- death logic -------------------- #
-on death of player:
-    summon_particle(victim)
-    play_sound(victim)
-    if victim is in world "rooevents":
+on death:
+    if attacker is in world "eventlobby":
+        add 1 to {player_kills::%attacker%}
+    if victim is in world "eventlobby":
+        summon_particle(victim)
+        play_sound(victim)
         clear_kit(victim)
         set {player_kills::%victim%} to 0
-        add 1 to {player_kills::%attacker%}
+        # add 1 to {player_kills::%attacker%}
         heal attacker
 
 # -------------------- up region logic -------------------- #
 on region enter:
-    if "%region%" is "up in world rooevents":
-        if {combat::cooldown::%player%} > 0:
-            message "&cYou can't go up whlie in combat!"
-            cancel event
-    if "%region%" is "pvp in world rooevents":
+    # if "%region%" is "up in world eventlobby":
+    #     if {combat::*} contains player's uuid:
+    #         message "&cYou can't go up whlie in combat!"
+    #         cancel event
+    if "%region%" is "pvp in world eventlobby":
         give_kit(player)
 
 # -------------------- exit pvp arena -------------------- #
 on region exit:
-    if "%region%" is "pvp in world rooevents":
+    if "%region%" is "pvp in world eventlobby":
         clear_kit(player)
         set {player_kills::%player%} to 0 
         heal player
@@ -89,25 +98,19 @@ on region exit:
 
 # -------------------- anti drop -------------------- #
 on drop:
-    if player is in world "rooevents":
+    if player is in world "eventlobby":
         if player is not op:
             cancel event
 
-# -------------------- for fun -------------------- #
+# -------------------- launch pads -------------------- #
+on step on bamboo slab:
+    push player up at speed 2
 
-on command "/ban nosidian":
-    cancel event
-on command "/banip nosidian":
-    cancel event
-on command "/ban-ip nosidian":
-    cancel event
-on command "/kick nosidian":
-    cancel event
-on command "/kill nosidian":
-    cancel event
-on command "/deop nosidian":
-    cancel event
-on command "/effect give nosidian":
-    cancel event
-on command "/attribute nosidian":
-    cancel event
+on step on red nether brick slab:
+    push player up at speed 2.5
+    push player forward at speed 3
+
+on step on nether brick slab:
+    push player up at speed 1.8
+    push player forward at speed 5.5
+    apply slow falling 2 to the player for 8 seconds
