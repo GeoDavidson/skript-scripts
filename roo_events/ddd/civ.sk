@@ -250,19 +250,19 @@ on region enter:
                 teleport player to team_choosing_spawn()
 
 # -------------------- team killing -------------------- #
-# on damage of player with priority highest:
-#     if {red::team::*} contains attacker:
-#         if {red::team::*} contains victim:
-#             cancel event
-#     else if {green::team::*} contains attacker:
-#         if {green::team::*} contains victim:
-#             cancel event
-#     else if {blue::team::*} contains attacker:
-#         if {blue::team::*} contains victim:
-#             cancel event
-#     else if {yellow::team::*} contains attacker:
-#         if {yellow::team::*} contains victim:
-#             cancel event
+on damage of player with priority highest:
+    if {red::team::*} contains attacker:
+        if {red::team::*} contains victim:
+            cancel event
+    else if {green::team::*} contains attacker:
+        if {green::team::*} contains victim:
+            cancel event
+    else if {blue::team::*} contains attacker:
+        if {blue::team::*} contains victim:
+            cancel event
+    else if {yellow::team::*} contains attacker:
+        if {yellow::team::*} contains victim:
+            cancel event
 
 # -------------------- on death logic -------------------- #
 on death of player with priority highest:

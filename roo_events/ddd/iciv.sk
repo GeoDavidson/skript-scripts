@@ -1,0 +1,754 @@
+variables:
+    # {redTeam::*}
+    # {greenTeam::*}
+    # {blueTeam::*}
+    # {yellowTeam::*}
+    # {redAlive::*}
+    # {greenAlive::*}
+    # {blueAlive::*}
+    # {yellowAlive::*}
+    {eventStarted} = false
+    {eventIsPhase} = false
+    {eventCanJoin} = true
+    {gameTime} = 0
+    {timerMin} = 0
+    {timerSec} = 0
+    {phase} = ""
+    {time} = ""
+    {day} = 0
+
+local function mainSpawn() :: object:
+    return location(-807, 37, 846, world "ic", 70, 0)
+
+local function boardingSpawn() :: object:
+    return location(-885, 41, 842, world "ic", 45, 0)
+
+local function redPlaneSpawn() :: object:
+    return location(-438, 142, -291, world "ic", -90, 0)
+
+local function greenPlaneSpawn() :: object:
+    return location(-596, 107, 286, world "ic", -90, 0)
+
+local function bluePlaneSpawn() :: object:
+    return location(125, 91, 511, world "ic", 180, 0)
+
+local function yellowPlaneSpawn() :: object:
+    return location(332, 101, -573, world "ic", 0, 0)
+
+local function redGroundSpawn() :: object:
+    return location(-461, 33, -514, world "ic", -60, 0)
+
+local function greenGroundSpawn() :: object:
+    return location(-293, 34, 568, world "ic", -140, 0) # done
+
+local function blueGroundSpawn() :: object:
+    return location(455, 34, 551, world "ic", -140, 0)
+
+local function yellowGroundSpawn() :: object:
+    return location(501, 33, -217, world "ic", 120, 0)
+
+local function removeFromTeam(player: player):
+    remove {_player}'s uuid from {redTeam::*}
+    remove {_player}'s uuid from {greenTeam::*}
+    remove {_player}'s uuid from {blueTeam::*}
+    remove {_player}'s uuid from {yellowTeam::*}
+
+local function removeFromAlive(player: player):
+    remove {_player}'s uuid from {redAlive::*}
+    remove {_player}'s uuid from {greenAlive::*}
+    remove {_player}'s uuid from {blueAlive::*}
+    remove {_player}'s uuid from {yellowAlive::*}
+
+function fill(world: text, 1x: number, 1y: number, 1z: number, 2x: number, 2y: number, 2z: number, block: text):
+    execute console command "/execute in minecraft:%{_world}% run forceload add %{_1x}% %{_1z}% %{_2x}% %{_2z}%"
+    execute console command "/execute in minecraft:%{_world}% run fill %{_1x}% %{_1y}% %{_1z}% %{_2x}% %{_2y}% %{_2z}% minecraft:%{_block}%"
+    execute console command "/execute in minecraft:%{_world}% run forceload remove %{_1x}% %{_1z}% %{_2x}% %{_2z}%"
+
+local function gameTime() :: string:
+    if {gameTime} < 0:
+        return "00:00"
+    set {timerMin} to floor({gameTime} / 60)
+    set {timerSec} to mod({gameTime}, 60)
+    if {timerMin} < 10:
+        if {timerSec} < 10:
+            return "0%{timerMin}%:0%{timerSec}%"
+        return "0%{timerMin}%:%{timerSec}%"
+    else if {timerSec} < 10:
+        return "%{timerMin}%:0%{timerSec}%"
+    return "%{timerMin}%:%{timerSec}%"
+
+local function startingScoreboard(player: player):
+    set line 1 of {_player}'s scoreboard to "&6&m                                 "
+    set line 2 of {_player}'s scoreboard to ""
+    set line 3 of {_player}'s scoreboard to "&b&lBoarding in: &r%gameTime()%"
+    set line 4 of {_player}'s scoreboard to ""
+    set line 5 of {_player}'s scoreboard to "&6&m                                 "
+    set title of {_player}'s scoreboard to "&x&f&f&e&f&9&b&lI&x&f&f&e&e&9&2&ls&x&f&f&e&c&8&9&ll&x&f&f&e&b&8&0&la&x&f&f&e&9&7&7&ln&x&f&f&e&8&6&d&ld &x&f&f&e&7&6&4&lC&x&f&f&e&5&5&b&li&x&f&f&e&4&5&2&lv&x&f&f&e&2&4&9&li&x&f&f&e&1&4&0&ll&x&f&f&d&f&3&7&li&x&f&f&d&e&2&e&lz&x&f&f&d&d&2&4&lation"
+
+local function eventScoreboard(player: player):
+    if {eventIsPhase} = true:
+        set line 1 of {_player}'s scoreboard to "&6&m                                 "
+        set line 2 of {_player}'s scoreboard to ""
+        set line 3 of {_player}'s scoreboard to "%colored {time}% &r%gameTime()%"
+        set line 4 of {_player}'s scoreboard to "&6&lPhase: &r%colored {phase}%"
+        set line 5 of {_player}'s scoreboard to ""
+        set line 6 of {_player}'s scoreboard to "&a&lDay: &r%{day}%"
+        set line 7 of {_player}'s scoreboard to ""
+        set line 8 of {_player}'s scoreboard to "&6&m                                 "
+        set line 9 of {_player}'s scoreboard to ""
+        set line 10 of {_player}'s scoreboard to "&e&lDesert: &r%size of {yellowAlive::*}%"
+        set line 11 of {_player}'s scoreboard to "&b&lPlains: &r%size of {blueAlive::*}%"
+        set line 12 of {_player}'s scoreboard to "&a&lJungle: &r%size of {greenAlive::*}%"
+        set line 13 of {_player}'s scoreboard to "&c&lMountain: &r%size of {redAlive::*}%"
+        set line 14 of {_player}'s scoreboard to ""
+        set line 15 of {_player}'s scoreboard to "&6&m                                 "
+    else:
+        set line 1 of {_player}'s scoreboard to "&6&m                                 "
+        set line 2 of {_player}'s scoreboard to ""
+        set line 3 of {_player}'s scoreboard to "&a&lDay: &r%{day}%"
+        set line 4 of {_player}'s scoreboard to ""
+        set line 5 of {_player}'s scoreboard to "&6&m                                 "
+        set line 6 of {_player}'s scoreboard to ""
+        set line 7 of {_player}'s scoreboard to "&e&lDesert: &r%size of {yellowAlive::*}%"
+        set line 8 of {_player}'s scoreboard to "&b&lPlains: &r%size of {blueAlive::*}%"
+        set line 9 of {_player}'s scoreboard to "&a&lJungle: &r%size of {greenAlive::*}%"
+        set line 10 of {_player}'s scoreboard to "&c&lMountain: &r%size of {redAlive::*}%"
+        set line 11 of {_player}'s scoreboard to ""
+        set line 12 of {_player}'s scoreboard to "&6&m                                 "
+    set title of {_player}'s scoreboard to "&x&f&f&e&f&9&b&lI&x&f&f&e&e&9&2&ls&x&f&f&e&c&8&9&ll&x&f&f&e&b&8&0&la&x&f&f&e&9&7&7&ln&x&f&f&e&8&6&d&ld &x&f&f&e&7&6&4&lC&x&f&f&e&5&5&b&li&x&f&f&e&4&5&2&lv&x&f&f&e&2&4&9&li&x&f&f&e&1&4&0&ll&x&f&f&d&f&3&7&li&x&f&f&d&e&2&e&lz&x&f&f&d&d&2&4&lation"
+
+on join:
+    if {eventCanJoin} = false:
+        if {redTeam::*} contains player's uuid:
+            add player's uuid to {redAlive::*}
+        else if {greenTeam::*} contains player's uuid:
+            add player's uuid to {greenAlive::*}
+        else if {blueTeam::*} contains player's uuid:
+            add player's uuid to {blueAlive::*}
+        else if {yellowTeam::*} contains player's uuid:
+            add player's uuid to {yellowAlive::*}
+        else:
+            kick the player due to "Event in progress"
+    else:
+        if {redTeam::*} contains player's uuid:
+            add player's uuid to {redAlive::*}
+        else if {greenTeam::*} contains player's uuid:
+            add player's uuid to {greenAlive::*}
+        else if {blueTeam::*} contains player's uuid:
+            add player's uuid to {blueAlive::*}
+        else if {yellowTeam::*} contains player's uuid:
+            add player's uuid to {yellowAlive::*}
+    set join message to ""
+    while player is online:
+        if {eventStarted} = true:
+            eventScoreboard(player)
+        else:
+            startingScoreboard(player)
+        wait 1 second
+
+on quit:
+    removeFromAlive(player)
+    if gamemode of player is spectator:
+        if player is not op:
+            ban player due to "You Died: Thanks For Playing :)"
+    set quit message to ""
+
+on region enter:
+    if gamemode of player is not spectator:
+        # should you use alive team
+        set {_maxTeamSize} to max(size of {redTeam::*}, size of {greenTeam::*}, size of {blueTeam::*}, size of {yellowTeam::*})
+        if size of {redTeam::*} >= {_maxTeamSize} - 3:
+            if size of {greenTeam::*} >= {_maxTeamSize} - 3:
+                if size of {blueTeam::*} >= {_maxTeamSize} - 3:
+                    if size of {yellowTeam::*} >= {_maxTeamSize} - 3:
+                        add 1 to {_maxTeamSize}
+        if "%region%" is "red in world ic":
+            if {redTeam::*} contains player's uuid:
+                if {eventStarted} = true:
+                    teleport player to redGroundSpawn()
+                else:
+                    teleport player to redPlaneSpawn()
+            else if size of {redTeam::*} < {_maxTeamSize}:
+                give 16 of steak to player
+                execute console command "/luckperms user %player% parent set red"
+                add player's uuid to {redTeam::*}
+                add player's uuid to {redAlive::*}
+                if {eventStarted} = true:
+                    teleport player to redGroundSpawn()
+                else:
+                    teleport player to redPlaneSpawn()
+            else:
+                teleport player to boardingSpawn()
+        else if "%region%" is "green in world ic":
+            if {greenTeam::*} contains player's uuid:
+                if {eventStarted} = true:
+                    teleport player to greenGroundSpawn()
+                else:
+                    teleport player to greenPlaneSpawn()
+            else if size of {greenTeam::*} < {_maxTeamSize}:
+                give 16 of steak to player
+                execute console command "/luckperms user %player% parent set green"
+                add player's uuid to {greenTeam::*}
+                add player's uuid to {greenAlive::*}
+                if {eventStarted} = true:
+                    teleport player to greenGroundSpawn()
+                else:
+                    teleport player to greenPlaneSpawn()
+            else:
+                teleport player to boardingSpawn()
+        else if "%region%" is "blue in world ic":
+            if {blueTeam::*} contains player's uuid:
+                if {eventStarted} = true:
+                    teleport player to blueGroundSpawn()
+                else:
+                    teleport player to bluePlaneSpawn()
+            else if size of {blueTeam::*} < {_maxTeamSize}:
+                give 16 of steak to player
+                execute console command "/luckperms user %player% parent set blue"
+                add player's uuid to {blueTeam::*}
+                add player's uuid to {blueAlive::*}
+                if {eventStarted} = true:
+                    teleport player to blueGroundSpawn()
+                else:
+                    teleport player to bluePlaneSpawn()
+            else:
+                teleport player to boardingSpawn()
+        else if "%region%" is "yellow in world ic":
+            if {yellowTeam::*} contains player's uuid:
+                if {eventStarted} = true:
+                    teleport player to yellowGroundSpawn()
+                else:
+                    teleport player to yellowPlaneSpawn()
+            else if size of {yellowTeam::*} < {_maxTeamSize}:
+                give 16 of steak to player
+                execute console command "/luckperms user %player% parent set yellow"
+                add player's uuid to {yellowTeam::*}
+                add player's uuid to {yellowAlive::*}
+                if {eventStarted} = true:
+                    teleport player to yellowGroundSpawn()
+                else:
+                    teleport player to yellowPlaneSpawn()
+            else:
+                teleport player to boardingSpawn()
+
+on death of player with priority highest:
+    if {eventStarted} = true:
+        cancel event
+        execute console command "/luckperms user %victim% parent set default"
+        set {_p} to victim
+        loop all items in {_p}'s inventory:
+            drop loop-value at {_p}
+            set slot index of loop-value of {_p} to air
+        set gamemode of victim to spectator
+        removeFromTeam(victim)
+        removeFromAlive(victim)
+        strike lightning effect at the victim
+        send title "" with subtitle "&4&lYou Died" to victim
+        wait 5 seconds
+        send title "" with subtitle "&a&lThanks For Playing" to victim
+        wait 5 seconds
+        ban victim due to "You Died: Thanks For Playing :)"
+        kick the victim due to "You Died: Thanks For Playing :)"
+
+# on damage of player with priority highest:
+#     if {redTeam::*} contains attacker's uuid:
+#         if {redTeam::*} contains victim's uuid:
+#             cancel event
+#     else if {greenTeam::*} contains attacker's uuid:
+#         if {greenTeam::*} contains victim's uuid:
+#             cancel event
+#     else if {blueTeam::*} contains attacker's uuid:
+#         if {blueTeam::*} contains victim's uuid:
+#             cancel event
+#     else if {yellowTeam::*} contains attacker's uuid:
+#         if {yellowTeam::*} contains victim's uuid:
+#             cancel event
+
+every 1 second:
+    if {gameTime} >= 0:
+        subtract 1 from {gameTime}
+
+command /civeventstatus <boolean>:
+    permission: op
+    trigger:
+        clear scoreboard of all players
+        set {eventStarted} to arg-1
+
+command /civphasestatus <boolean>:
+    permission: op
+    trigger:
+        clear scoreboard of all players
+        set {eventIsPhase} to arg-1
+
+command /civcanjoin <boolean>:
+    permission: op
+    trigger:
+        set {eventCanJoin} to arg-1
+
+command /civsetphase <text>:
+    permission: op
+    trigger:
+        set {phase} to arg-1
+
+command /civsetphaset <text>:
+    permission: op
+    trigger:
+        set {time} to arg-1
+
+command /civsettime <number>:
+    permission: op
+    trigger:
+        set {gameTime} to arg-1
+
+command /civday <number>:
+    permission: op
+    trigger:
+        execute console command "/gamerule doDaylightCycle true"
+        execute console command "/time set 22500"
+        wait 40 seconds
+        set {eventIsPhase} to false
+        clear scoreboard of all players
+        execute console command "/gamerule doMobSpawning false"
+        execute console command "/minecraft:kill @e[type=minecraft:iron_golem]"
+        execute console command "/minecraft:kill @e[type=minecraft:snow_golem]"
+        execute console command "/minecraft:kill @e[type=minecraft:zombie_horse]"
+        execute console command "/minecraft:kill @e[type=minecraft:zombie]"
+        execute console command "/minecraft:kill @e[type=minecraft:skeleton_horse]"
+        execute console command "/minecraft:kill @e[type=minecraft:skeleton]"
+        execute console command "/minecraft:kill @e[type=minecraft:husk]"
+        execute console command "/killall hostile ic"
+        set {day} to arg-1
+        send title "&a&lDay %{day}%" with subtitle "" to all players
+        wait 50 seconds
+        execute console command "/gamerule doDaylightCycle false"
+        execute console command "/time set morning"
+
+command /civnight:
+    permission: op
+    trigger:
+        set {eventIsPhase} to false
+        clear scoreboard of all players
+        execute console command "/gamerule doDaylightCycle true"
+        execute console command "/time set sunset"
+        wait 90 seconds
+        execute console command "/gamerule doDaylightCycle false"
+        execute console command "/time set midnight"
+
+command /civblood:
+    permission: op
+    trigger:
+        execute console command "/gamerule doMobSpawning true"
+        set {eventIsPhase} to true
+        clear scoreboard of all players
+        set {phase} to "&c&lBlood Moon"
+        set {gameTime} to 600
+        send title "&c&lBlood Moon" with subtitle "" to all players
+
+command /civdisaster:
+    permission: op
+    trigger:
+        set {eventIsPhase} to true
+        clear scoreboard of all players
+        set {phase} to "&c&lDisasters"
+        set {gameTime} to 600
+        send title "&c&lDisasters" with subtitle "" to all players
+
+command /civsetteam <player> <text>:
+    permission: op
+    trigger:
+        if arg-2 is "red":
+            removeFromTeam(arg-1)
+            removeFromAlive(arg-1)
+            teleport arg-1 to redGroundSpawn()
+            give 16 of steak to arg-1
+            set gamemode of arg-1 to survival
+            execute console command "/luckperms user %arg-1% parent set red"
+            add arg-1's uuid to {redTeam::*}
+            add arg-1's uuid to {redAlive::*}
+        else if arg-2 is "green":
+            removeFromTeam(arg-1)
+            removeFromAlive(arg-1)
+            teleport arg-1 to greenGroundSpawn()
+            give 16 of steak to arg-1
+            set gamemode of arg-1 to survival
+            execute console command "/luckperms user %arg-1% parent set green"
+            add arg-1's uuid to {greenTeam::*}
+            add arg-1's uuid to {greenAlive::*}
+        else if arg-2 is "blue":
+            removeFromTeam(arg-1)
+            removeFromAlive(arg-1)
+            teleport arg-1 to blueGroundSpawn()
+            give 16 of steak to arg-1
+            set gamemode of arg-1 to survival
+            execute console command "/luckperms user %arg-1% parent set blue"
+            add arg-1's uuid to {blueTeam::*}
+            add arg-1's uuid to {blueAlive::*}
+        else if arg-2 is "yellow":
+            removeFromTeam(arg-1)
+            removeFromAlive(arg-1)
+            teleport arg-1 to yellowGroundSpawn()
+            give 16 of steak to arg-1
+            set gamemode of arg-1 to survival
+            execute console command "/luckperms user %arg-1% parent set yellow"
+            add arg-1's uuid to {yellowTeam::*}
+            add arg-1's uuid to {yellowAlive::*}
+
+command /civresetall:
+    permission: op
+    trigger:
+        clear scoreboard of all players
+        delete {redTeam::*}
+        delete {greenTeam::*}
+        delete {blueTeam::*}
+        delete {yellowTeam::*}
+        delete {redAlive::*}
+        delete {greenAlive::*}
+        delete {blueAlive::*}
+        delete {yellowAlive::*}
+        set {eventStarted} to false
+        set {eventIsPhase} to false
+        set {eventCanJoin} to true
+        loop all players:
+            execute console command "/luckperms user %loop-player% parent set default"
+
+command /civresetteams:
+    permission: op
+    trigger:
+        delete {redTeam::*}
+        delete {greenTeam::*}
+        delete {blueTeam::*}
+        delete {yellowTeam::*}
+        delete {redAlive::*}
+        delete {greenAlive::*}
+        delete {blueAlive::*}
+        delete {yellowAlive::*}
+
+command /civteamchoosing:
+    permission: op
+    trigger:
+        fill("overworld", -870, 40, 833, -867, 40, 830, "barrier")
+        send title "" with subtitle "&b&lBoarding is about to begin" to all players
+        loop all players:
+            wait 1 tick
+            teleport loop-player to boardingSpawn()
+
+command /civboarding:
+    permission: op
+    trigger:
+        fill("overworld", -876, 43, 864, -878, 41, 864, "air")
+        fill("overworld", -892, 43, 864, -894, 41, 864, "air")
+        fill("overworld", -907, 43, 851, -907, 41, 849, "air")
+        fill("overworld", -907, 43, 835, -907, 41, 833, "air")
+        send title "" with subtitle "&b&lYou may now board your plane" to all players
+
+command /civleader:
+    permission: op
+    trigger:
+        send title "" with subtitle "&e&lElection Phase" to all players
+        set {phase} to "&e&lElection"
+        set {time} to "&b&lVoting starts in:"
+        set {gameTime} to 900
+        set {eventIsPhase} to true
+
+command /civstart:
+    permission: op
+    trigger:
+        execute console command "/time set 1000"
+        apply nausea to all players for 13 seconds
+        apply blindness to all players for 13 seconds
+        loop all players:
+            play sound "entity.lightning_bolt.thunder" to loop-player
+        wait 7 seconds
+        loop all players:
+            if {redTeam::*} contains loop-player's uuid:
+                teleport loop-player to redGroundSpawn()
+            else if {greenTeam::*} contains loop-player's uuid:
+                teleport loop-player to greenGroundSpawn()
+            else if {blueTeam::*} contains loop-player's uuid:
+                teleport loop-player to blueGroundSpawn()
+            else if {yellowTeam::*} contains loop-player's uuid:
+                teleport loop-player to yellowGroundSpawn()
+            wait 1 tick
+            play sound "entity.generic.explode" to loop-player
+        wait 5 seconds
+        # red
+        fill("overworld", -404, 148, -242, -483, 145, -340, "air")
+        wait 2 ticks
+        fill("overworld", -404, 144, -242, -483, 141, -340, "air")
+        wait 2 ticks
+        fill("overworld", -404, 140, -242, -483, 138, -340, "air")
+        wait 2 ticks
+        # green
+        fill("overworld", -562, 113, 335, -641, 110, 237, "air")
+        wait 2 ticks
+        fill("overworld", -562, 109, 335, -641, 106, 237, "air")
+        wait 2 ticks
+        fill("overworld", -562, 105, 335, -641, 103, 237, "air")
+        wait 2 ticks
+        # blue
+        fill("overworld", 76, 97, 556, 174, 94, 477, "air")
+        wait 2 ticks
+        fill("overworld", 76, 93, 556, 174, 90, 477, "air")
+        wait 2 ticks
+        fill("overworld", 76, 89, 556, 174, 87, 477, "air")
+        wait 2 ticks
+        # yellow
+        fill("overworld", 381, 107, -618, 283, 104, -539, "air")
+        wait 2 ticks
+        fill("overworld", 381, 103, -618, 283, 100, -539, "air")
+        wait 2 ticks
+        fill("overworld", 381, 99, -618, 283, 97, -539, "air")
+        wait 2 ticks
+        set {eventStarted} to true
+        send title "&a&lDay 1" with subtitle "" to all players
+        execute console command "/minecraft:kill @e[type=item]"
+
+command /civshrinkborder:
+    permission: op
+    trigger:
+        send title "" with subtitle "&c&lBorder Shrinking to Middle Island &e&l0, 0" to all players
+        execute console command "/worldborder set 1500"
+        wait 2 ticks
+        execute console command "/worldborder set 300 600"
+        set {eventCanJoin} to false
+
+command /civwallsup:
+    permission: op
+    trigger:
+        # north - south
+        fill("overworld", 1, 27, 750, -1, 199, 688, "barrier")
+        wait 5 ticks
+        fill("overworld", 1, 27, 687, -1, 199, 627, "barrier")
+        wait 5 ticks
+        fill("overworld", 1, 27, 626, -1, 199, 566, "barrier")
+        wait 5 ticks
+        fill("overworld", 1, 27, 565, -1, 199, 505, "barrier")
+        wait 5 ticks
+        fill("overworld", 1, 27, 504, -1, 199, 444, "barrier")
+        wait 5 ticks
+        fill("overworld", 1, 27, 443, -1, 199, 383, "barrier")
+        wait 5 ticks
+        fill("overworld", 1, 27, 382, -1, 199, 322, "barrier")
+        wait 5 ticks
+        fill("overworld", 1, 27, 321, -1, 199, 261, "barrier")
+        wait 5 ticks
+        fill("overworld", 1, 27, 260, -1, 199, 200, "barrier")
+        wait 5 ticks
+        fill("overworld", 1, 27, 199, -1, 199, 139, "barrier")
+        wait 5 ticks
+        fill("overworld", 1, 27, 138, -1, 199, 78, "barrier")
+        wait 5 ticks
+        fill("overworld", 1, 27, 77, -1, 199, 17, "barrier")
+        wait 5 ticks
+        fill("overworld", 1, 27, 16, -1, 199, -44, "barrier")
+        wait 5 ticks
+        fill("overworld", 1, 27, -45, -1, 199, -105, "barrier")
+        wait 5 ticks
+        fill("overworld", 1, 27, -106, -1, 199, -166, "barrier")
+        wait 5 ticks
+        fill("overworld", 1, 27, -167, -1, 199, -227, "barrier")
+        wait 5 ticks
+        fill("overworld", 1, 27, -228, -1, 199, -288, "barrier")
+        wait 5 ticks
+        fill("overworld", 1, 27, -289, -1, 199, -349, "barrier")
+        wait 5 ticks
+        fill("overworld", 1, 27, -350, -1, 199, -410, "barrier")
+        wait 5 ticks
+        fill("overworld", 1, 27, -411, -1, 199, -471, "barrier")
+        wait 5 ticks
+        fill("overworld", 1, 27, -472, -1, 199, -532, "barrier")
+        wait 5 ticks
+        fill("overworld", 1, 27, -533, -1, 199, -593, "barrier")
+        wait 5 ticks
+        fill("overworld", 1, 27, -594, -1, 199, -654, "barrier")
+        wait 5 ticks
+        fill("overworld", 1, 27, -655, -1, 199, -715, "barrier")
+        wait 5 ticks
+        fill("overworld", 1, 27, -716, -1, 199, -750, "barrier")
+        # east - west
+        wait 5 ticks
+        fill("overworld", 750, 27, 1, 688, 199, -1, "barrier")
+        wait 5 ticks
+        fill("overworld", 687, 27, 1, 627, 199, -1, "barrier")
+        wait 5 ticks
+        fill("overworld", 626, 27, 1, 566, 199, -1, "barrier")
+        wait 5 ticks
+        fill("overworld", 565, 27, 1, 505, 199, -1, "barrier")
+        wait 5 ticks
+        fill("overworld", 504, 27, 1, 444, 199, -1, "barrier")
+        wait 5 ticks
+        fill("overworld", 443, 27, 1, 383, 199, -1, "barrier")
+        wait 5 ticks
+        fill("overworld", 382, 27, 1, 322, 199, -1, "barrier")
+        wait 5 ticks
+        fill("overworld", 321, 27, 1, 261, 199, -1, "barrier")
+        wait 5 ticks
+        fill("overworld", 260, 27, 1, 200, 199, -1, "barrier")
+        wait 5 ticks
+        fill("overworld", 199, 27, 1, 139, 199, -1, "barrier")
+        wait 5 ticks
+        fill("overworld", 138, 27, 1, 78, 199, -1, "barrier")
+        wait 5 ticks
+        fill("overworld", 77, 27, 1, 17, 199, -1, "barrier")
+        wait 5 ticks
+        fill("overworld", 16, 27, 1, -44, 199, -1, "barrier")
+        wait 5 ticks
+        fill("overworld", -45, 27, 1, -105, 199, -1, "barrier")
+        wait 5 ticks
+        fill("overworld", -106, 27, 1, -166, 199, -1, "barrier")
+        wait 5 ticks
+        fill("overworld", -167, 27, 1, -227, 199, -1, "barrier")
+        wait 5 ticks
+        fill("overworld", -228, 27, 1, -288, 199, -1, "barrier")
+        wait 5 ticks
+        fill("overworld", -289, 27, 1, -349, 199, -1, "barrier")
+        wait 5 ticks
+        fill("overworld", -350, 27, 1, -410, 199, -1, "barrier")
+        wait 5 ticks
+        fill("overworld", -411, 27, 1, -471, 199, -1, "barrier")
+        wait 5 ticks
+        fill("overworld", -472, 27, 1, -532, 199, -1, "barrier")
+        wait 5 ticks
+        fill("overworld", -533, 27, 1, -593, 199, -1, "barrier")
+        wait 5 ticks
+        fill("overworld", -594, 27, 1, -654, 199, -1, "barrier")
+        wait 5 ticks
+        fill("overworld", -655, 27, 1, -715, 199, -1, "barrier")
+        wait 5 ticks
+        fill("overworld", -716, 27, 1, -750, 199, -1, "barrier")
+
+command /civwallsdown:
+    permission: op
+    trigger:
+        send title "" with subtitle "&4&lWalls are now down" to all players
+        # north - south
+        fill("overworld", 1, 27, 750, -1, 199, 688, "air")
+        wait 5 ticks
+        fill("overworld", 1, 27, 687, -1, 199, 627, "air")
+        wait 5 ticks
+        fill("overworld", 1, 27, 626, -1, 199, 566, "air")
+        wait 5 ticks
+        fill("overworld", 1, 27, 565, -1, 199, 505, "air")
+        wait 5 ticks
+        fill("overworld", 1, 27, 504, -1, 199, 444, "air")
+        wait 5 ticks
+        fill("overworld", 1, 27, 443, -1, 199, 383, "air")
+        wait 5 ticks
+        fill("overworld", 1, 27, 382, -1, 199, 322, "air")
+        wait 5 ticks
+        fill("overworld", 1, 27, 321, -1, 199, 261, "air")
+        wait 5 ticks
+        fill("overworld", 1, 27, 260, -1, 199, 200, "air")
+        wait 5 ticks
+        fill("overworld", 1, 27, 199, -1, 199, 139, "air")
+        wait 5 ticks
+        fill("overworld", 1, 27, 138, -1, 199, 78, "air")
+        wait 5 ticks
+        fill("overworld", 1, 27, 77, -1, 199, 17, "air")
+        wait 5 ticks
+        fill("overworld", 1, 27, 16, -1, 199, -44, "air")
+        wait 5 ticks
+        fill("overworld", 1, 27, -45, -1, 199, -105, "air")
+        wait 5 ticks
+        fill("overworld", 1, 27, -106, -1, 199, -166, "air")
+        wait 5 ticks
+        fill("overworld", 1, 27, -167, -1, 199, -227, "air")
+        wait 5 ticks
+        fill("overworld", 1, 27, -228, -1, 199, -288, "air")
+        wait 5 ticks
+        fill("overworld", 1, 27, -289, -1, 199, -349, "air")
+        wait 5 ticks
+        fill("overworld", 1, 27, -350, -1, 199, -410, "air")
+        wait 5 ticks
+        fill("overworld", 1, 27, -411, -1, 199, -471, "air")
+        wait 5 ticks
+        fill("overworld", 1, 27, -472, -1, 199, -532, "air")
+        wait 5 ticks
+        fill("overworld", 1, 27, -533, -1, 199, -593, "air")
+        wait 5 ticks
+        fill("overworld", 1, 27, -594, -1, 199, -654, "air")
+        wait 5 ticks
+        fill("overworld", 1, 27, -655, -1, 199, -715, "air")
+        wait 5 ticks
+        fill("overworld", 1, 27, -716, -1, 199, -750, "air")
+        # water north - south
+        wait 5 ticks
+        fill("overworld", 1, 27, 750, -1, 30, 530, "water")
+        wait 5 ticks
+        fill("overworld", 1, 27, 529, -1, 30, 309, "water")
+        wait 5 ticks
+        fill("overworld", 1, 27, 308, -1, 30, 88, "water")
+        wait 5 ticks
+        fill("overworld", 1, 27, 87, -1, 30, -133, "water")
+        wait 5 ticks
+        fill("overworld", 1, 27, -134, -1, 30, -334, "water")
+        wait 5 ticks
+        fill("overworld", 1, 27, -335, -1, 30, -555, "water")
+        wait 5 ticks        
+        fill("overworld", 1, 27, -556, -1, 30, -750, "water")
+        # east - west
+        wait 5 ticks
+        fill("overworld", 750, 27, 1, 688, 199, -1, "air")
+        wait 5 ticks
+        fill("overworld", 687, 27, 1, 627, 199, -1, "air")
+        wait 5 ticks
+        fill("overworld", 626, 27, 1, 566, 199, -1, "air")
+        wait 5 ticks
+        fill("overworld", 565, 27, 1, 505, 199, -1, "air")
+        wait 5 ticks
+        fill("overworld", 504, 27, 1, 444, 199, -1, "air")
+        wait 5 ticks
+        fill("overworld", 443, 27, 1, 383, 199, -1, "air")
+        wait 5 ticks
+        fill("overworld", 382, 27, 1, 322, 199, -1, "air")
+        wait 5 ticks
+        fill("overworld", 321, 27, 1, 261, 199, -1, "air")
+        wait 5 ticks
+        fill("overworld", 260, 27, 1, 200, 199, -1, "air")
+        wait 5 ticks
+        fill("overworld", 199, 27, 1, 139, 199, -1, "air")
+        wait 5 ticks
+        fill("overworld", 138, 27, 1, 78, 199, -1, "air")
+        wait 5 ticks
+        fill("overworld", 77, 27, 1, 17, 199, -1, "air")
+        wait 5 ticks
+        fill("overworld", 16, 27, 1, -44, 199, -1, "air")
+        wait 5 ticks
+        fill("overworld", -45, 27, 1, -105, 199, -1, "air")
+        wait 5 ticks
+        fill("overworld", -106, 27, 1, -166, 199, -1, "air")
+        wait 5 ticks
+        fill("overworld", -167, 27, 1, -227, 199, -1, "air")
+        wait 5 ticks
+        fill("overworld", -228, 27, 1, -288, 199, -1, "air")
+        wait 5 ticks
+        fill("overworld", -289, 27, 1, -349, 199, -1, "air")
+        wait 5 ticks
+        fill("overworld", -350, 27, 1, -410, 199, -1, "air")
+        wait 5 ticks
+        fill("overworld", -411, 27, 1, -471, 199, -1, "air")
+        wait 5 ticks
+        fill("overworld", -472, 27, 1, -532, 199, -1, "air")
+        wait 5 ticks
+        fill("overworld", -533, 27, 1, -593, 199, -1, "air")
+        wait 5 ticks
+        fill("overworld", -594, 27, 1, -654, 199, -1, "air")
+        wait 5 ticks
+        fill("overworld", -655, 27, 1, -715, 199, -1, "air")
+        wait 5 ticks
+        fill("overworld", -716, 27, 1, -750, 199, -1, "air")
+        # water east - west
+        wait 5 ticks
+        fill("overworld", 750, 27, 1, 530, 30, -1, "water")
+        wait 5 ticks
+        fill("overworld", 529, 27, 1, 309, 30, -1, "water")
+        wait 5 ticks
+        fill("overworld", 308, 27, 1, 88, 30, -1, "water")
+        wait 5 ticks
+        fill("overworld", 87, 27, 1, -133, 30, -1, "water")
+        wait 5 ticks
+        fill("overworld", -134, 27, 1, -334, 30, -1, "water")
+        wait 5 ticks
+        fill("overworld", -335, 27, 1, -555, 30, -1, "water")
+        wait 5 ticks        
+        fill("overworld", -556, 27, 1, -750, 30, -1, "water")

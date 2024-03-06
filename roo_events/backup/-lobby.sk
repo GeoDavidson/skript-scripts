@@ -1,0 +1,101 @@
+# -------------------- state variables (don't modify) -------------------- #
+variables:
+    # {combat::*}
+    {player_kills::%player%} = 0
+
+# -------------------- command function -------------------- #
+local function give_kit(p: player):
+    execute console command "/minecraft:give %{_p}% minecraft:diamond_sword"
+    execute console command "/minecraft:give %{_p}% minecraft:diamond_axe"
+    execute console command "/minecraft:give %{_p}% minecraft:cooked_beef 64"
+    execute console command "/minecraft:item replace entity %{_p}% armor.head with minecraft:diamond_helmet"
+    execute console command "/minecraft:item replace entity %{_p}% armor.chest with minecraft:diamond_chestplate"
+    execute console command "/minecraft:item replace entity %{_p}% armor.legs with minecraft:diamond_leggings"
+    execute console command "/minecraft:item replace entity %{_p}% armor.feet with minecraft:diamond_boots"
+    execute console command "/minecraft:item replace entity %{_p}% weapon.offhand with minecraft:shield"
+
+function clear_kit(p: player):
+    execute console command "/minecraft:clear %{_p}% minecraft:diamond_sword"
+    execute console command "/minecraft:clear %{_p}% minecraft:diamond_axe"
+    execute console command "/minecraft:clear %{_p}% minecraft:cooked_beef"
+    execute console command "/minecraft:clear %{_p}% minecraft:diamond_helmet"
+    execute console command "/minecraft:clear %{_p}% minecraft:diamond_chestplate"
+    execute console command "/minecraft:clear %{_p}% minecraft:diamond_leggings"
+    execute console command "/minecraft:clear %{_p}% minecraft:diamond_boots"
+    execute console command "/minecraft:clear %{_p}% minecraft:shield"
+
+local function summon_particle(p: player):
+    execute console command "/execute at %{_p}% run particle item minecraft:redstone ~ ~1 ~ 0 0 0 0.4 500 normal"
+
+local function play_sound(p: player):
+    execute console command "/execute at %{_p}% run playsound minecraft:entity.dragon_fireball.explode player @a ~ ~ ~ 0.5 2"
+
+local function set_lp(p: player, n: text):
+    execute console command "/luckperms user %{_p}% parent set %{_n}%"
+
+# -------------------- def -------------------- #
+on first join:
+    set_lp(player, "default")
+
+# -------------------- scoreboard -------------------- #
+on join:
+    set join message to ""
+    if player is in world "eventlobby":
+        send title "&x&f&f&2&6&2&6&lR&x&f&f&3&a&2&1&lo&x&f&f&4&e&1&6&lo &x&f&f&6&2&1&8&lE&x&f&f&7&7&1&3&lv&x&f&f&8&b&0&e&le&x&f&f&9&f&0&a&ln&x&f&f&b&3&0&5&lt&x&f&f&c&7&0&0&ls" with subtitle "<light green><bold>Welcome %player%" to player for 4 seconds
+    while player is online:
+        if player is in world "eventlobby":
+            set line 1 of player's scoreboard to "&6&m                                "
+            set line 2 of player's scoreboard to ""
+            set line 3 of player's scoreboard to "%colored {phase}%:&r %game_time()%"
+            set line 4 of player's scoreboard to ""
+            set line 5 of player's scoreboard to "&6&m                                "
+            set title of player's scoreboard to "&x&f&f&2&6&2&6&lR&x&f&f&3&a&2&1&lo&x&f&f&4&e&1&6&lo &x&f&f&6&2&1&8&lE&x&f&f&7&7&1&3&lv&x&f&f&8&b&0&e&le&x&f&f&9&f&0&a&ln&x&f&f&b&3&0&5&lt&x&f&f&c&7&0&0&ls"
+        wait 1 second
+
+# -------------------- quit logic -------------------- #
+on quit:
+    set quit message to ""
+    delete {player_kills::%player%}
+    # remove player's uuid from {combat::*}
+
+# on damage of a player:
+#     add victim's uuid to {combat::*}
+#     add attacker's uuid to {combat::*}
+#     wait 10 seconds
+#     remove victim's uuid from {combat::*}
+#     remove attacker's uuid from {combat::*}
+
+# -------------------- death logic -------------------- #
+on death:
+    if attacker is in world "eventlobby":
+        add 1 to {player_kills::%attacker%}
+    if victim is in world "eventlobby":
+        summon_particle(victim)
+        play_sound(victim)
+        clear_kit(victim)
+        set {player_kills::%victim%} to 0
+        # add 1 to {player_kills::%attacker%}
+        heal attacker
+
+# -------------------- up region logic -------------------- #
+on region enter:
+    # if "%region%" is "up in world eventlobby":
+    #     if {combat::*} contains player's uuid:
+    #         message "&cYou can't go up whlie in combat!"
+    #         cancel event
+    if "%region%" is "pvp in world eventlobby":
+        give_kit(player)
+
+# -------------------- exit pvp arena -------------------- #
+on region exit:
+    if "%region%" is "pvp in world eventlobby":
+        clear_kit(player)
+        set {player_kills::%player%} to 0 
+        heal player
+        feed player
+
+# -------------------- anti drop -------------------- #
+on drop:
+    if player is in world "eventlobby":
+        if player is not op:
+            cancel event

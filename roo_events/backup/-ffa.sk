@@ -130,7 +130,7 @@ on death of player with priority highest:
             if {alive::*} contains victim's uuid:
                 strike lightning effect at the victim
             remove victim's uuid from {alive::*}
-            # Aidan's team Code
+            # Aidan's Team Code
             set {_id} to {event::pteams::%{_p}'s uuid%}
             remove {_p}'s uuid from {event::teams::%{_id}%::members::*}
             delete {event::pteams::%{_p}'s uuid%}

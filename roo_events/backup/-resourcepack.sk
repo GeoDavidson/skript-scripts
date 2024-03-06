@@ -1,0 +1,10 @@
+on join:
+    send resource pack from URL "https://download.mc-packs.net/pack/232cec7a6ba087010303a862179d01fd3266ab1b.zip" with hash "232cec7a6ba087010303a862179d01fd3266ab1b" to player
+
+command /sendresourcepack [<player>]:
+    permission: op
+    trigger:
+        if arg-1 is not set:
+            send resource pack from URL "https://download.mc-packs.net/pack/232cec7a6ba087010303a862179d01fd3266ab1b.zip" with hash "232cec7a6ba087010303a862179d01fd3266ab1b" to all players
+        else:
+            send resource pack from URL "https://download.mc-packs.net/pack/232cec7a6ba087010303a862179d01fd3266ab1b.zip" with hash "232cec7a6ba087010303a862179d01fd3266ab1b" to arg-1
