@@ -11,7 +11,7 @@ variables:
     {world} = ""
 
 # -------------------- spawns -------------------- #
-function lobby_spawn() :: object:
+local function lobby_spawn() :: object:
     return location(0.5, -32, 0.5, world "eventlobby", 90, 0)
 
 local function event_spawn() :: object:
