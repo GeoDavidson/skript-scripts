@@ -250,19 +250,19 @@ on death of player with priority highest:
         ban victim due to "You Died: Thanks For Playing :)"
         kick the victim due to "You Died: Thanks For Playing :)"
 
-# on damage of player with priority highest:
-#     if {redTeam::*} contains attacker's uuid:
-#         if {redTeam::*} contains victim's uuid:
-#             cancel event
-#     else if {greenTeam::*} contains attacker's uuid:
-#         if {greenTeam::*} contains victim's uuid:
-#             cancel event
-#     else if {blueTeam::*} contains attacker's uuid:
-#         if {blueTeam::*} contains victim's uuid:
-#             cancel event
-#     else if {yellowTeam::*} contains attacker's uuid:
-#         if {yellowTeam::*} contains victim's uuid:
-#             cancel event
+on damage of player with priority highest:
+    if {redTeam::*} contains attacker's uuid:
+        if {redTeam::*} contains victim's uuid:
+            cancel event
+    else if {greenTeam::*} contains attacker's uuid:
+        if {greenTeam::*} contains victim's uuid:
+            cancel event
+    else if {blueTeam::*} contains attacker's uuid:
+        if {blueTeam::*} contains victim's uuid:
+            cancel event
+    else if {yellowTeam::*} contains attacker's uuid:
+        if {yellowTeam::*} contains victim's uuid:
+            cancel event
 
 every 1 second:
     if {gameTime} >= 0:

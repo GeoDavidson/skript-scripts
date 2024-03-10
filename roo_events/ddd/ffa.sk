@@ -11,7 +11,7 @@ variables:
     {world} = ""
 
 # -------------------- spawns -------------------- #
-local function lobby_spawn() :: object:
+function lobby_spawn() :: object:
     return location(0.5, -32, 0.5, world "eventlobby", 90, 0)
 
 local function event_spawn() :: object:
@@ -40,7 +40,7 @@ local function give_item(w: text, p: player, i: text, n: number):
 local function play_sound(s: text):
     execute console command "/execute at @a run playsound minecraft:%{_s}% player @p ~ ~ ~ 0.5 1"
 
-function set_lp(p: player, n: text):
+local function set_lp(p: player, n: text):
     execute console command "/luckperms user %{_p}% parent set %{_n}%"
 
 # -------------------- scoreboard function -------------------- #
