@@ -135,7 +135,6 @@ on damage:
             make 800 of item particle using feather at location of victim with offset vector(0, 2, 0)
 
 on shoot:
-    
     if custom model data of shooter's tool is 10980:
         if {bow::cooldown::*} does not contain shooter's uuid:
             add shooter's uuid to {bow::cooldown::*}
