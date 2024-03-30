@@ -1,0 +1,157 @@
+on skript load:
+    if {dashsword.cooldown} is not set:
+        set {dashsword.cooldown} to 25
+
+on join:
+    if {dashc::%player's uuid%} is set:
+        set {_dasht} to difference between {dashc::%player's uuid%} and now
+        set {_dashc} to {dashsword.cooldown}
+        subtract {_dasht} from {_dashc}
+        set item cooldown of diamond sword for player to {_dashc}
+    if {bbc::%player's uuid%} is set:
+        set {_bbt} to difference between {bbc::%player's uuid%} and now
+        set {_bbc} to {blastbow.cooldown}
+        subtract {_bbt} from {_bbc}
+        set item cooldown of crossbow for player to {_bbc}
+
+on right click:
+    if byte tag "BPdash" of nbt compound of event-item is 1:
+        if {dashc::%player's uuid%} is not set:
+            set {dashc::%player's uuid%} to now
+            set item cooldown of event-item for player to {dashsword.cooldown}
+            fallblanket(player)
+            push player forwards with force 0.6
+            push player upwards with force 0.3
+            play sound "block.beacon.power_select" with volume 0.4 with pitch 2 at player to all players
+            loop 22 times:
+                if the pitch of player is above -30:
+                    wait 2 ticks
+                    push player forwards with force 0.12
+                    push player upwards with force 0.13
+                    draw 1 of dust using dustOption(yellow, 1) at player with offset vector(0.2, 0, 0.2)
+                    draw 3 of enchant at player with offset vector(0.3, 0.3, 0.3)
+                    if loop-value is above 10:
+                        if player is on ground:
+                            stop
+                    if player is sneaking:
+                        stop
+                else:
+                    wait 2 ticks
+                    push player forwards with force 0.06
+                    push player upwards with force 0.1
+                    draw 1 of dust using dustOption(yellow, 1) at player with offset vector(0.2, 0, 0.2)
+                    draw 3 of enchant at player with offset vector(0.3, 0.3, 0.3)
+                    if loop-value is above 10:
+                        if player is on ground:
+                            stop
+                    if player is sneaking:
+                        stop
+            stop
+        set {_dasht} to difference between {dashc::%player's uuid%} and now
+        if {_dasht} is less than {dashsword.cooldown}:
+            stop
+        else:
+            set {dashc::%player's uuid%} to now
+            set item cooldown of event-item for player to {dashsword.cooldown}
+            fallblanket(player)
+            push player forwards with force 0.6
+            push player upwards with force 0.3
+            play sound "block.beacon.power_select" with volume 0.4 with pitch 2 at player to all players
+            loop 22 times:
+                if the pitch of player is above -30:
+                    wait 2 ticks
+                    push player forwards with force 0.12
+                    push player upwards with force 0.13
+                    draw 1 of dust using dustOption(yellow, 1) at player with offset vector(0.2, 0, 0.2)
+                    draw 5 of enchant at player with offset vector(0.3, 0.3, 0.3)
+                    if loop-value is above 10:
+                        if player is on ground:
+                            stop
+                    if player is sneaking:
+                        stop
+                else:
+                    wait 2 ticks
+                    push player forwards with force 0.06
+                    push player upwards with force 0.1
+                    draw 1 of dust using dustOption(yellow, 1) at player with offset vector(0.2, 0, 0.2)
+                    draw 5 of enchant at player with offset vector(0.3, 0.3, 0.3)
+                    if loop-value is above 10:
+                        if player is on ground:
+                            stop
+                    if player is sneaking:
+                        stop
+            stop
+
+function fallblanket(p: player):
+    set metadata value "fallblanket" of {_p} to true
+    wait 6 seconds
+    set metadata value "fallblanket" of {_p} to false
+
+on damage:
+    damage cause is fall:
+        if metadata value "fallblanket" of victim is true:
+            cancel event
+
+command /bec <string> <string> <number>:
+    permission: op
+    permission message: &x&7&2&F&F&8&1&lB.E.C &r&f> &cYou don't have permission to run this command!
+    usage: &x&7&2&F&F&8&1&lB.E.C &r&f> &c/bec <item> <type> <number>
+    trigger:
+        if arg-1 is "blastbow":
+            if arg-2 is "damage":
+                if arg-3 is below 1:
+                    send "&x&7&2&F&F&8&1&lB.E.C &r&f> &cThe damage of the blastbow can't go below 1!"
+                    stop
+                else:
+                    set {blastbow.dmg} to arg-3
+                    send "&x&7&2&F&F&8&1&lB.E.C &r&f> &aThe damage of the blastbow has been set to %arg-3%!"
+            if arg-2 is "cooldown":
+                if arg-3 is below 0:
+                    send "&x&7&2&F&F&8&1&lB.E.C &r&f> &cThe cooldown of the blastbow can't go below 0!"
+                    stop
+                else:
+                    set {blastbow.cooldown} to "%arg-3% seconds" parsed as timespan
+                    send "&x&7&2&F&F&8&1&lB.E.C &r&f> &aThe cooldown of the blastbow has been set to %arg-3% seconds!"
+        if arg-1 is "thunderbow":
+            if arg-2 is "chance":
+                if arg-3 is below 0:
+                    send "&x&7&2&F&F&8&1&lB.E.C &r&f> &cThe chance of the thunderbow can't go below 0!"
+                    stop
+                if arg-3 is above 100:
+                    send "&x&7&2&F&F&8&1&lB.E.C &r&f> &cThe chance of the thunderbow can't go above 100!"
+                    stop
+                else:
+                    set {thunderbow.chance} to arg-3
+                    send "&x&7&2&F&F&8&1&lB.E.C &r&f> &aThe chance of the thunderbow has been set to %arg-3%!"
+            if arg-2 is "cooldown":
+                if arg-3 is below 0:
+                    send "&x&7&2&F&F&8&1&lB.E.C &r&f> &cThe cooldown of the thunderbow can't go below 0!"
+                    stop
+                else:
+                    set {thunderbow.cooldown} to "%arg-3% seconds" parsed as timespan
+                    send "&x&7&2&F&F&8&1&lB.E.C &r&f> &aThe cooldown of the thunderbow has been set to %arg-3% seconds!"
+            if arg-2 is "damage":
+                if arg-3 is below 0:
+                    send "&x&7&2&F&F&8&1&lB.E.C &r&f> &cThe lightning damage of the thunderbow can't go below 0!"
+                    stop
+                else:
+                    set {thunderbow.lightningdmg} to arg-3
+                    send "&x&7&2&F&F&8&1&lB.E.C &r&f> &aThe lightning damage of the thunderbow has been set to %arg-3%!"
+                    stop
+        if arg-1 is "dashsword":
+            if arg-2 is "cooldown":
+                if arg-3 is below 0:
+                    send "&x&7&2&F&F&8&1&lB.E.C &r&f> &cThe cooldown of the dashsword can't go below 0!"
+                    stop
+                else:
+                    set {dashsword.cooldown} to "%arg-3% seconds" parsed as timespan
+                    send "&x&7&2&F&F&8&1&lB.E.C &r&f> &aThe cooldown of the dashsword has been set to %arg-3% seconds!"
+
+on tab complete of "/bec":
+    set tab completions for position 1 to "blastbow" and "thunderbow" and "dashsword"
+    if tab arg-1 = "blastbow":
+        set tab completions for position 2 to "damage" and "cooldown"
+    if tab arg-1 = "thunderbow":
+        set tab completions for position 2 to "chance" and "cooldown" and "damage"
+    if tab arg-1 = "dashsword":
+        set tab completions for position 2 to "cooldown"

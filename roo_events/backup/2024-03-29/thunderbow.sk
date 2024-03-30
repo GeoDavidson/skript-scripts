@@ -1,0 +1,64 @@
+on skript load:
+    if {thunderbow.chance} is not set:
+        set {thunderbow.chance} to 25
+    if {thunderbow.cooldown} is not set:
+        set {thunderbow.cooldown} to 0.5
+    if {thunderbow.lightningdmg} is not set:
+        set {thunderbow.lightningdmg} to 5
+
+on projectile hit:
+    wait 5 ticks
+    if metadata value "BPlight" of event-projectile is true:
+        set metadata value "BPlight" of event-projectile to false
+        wait 2 seconds
+        delete event-projectile
+
+on damage:
+    if event-damagecause is projectile:
+        if metadata value "BPlight" of event-projectile is true:
+            chance of {thunderbow.chance}%:
+                strike lightning effect at victim
+                damage victim by {thunderbow.lightningdmg}
+
+on shoot:
+    if byte tag "BPzap" of nbt compound of shooter's tool is 1:
+        if {lbc::%shooter's uuid%} is not set:
+            set {lbc::%shooter's uuid%} to now
+            set item cooldown of shooter's tool for shooter to {thunderbow.cooldown}
+            set metadata value "BPlight" of event-projectile to true
+            play sound "item.trident.return" with volume 0.3 with pitch 2 to all players at shooter's location
+            loop 10 times:
+                wait 0.15 seconds
+                if metadata value "BPlight" of event-projectile is true:
+                    draw 3 of electric spark at event-projectile
+                else:
+                    stop
+            stop
+        set {_lbt} to difference between {lbc::%shooter's uuid%} and now
+        if {_lbt} is less than {thunderbow.cooldown}:
+            cancel event
+            stop
+        else:
+            set {lbc::%shooter's uuid%} to now
+            set item cooldown of shooter's tool for shooter to {thunderbow.cooldown}
+            set metadata value "BPlight" of event-projectile to true
+            play sound "item.trident.return" with volume 0.3 with pitch 2 to all players at shooter's location
+            loop 10 times:
+                wait 0.15 seconds
+                if metadata value "BPlight" of event-projectile is true:
+                    draw 3 of electric spark at event-projectile
+                else:
+                    stop
+            stop
+
+on swap hand items:
+    if byte tag "BPzap" of nbt compound of player's tool is 1:
+        cancel event
+        send "&cYou can't put this item in your off hand!" to player
+
+on inventory slot change:
+    if event-slot is 40:
+        if byte tag "BPzap" of nbt compound of event-item is 1:
+            set slot 40 of player to air
+            set cursor slot of player to event-item
+            send "&cYou can't put this item in your off hand!" to player

@@ -1,0 +1,401 @@
+variables:
+    {playerOffset} = 0
+    {eventCanJoin} = true
+    {eventIsPhase} = true
+    {eventStarted} = false
+    {canDiamond} = false
+    {isPvp} = false
+    {canCus} = false
+    {drop1} = false
+    {posX1} = 0
+    {posZ1} = 0
+    {drop2} = false
+    {posX2} = 0
+    {posZ2} = 0
+    {gameTime} = 0
+    {timerMin} = 0
+    {timerSec} = 0
+    {day} = 1
+    {phase} = ""
+
+on player move:
+    if {eventStarted} = false:
+        if player is not op:
+            cancel event
+
+on damage of player by player:
+    if {isPvp} = false:
+        cancel event
+
+local function gameTime() :: string:
+    if {gameTime} < 0:
+        return "00:00"
+    set {timerMin} to floor({gameTime} / 60)
+    set {timerSec} to mod({gameTime}, 60)
+    if {timerMin} < 10:
+        if {timerSec} < 10:
+            return "0%{timerMin}%:0%{timerSec}%"
+        return "0%{timerMin}%:%{timerSec}%"
+    else if {timerSec} < 10:
+        return "%{timerMin}%:0%{timerSec}%"
+    return "%{timerMin}%:%{timerSec}%"
+
+local function send_brodcast(t: text):
+    execute console command "/broadcast %{_t}%"
+
+local function send_title(t: text, n: text):
+    execute console command "/minecraft:title @a title ""%{_t}%"""
+    execute console command "/minecraft:title @a subtitle ""%{_n}%"""
+
+on join:
+    set join message to ""
+    wait 2 ticks
+    if {died::*} contains player's uuid:
+        set gamemode of player to spectator
+    if {banned::*} contains player's uuid:
+        kick the player due to "You Died: Thanks For Playing :)"
+    if {eventCanJoin} = false:
+        kick the player due to "Event in progress"
+    while player is online:
+        set {_n} to number of all players
+        add {playerOffset} to {_n}
+        if {drop1} = true:
+            if {drop2} = true:
+                set line 1 of player's scoreboard to "&6&m                            "
+                set line 2 of player's scoreboard to "&6&l/crafts"
+                set line 3 of player's scoreboard to "&b&l/team invite"
+                set line 4 of player's scoreboard to "&6&m                            "
+                set line 5 of player's scoreboard to ""
+                set line 6 of player's scoreboard to "&e&lDrop: X&r&6 %{posX1}%&r&e&l Z&r&6 %{posZ1}%"
+                set line 7 of player's scoreboard to ""
+                set line 8 of player's scoreboard to "&e&lDrop: X&r&6 %{posX2}%&r&e&l Z&r&6 %{posZ2}%"
+                set line 9 of player's scoreboard to ""
+                set line 10 of player's scoreboard to "&6&m                            "
+                set line 11 of player's scoreboard to "&a&lDay:&r %{day}%"
+                set line 12 of player's scoreboard to "&6&m                            "
+                set line 13 of player's scoreboard to "&c&lPlayers Alive:&r %{_n}%"
+                set line 14 of player's scoreboard to "&6&m                            "
+            else:
+                set line 1 of player's scoreboard to "&6&m                            "
+                set line 2 of player's scoreboard to "&6&l/crafts"
+                set line 3 of player's scoreboard to "&b&l/team invite"
+                set line 4 of player's scoreboard to "&6&m                            "
+                set line 5 of player's scoreboard to ""
+                set line 6 of player's scoreboard to "&e&lDrop: X&r&6 %{posX1}%&r&e&l Z&r&6 %{posZ1}%"
+                set line 7 of player's scoreboard to ""
+                set line 8 of player's scoreboard to "&6&m                            "
+                set line 9 of player's scoreboard to "&a&lDay:&r %{day}%"
+                set line 10 of player's scoreboard to "&6&m                            "
+                set line 11 of player's scoreboard to "&c&lPlayers Alive:&r %{_n}%"
+                set line 12 of player's scoreboard to "&6&m                            "
+        else if {drop2} =  true:
+            set line 1 of player's scoreboard to "&6&m                            "
+            set line 2 of player's scoreboard to "&6&l/crafts"
+            set line 3 of player's scoreboard to "&b&l/team invite"
+            set line 4 of player's scoreboard to "&6&m                            "
+            set line 5 of player's scoreboard to ""
+            set line 6 of player's scoreboard to "&e&lDrop: X&r&6 %{posX2}%&r&e&l Z&r&6 %{posZ2}%"
+            set line 7 of player's scoreboard to ""
+            set line 8 of player's scoreboard to "&6&m                            "
+            set line 9 of player's scoreboard to "&a&lDay:&r %{day}%"
+            set line 10 of player's scoreboard to "&6&m                            "
+            set line 11 of player's scoreboard to "&c&lPlayers Alive:&r %{_n}%"
+            set line 12 of player's scoreboard to "&6&m                            "
+        else if {eventIsPhase} = true:
+            set line 1 of player's scoreboard to "&6&m                            "
+            set line 2 of player's scoreboard to "&6&l/crafts"
+            set line 3 of player's scoreboard to "&b&l/team invite"
+            set line 4 of player's scoreboard to "&6&m                            "
+            set line 5 of player's scoreboard to "%colored {phase}%: &r%gameTime()%"
+            set line 6 of player's scoreboard to "&6&m                            "
+            set line 7 of player's scoreboard to "&a&lDay:&r %{day}%"
+            set line 8 of player's scoreboard to "&6&m                            "
+            set line 9 of player's scoreboard to "&c&lPlayers Alive:&r %{_n}%"
+            set line 10 of player's scoreboard to "&6&m                            "
+        else:
+            set line 1 of player's scoreboard to "&6&m                            "
+            set line 2 of player's scoreboard to "&6&l/crafts"
+            set line 3 of player's scoreboard to "&b&l/team invite"
+            set line 4 of player's scoreboard to "&6&m                            "
+            set line 5 of player's scoreboard to "&a&lDay:&r %{day}%"
+            set line 6 of player's scoreboard to "&6&m                            "
+            set line 7 of player's scoreboard to "&c&lPlayers Alive:&r %{_n}%"
+            set line 8 of player's scoreboard to "&6&m                            "
+        set title of player's scoreboard to "&x&F&F&F&2&A&B&lH&x&F&F&E&E&9&A&lu&x&F&F&E&9&8&9&ln&x&F&F&E&5&7&8&lg&x&F&F&E&1&6&7&le&x&F&F&D&D&5&6&lr &x&F&F&D&8&4&4&lG&x&F&F&D&4&3&3&la&x&F&F&D&0&2&2&lm&x&F&F&C&B&1&1&le&x&F&F&C&7&0&0&ls"
+        wait 1 second
+
+on quit:
+    set quit message to ""
+
+on death of player with priority highest:
+    cancel event
+    add victim's uuid to {died::*}
+    add victim's uuid to {banned::*}
+    set {_p} to victim
+    loop all items in {_p}'s inventory:
+        drop loop-value at {_p}
+        set slot index of loop-value of {_p} to air
+    set gamemode of victim to spectator
+    send "&c&lA player has fallen! &r&l&aOnly %number of all players% remain!" to all players
+    strike lightning effect at the victim
+    send title "" with subtitle "&4&lYou Died" to victim
+    wait 5 seconds
+    send title "" with subtitle "&a&lThanks For Playing" to victim
+    wait 5 seconds
+    ban victim due to "You Died: Thanks For Playing :)"
+    kick the victim due to "You Died: Thanks For Playing :)"
+    remove victim's uuid from {banned::*}
+
+on craft:
+    if {canCus} = false:
+        if event-item has custom model data:
+            cancel event
+            send "&c&lCan't craft with item until &a&lDay 4"
+    if {canDiamond} = false:
+        if event-item is diamond sword:
+            cancel event
+            send "&c&lCan't craft with diamonds until &a&lDay 3"
+        else if event-item is diamond axe:
+            cancel event
+            send "&c&lCan't craft with diamonds until &a&lDay 3"
+        else if event-item is diamond chestplate:
+            cancel event
+            send "&c&lCan't craft with diamonds until &a&lDay 3"
+        else if event-item is diamond helmet:
+            cancel event
+            send "&c&lCan't craft with diamonds until &a&lDay 3"
+        else if event-item is diamond leggings:
+            cancel event
+            send "&c&lCan't craft with diamonds until &a&lDay 3"
+        else if event-item is diamond boots:
+            cancel event
+            send "&c&lCan't craft with diamonds until &a&lDay 3"
+        else if event-item is diamond shovel:
+            cancel event
+            send "&c&lCan't craft with diamonds until &a&lDay 3"
+        else if event-item is diamond hoe:
+            cancel event
+            send "&c&lCan't craft with diamonds until &a&lDay 3"
+
+command /hgstart:
+    permission: op
+    trigger:
+        set {_n} to 10
+        set {_c} to {_n}
+        loop {_n} times:
+            send title "&a%{_c}%" to all players
+            subtract 1 from {_c}
+            wait 1 second
+        send_title("&a&lGood Luck", "&cMay the odds forever be in your favor")
+        set {eventStarted} to true
+        set {day} to 1
+        set {gameTime} to 360
+        send_brodcast("&c&lPvP on in 6:00 Minutes")
+        set {phase} to "&c&lPvP on in"
+        set {isPvp} to false
+        execute console command "/worldborder set 2236"
+        wait 2 ticks
+        execute console command "/worldborder center 276 78"
+        wait 360 seconds # 5 min
+        # enable pvp ----------------------------------------------
+        send_title("&c&lPvP", "&cIs now enabled!")
+        send_brodcast("&c&lPvP is now enabled!")
+        set {isPvp} to true
+        set {eventIsPhase} to false
+        clear scoreboard of all players
+        # end ------------------------------------------------
+        wait 1020 seconds # 17 min
+        # start night ---------------------------------------------
+        execute console command "/gamerule doDaylightCycle true"
+        execute console command "/time set sunset"
+        wait 90 seconds
+        execute console command "/gamerule doDaylightCycle false"
+        execute console command "/time set midnight"
+        # end --------------------------------------------
+        wait 420 seconds # 7 min
+        # start day ----------------------------
+        execute console command "/gamerule doDaylightCycle true"
+        execute console command "/time set 22500"
+        wait 40 seconds
+        set {day} to 2
+        send_title("&a&lDay %{day}%", "Supply drops will appear today!")
+        wait 50 seconds
+        execute console command "/gamerule doDaylightCycle false"
+        execute console command "/time set morning"
+        # end --------------------------------------
+        wait 1320 seconds # 22 min
+        # night start ----------------------------------------
+        execute console command "/gamerule doDaylightCycle true"
+        execute console command "/time set sunset"
+        wait 90 seconds
+        execute console command "/gamerule doDaylightCycle false"
+        execute console command "/time set midnight"
+        #end-----------------------------------
+        wait 420 seconds # 7 min
+        # day ----------------------------
+        execute console command "/gamerule doDaylightCycle true"
+        execute console command "/time set 22500"
+        wait 40 seconds
+        set {day} to 3
+        set {canDiamond} to true
+        send_title("&a&lDay %{day}%", "You can now craft with diamonds!")
+        send_brodcast("&c&lYou can now craft with diamonds!")
+        wait 50 seconds
+        execute console command "/gamerule doDaylightCycle false"
+        execute console command "/time set morning"
+        # day end -------------------------------
+        wait 840 seconds # 14 min
+        # start night ----------------------------------------
+        execute console command "/gamerule doDaylightCycle true"
+        execute console command "/time set sunset"
+        wait 90 seconds
+        execute console command "/gamerule doDaylightCycle false"
+        execute console command "/time set midnight"
+        # end -----------------------
+        wait 420 seconds # 7 min
+        # day start ----------------------------
+        execute console command "/gamerule doDaylightCycle true"
+        execute console command "/time set 22500"
+        wait 40 seconds
+        set {day} to 4
+        set {canCus} to true
+        send_title("&a&lDay %{day}%", "You can now craft legendary weapons! &6&l/crafts")
+        wait 50 seconds
+        execute console command "/gamerule doDaylightCycle false"
+        execute console command "/time set morning"
+        # day end -------------------------------
+        wait 840 seconds # 14 min
+        # night ----------------------------------------
+        execute console command "/gamerule doDaylightCycle true"
+        execute console command "/time set sunset"
+        wait 90 seconds
+        execute console command "/gamerule doDaylightCycle false"
+        execute console command "/time set midnight"
+        #- -----------------------------------
+        wait 420 seconds # 7 min
+        # day ----------------------------
+        execute console command "/gamerule doDaylightCycle true"
+        execute console command "/time set 22500"
+        wait 40 seconds
+        set {day} to 5
+        send_title("&a&lDay %{day}%", "&cBorder has started to shrink")
+        send_brodcast("&c&lBorder has started to shrinking towards 0, 0")
+        execute console command "/worldborder set 2790"
+        wait 2 ticks
+        execute console command "/worldborder center 33 9"
+        wait 2 ticks
+        execute console command "/worldborder set 400 1200"
+        set {eventCanJoin} to false
+        wait 50 seconds
+        execute console command "/gamerule doDaylightCycle false"
+        execute console command "/time set morning"
+
+command /hgreset:
+    permission: op
+    trigger:
+        delete {died::*}
+        delete {banned::*}
+        set {eventCanJoin} to true
+        set {eventStarted} to false
+        set {eventIsPhase} to true
+        set {isPvp} to false
+        set {canDiamond} to false
+        set {canCus} to false
+        set {drop1} to false
+        set {posX1} to 0
+        set {posZ1} to 0
+        set {drop2} to false
+        set {posX2} to 0
+        set {posZ2} to 0
+        set {gameTime} to 300
+        set {timerMin} to 0
+        set {timerSec} to 0
+        set {day} to 1
+        set {phase} to "&c&lStarting in"
+
+command /hgcanjoin <boolean>:
+    permission: op
+    trigger:
+        set {eventCanJoin} to arg-1
+
+command /hgcanwalk <boolean>:
+    permission: op
+    trigger:
+        set {eventStarted} to arg-1
+
+command /hgcanDim <boolean>:
+    permission: op
+    trigger:
+        set {canDiamond} to arg-1
+
+command /hgcanCus <boolean>:
+    permission: op
+    trigger:
+        set {canCus} to arg-1
+
+command /hgisphase <boolean>:
+    permission: op
+    trigger:
+        set {eventIsPhase} to arg-1
+
+command /hgispvp <boolean>:
+    permission: op
+    trigger:
+        set {isPvp} to arg-1
+
+command /hgsetphase <text>:
+    permission: op
+    trigger:
+        set {phase} to arg-1
+
+command /hgsetoffset <number>:
+    permission: op
+    trigger:
+        set {playerOffset} to arg-1
+
+command /hgdrop1:
+    permission: op
+    trigger:
+        set {drop1} to true
+        set {posX1} to round(player's x-coordinate)
+        set {posZ1} to round(player's z-coordinate)
+        send_title("&c&lSupply Drop", "&eX:&r&6 %{posX1}% &r&eZ:&r&6 %{posZ1}%")
+        send_brodcast("Supply Drop at &c&lx &6&l%{posX1}% &c&lz &6&l%{posZ1}%")
+        clear scoreboard of all players
+
+command /hgdrop2:
+    permission: op
+    trigger:
+        set {drop2} to true
+        set {posX2} to round(player's x-coordinate)
+        set {posZ2} to round(player's z-coordinate)
+        send_title("&c&lSupply Drop", "&eX:&r&6 %{posX2}% &r&eZ:&r&6 %{posZ2}%")
+        send_brodcast("Supply Drop at &c&lx &6&l%{posX2}% &c&lz &6&l%{posZ2}%")
+        clear scoreboard of all players
+
+command /hgcleardrop1:
+    permission: op
+    trigger:
+        set {drop1} to false
+        clear scoreboard of all players
+
+command /hgcleardrop2:
+    permission: op
+    trigger:
+        set {drop2} to false
+        clear scoreboard of all players
+
+command /hgsettime <number>:
+    permission: op
+    trigger:
+        set {gameTime} to arg-1
+
+command /hgrevive <player>:
+    permission: op
+    trigger:
+        teleport arg-1 to player
+        set gamemode of arg-1 to survival
+
+every 1 second:
+    if {gameTime} >= 0:
+        subtract 1 from {gameTime}
