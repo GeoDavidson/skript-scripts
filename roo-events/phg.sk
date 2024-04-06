@@ -19,9 +19,10 @@ variables:
     {phase} = ""
 
 on player move:
-    if {eventStarted} = false:
-        if player is not op:
-            cancel event
+    if player is in world "hg2":
+        if {eventStarted} = false:
+            if player is not op:
+                cancel event
 
 on damage of player by player:
     if {isPvp} = false:
@@ -63,7 +64,7 @@ on join:
             if {drop2} = true:
                 set line 1 of player's scoreboard to "&6&m                            "
                 set line 2 of player's scoreboard to "&6&l/crafts"
-                set line 3 of player's scoreboard to "&b&l/team invite"
+                set line 3 of player's scoreboard to "&b&l/team create"
                 set line 4 of player's scoreboard to "&6&m                            "
                 set line 5 of player's scoreboard to ""
                 set line 6 of player's scoreboard to "&e&lDrop: X&r&6 %{posX1}%&r&e&l Z&r&6 %{posZ1}%"
@@ -78,7 +79,7 @@ on join:
             else:
                 set line 1 of player's scoreboard to "&6&m                            "
                 set line 2 of player's scoreboard to "&6&l/crafts"
-                set line 3 of player's scoreboard to "&b&l/team invite"
+                set line 3 of player's scoreboard to "&b&l/team create"
                 set line 4 of player's scoreboard to "&6&m                            "
                 set line 5 of player's scoreboard to ""
                 set line 6 of player's scoreboard to "&e&lDrop: X&r&6 %{posX1}%&r&e&l Z&r&6 %{posZ1}%"
@@ -91,7 +92,7 @@ on join:
         else if {drop2} =  true:
             set line 1 of player's scoreboard to "&6&m                            "
             set line 2 of player's scoreboard to "&6&l/crafts"
-            set line 3 of player's scoreboard to "&b&l/team invite"
+            set line 3 of player's scoreboard to "&b&l/team create"
             set line 4 of player's scoreboard to "&6&m                            "
             set line 5 of player's scoreboard to ""
             set line 6 of player's scoreboard to "&e&lDrop: X&r&6 %{posX2}%&r&e&l Z&r&6 %{posZ2}%"
@@ -104,7 +105,7 @@ on join:
         else if {eventIsPhase} = true:
             set line 1 of player's scoreboard to "&6&m                            "
             set line 2 of player's scoreboard to "&6&l/crafts"
-            set line 3 of player's scoreboard to "&b&l/team invite"
+            set line 3 of player's scoreboard to "&b&l/team create"
             set line 4 of player's scoreboard to "&6&m                            "
             set line 5 of player's scoreboard to "%colored {phase}%: &r%gameTime()%"
             set line 6 of player's scoreboard to "&6&m                            "
@@ -115,7 +116,7 @@ on join:
         else:
             set line 1 of player's scoreboard to "&6&m                            "
             set line 2 of player's scoreboard to "&6&l/crafts"
-            set line 3 of player's scoreboard to "&b&l/team invite"
+            set line 3 of player's scoreboard to "&b&l/team create"
             set line 4 of player's scoreboard to "&6&m                            "
             set line 5 of player's scoreboard to "&a&lDay:&r %{day}%"
             set line 6 of player's scoreboard to "&6&m                            "
@@ -193,9 +194,6 @@ command /hgstart:
         send_brodcast("&c&lPvP on in 6:00 Minutes")
         set {phase} to "&c&lPvP on in"
         set {isPvp} to false
-        execute console command "/worldborder set 2236"
-        wait 2 ticks
-        execute console command "/worldborder center 276 78"
         wait 360 seconds # 5 min
         # enable pvp ----------------------------------------------
         send_title("&c&lPvP", "&cIs now enabled!")
@@ -204,7 +202,7 @@ command /hgstart:
         set {eventIsPhase} to false
         clear scoreboard of all players
         # end ------------------------------------------------
-        wait 1020 seconds # 17 min
+        wait 780 seconds # 13 min
         # start night ---------------------------------------------
         execute console command "/gamerule doDaylightCycle true"
         execute console command "/time set sunset"
@@ -212,8 +210,8 @@ command /hgstart:
         execute console command "/gamerule doDaylightCycle false"
         execute console command "/time set midnight"
         # end --------------------------------------------
-        wait 420 seconds # 7 min
-        # start day ----------------------------
+        wait 300 seconds # 5 min
+        # start day --------------------------------
         execute console command "/gamerule doDaylightCycle true"
         execute console command "/time set 22500"
         wait 40 seconds
@@ -222,17 +220,17 @@ command /hgstart:
         wait 50 seconds
         execute console command "/gamerule doDaylightCycle false"
         execute console command "/time set morning"
-        # end --------------------------------------
-        wait 1320 seconds # 22 min
+        # end -----------------------------------------
+        wait 1200 seconds # 20 min
         # night start ----------------------------------------
         execute console command "/gamerule doDaylightCycle true"
         execute console command "/time set sunset"
         wait 90 seconds
         execute console command "/gamerule doDaylightCycle false"
         execute console command "/time set midnight"
-        #end-----------------------------------
-        wait 420 seconds # 7 min
-        # day ----------------------------
+        #end-------------------------------------
+        wait 240 seconds # 4 min
+        # day --------------------------------
         execute console command "/gamerule doDaylightCycle true"
         execute console command "/time set 22500"
         wait 40 seconds
@@ -243,16 +241,16 @@ command /hgstart:
         wait 50 seconds
         execute console command "/gamerule doDaylightCycle false"
         execute console command "/time set morning"
-        # day end -------------------------------
-        wait 840 seconds # 14 min
+        # day end ---------------------------------
+        wait 720 seconds # 12 min
         # start night ----------------------------------------
         execute console command "/gamerule doDaylightCycle true"
         execute console command "/time set sunset"
         wait 90 seconds
         execute console command "/gamerule doDaylightCycle false"
         execute console command "/time set midnight"
-        # end -----------------------
-        wait 420 seconds # 7 min
+        # end ----------------------------
+        wait 240 seconds # 4 min
         # day start ----------------------------
         execute console command "/gamerule doDaylightCycle true"
         execute console command "/time set 22500"
@@ -263,8 +261,8 @@ command /hgstart:
         wait 50 seconds
         execute console command "/gamerule doDaylightCycle false"
         execute console command "/time set morning"
-        # day end -------------------------------
-        wait 840 seconds # 14 min
+        # day end ----------------------------------
+        wait 720 seconds # 12 min
         # night ----------------------------------------
         execute console command "/gamerule doDaylightCycle true"
         execute console command "/time set sunset"
@@ -272,18 +270,14 @@ command /hgstart:
         execute console command "/gamerule doDaylightCycle false"
         execute console command "/time set midnight"
         #- -----------------------------------
-        wait 420 seconds # 7 min
-        # day ----------------------------
+        wait 240 seconds # 4 min
+        # day ------------------------------
         execute console command "/gamerule doDaylightCycle true"
         execute console command "/time set 22500"
         wait 40 seconds
         set {day} to 5
         send_title("&a&lDay %{day}%", "&cBorder has started to shrink")
         send_brodcast("&c&lBorder has started to shrinking towards 0, 0")
-        execute console command "/worldborder set 2790"
-        wait 2 ticks
-        execute console command "/worldborder center 33 9"
-        wait 2 ticks
         execute console command "/worldborder set 400 1200"
         set {eventCanJoin} to false
         wait 50 seconds
