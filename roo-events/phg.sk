@@ -228,9 +228,9 @@ command /hgstart:
         wait 90 seconds
         execute console command "/gamerule doDaylightCycle false"
         execute console command "/time set midnight"
-        #end-------------------------------------
+        # end-------------------------------------
         wait 240 seconds # 4 min
-        # day --------------------------------
+        # day ----------------------------------
         execute console command "/gamerule doDaylightCycle true"
         execute console command "/time set 22500"
         wait 40 seconds
@@ -241,7 +241,7 @@ command /hgstart:
         wait 50 seconds
         execute console command "/gamerule doDaylightCycle false"
         execute console command "/time set morning"
-        # day end ---------------------------------
+        # day end -----------------------------------
         wait 720 seconds # 12 min
         # start night ----------------------------------------
         execute console command "/gamerule doDaylightCycle true"
@@ -249,7 +249,7 @@ command /hgstart:
         wait 90 seconds
         execute console command "/gamerule doDaylightCycle false"
         execute console command "/time set midnight"
-        # end ----------------------------
+        # end ---------------------------------
         wait 240 seconds # 4 min
         # day start ----------------------------
         execute console command "/gamerule doDaylightCycle true"
@@ -269,7 +269,7 @@ command /hgstart:
         wait 90 seconds
         execute console command "/gamerule doDaylightCycle false"
         execute console command "/time set midnight"
-        #- -----------------------------------
+        # -------------------------------------
         wait 240 seconds # 4 min
         # day ------------------------------
         execute console command "/gamerule doDaylightCycle true"
@@ -322,7 +322,7 @@ command /hgcanDim <boolean>:
     trigger:
         set {canDiamond} to arg-1
 
-command /hgcanCus <boolean>:
+command /hgcancus <boolean>:
     permission: op
     trigger:
         set {canCus} to arg-1
