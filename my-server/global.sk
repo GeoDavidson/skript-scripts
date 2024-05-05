@@ -1,3 +1,0 @@
-on world change with priority highest:
-    clear scoreboard of player
-    clear(player)

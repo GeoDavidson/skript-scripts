@@ -1,4 +1,3 @@
-# -------------------- state variables (don't modify) -------------------- #
 variables:
     {game::state} = false
     {deathmatch} = false

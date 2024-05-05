@@ -1,0 +1,494 @@
+variables:
+    # {redTeam::*}
+    # {greenTeam::*}
+    # {blueTeam::*}
+    # {redAlive::*}
+    # {greenAlive::*}
+    # {blueAlive::*}
+    # {dead::*}
+    # {banned::*}
+    {eventIsPhase} = false
+    {eventStarted} = false
+    {eventCanJoin} = true
+    {gameTime} = 0
+    {timerMin} = 0
+    {timerSec} = 0
+    {day} = 0
+    {phase} = ""
+
+local function lobbySpawn() :: object:
+    return location(-1352, 38, 1360, world "rc", 180, 0)
+
+local function teamChoosingSpawn() :: object:
+    return location(-1484, 43, 1396, world "rc", 90, 0)
+
+local function redSpawn() :: object:
+    return location(-486, 35, 722, world "rc", 0, 0)
+
+local function redStartSpawn() :: object:
+    return location(-1191, -13, 1335, world "rc", 0, 0)
+
+local function greenSpawn() :: object:
+    return location(38, 47, -518, world "rc", 0, 0)
+
+local function greenStartSpawn() :: object:
+    return location(-1190, -13, 1399, world "rc", 0, 0)
+
+local function blueSpawn() :: object:
+    return location(624, 33, 649, world "rc", 0, 0)
+
+local function blueStartSpawn() :: object:
+    return location(-1188, -13, 1468, world "rc", 0, 0)
+
+local function gameTime() :: string:
+    if {gameTime} < 0:
+        return "00:00"
+    set {timerMin} to floor({gameTime} / 60)
+    set {timerSec} to mod({gameTime}, 60)
+    if {timerMin} < 10:
+        if {timerSec} < 10:
+            return "0%{timerMin}%:0%{timerSec}%"
+        return "0%{timerMin}%:%{timerSec}%"
+    else if {timerSec} < 10:
+        return "%{timerMin}%:0%{timerSec}%"
+    return "%{timerMin}%:%{timerSec}%"
+
+function fill(world: text, 1x: number, 1y: number, 1z: number, 2x: number, 2y: number, 2z: number, block: text):
+    execute console command "/execute in minecraft:%{_world}% run forceload add %{_1x}% %{_1z}% %{_2x}% %{_2z}%"
+    execute console command "/execute in minecraft:%{_world}% run fill %{_1x}% %{_1y}% %{_1z}% %{_2x}% %{_2y}% %{_2z}% minecraft:%{_block}%"
+    execute console command "/execute in minecraft:%{_world}% run forceload remove %{_1x}% %{_1z}% %{_2x}% %{_2z}%"
+
+local function boxOpen(world: text, x: number, y: number, z: number):
+    set {_1x} to {_x} - 4
+    set {_1z} to {_z} - 4
+    set {_2x} to {_x} + 4
+    set {_2y} to {_y} + 4
+    set {_2z} to {_z} + 4
+    fill({_world}, {_1x}, {_y}, {_1z}, {_2x}, {_2y}, {_2z}, "air")
+
+local function boxClose(world: text, x: number, y: number, z: number, b: text):
+    set {_1x} to {_x} - 4
+    set {_1z} to {_z} - 4
+    set {_2x} to {_x} + 4
+    set {_2y} to {_y} + 4
+    set {_2z} to {_z} + 4
+    fill({_world}, {_1x}, {_y}, {_1z}, {_2x}, {_2y}, {_2z}, {_b})
+    set {_1x} to {_x} - 3
+    set {_1z} to {_z} - 3
+    set {_2x} to {_x} + 3
+    set {_2y} to {_y} + 3
+    set {_2z} to {_z} + 3
+    fill({_world}, {_1x}, {_y}, {_1z}, {_2x}, {_2y}, {_2z}, "air")
+
+local function eventScoreboard(player: player):
+    if {eventIsPhase} = true:
+        set line 1 of {_player}'s scoreboard to "&6&m                                 "
+        set line 2 of {_player}'s scoreboard to ""
+        set line 3 of {_player}'s scoreboard to "&6&lTime: &r%gameTime()%"
+        set line 4 of {_player}'s scoreboard to "%colored {phase}%"
+        set line 5 of {_player}'s scoreboard to ""
+        set line 6 of {_player}'s scoreboard to "&a&lDay: &r%{day}%"
+        set line 7 of {_player}'s scoreboard to ""
+        set line 8 of {_player}'s scoreboard to "&6&m                                 "
+        set line 9 of {_player}'s scoreboard to ""
+        set line 10 of {_player}'s scoreboard to "&x&C&6&F&F&1&D&lA&x&A&E&E&3&1&1&lz&x&9&6&C&6&0&6&lt&x&8&6&B&3&0&0&le&x&7&F&A&A&0&0&lc&x&7&8&A&0&0&0&l: &r%size of {blueAlive::*}%"
+        set line 11 of {_player}'s scoreboard to "&x&F&F&F&4&B&C&lE&x&F&F&F&0&A&4&lg&x&F&F&E&D&8&D&ly&x&F&F&E&9&7&5&lp&x&F&F&E&6&5&E&lt&x&F&F&E&3&4&9&li&x&F&F&E&0&3&7&la&x&F&F&D&D&2&4&ln&x&F&F&D&A&1&2&ls&x&F&F&D&7&0&0&l: &r%size of {greenAlive::*}%"
+        set line 12 of {_player}'s scoreboard to "&x&F&F&7&0&7&0&lR&x&F&F&5&D&5&D&lo&x&F&F&4&A&4&A&lm&x&F&F&3&C&3&C&la&x&F&F&3&3&3&3&ln&x&F&F&2&9&2&9&ls&x&F&F&2&9&2&9&l: &r%size of {redAlive::*}%"
+        set line 13 of {_player}'s scoreboard to ""
+        set line 14 of {_player}'s scoreboard to "&6&m                                 "
+    else:
+        set line 1 of {_player}'s scoreboard to "&6&m                                 "
+        set line 2 of {_player}'s scoreboard to ""
+        set line 3 of {_player}'s scoreboard to "&a&lDay: &r%{day}%"
+        set line 4 of {_player}'s scoreboard to ""
+        set line 5 of {_player}'s scoreboard to "&6&m                                 "
+        set line 6 of {_player}'s scoreboard to ""
+        set line 8 of {_player}'s scoreboard to "&x&C&6&F&F&1&D&lA&x&A&E&E&3&1&1&lz&x&9&6&C&6&0&6&lt&x&8&6&B&3&0&0&le&x&7&F&A&A&0&0&lc&x&7&8&A&0&0&0&l: &r%size of {blueAlive::*}%"
+        set line 9 of {_player}'s scoreboard to "&x&F&F&F&4&B&C&lE&x&F&F&F&0&A&4&lg&x&F&F&E&D&8&D&ly&x&F&F&E&9&7&5&lp&x&F&F&E&6&5&E&lt&x&F&F&E&3&4&9&li&x&F&F&E&0&3&7&la&x&F&F&D&D&2&4&ln&x&F&F&D&A&1&2&ls&x&F&F&D&7&0&0&l: &r%size of {greenAlive::*}%"
+        set line 10 of {_player}'s scoreboard to "&x&F&F&7&0&7&0&lR&x&F&F&5&D&5&D&lo&x&F&F&4&A&4&A&lm&x&F&F&3&C&3&C&la&x&F&F&3&3&3&3&ln&x&F&F&2&9&2&9&ls&x&F&F&2&9&2&9&l: &r%size of {redAlive::*}%"
+        set line 11 of {_player}'s scoreboard to ""
+        set line 12 of {_player}'s scoreboard to "&6&m                                 "
+    set title of {_player}'s scoreboard to "&x&F&F&E&F&9&9&lA&x&F&F&E&E&9&0&ln&x&F&F&E&C&8&7&lc&x&F&F&E&B&7&E&li&x&F&F&E&A&7&5&le&x&F&F&E&8&6&C&ln&x&F&F&E&7&6&3&lt &x&F&F&E&5&5&A&lC&x&F&F&E&4&5&1&li&x&F&F&E&3&4&8&lv&x&F&F&E&1&3&F&li&x&F&F&E&0&3&8&ll&x&F&F&D&F&3&1&li&x&F&F&D&E&2&A&lz&x&F&F&D&D&2&3&la&x&F&F&D&C&1&C&lt&x&F&F&D&A&1&5&li&x&F&F&D&9&0&E&lo&x&F&F&D&8&0&7&ln&x&F&F&D&7&0&0&ls"
+
+on join:
+    if {banned::*} contains player's uuid:
+        kick the player due to "You Died: Thanks For Playing :)"
+    else if {died::*} contains player's uuid:
+        set gamemode of player to spectator
+    else if {eventCanJoin} = false:
+        if {redTeam::*} contains player's uuid:
+            add player's uuid to {redAlive::*}
+        else if {greenTeam::*} contains player's uuid:
+            add player's uuid to {greenAlive::*}
+        else if {blueTeam::*} contains player's uuid:
+            add player's uuid to {blueAlive::*}
+        else:
+            kick the player due to "Event in progress"
+    else:
+        if {redTeam::*} contains player's uuid:
+            add player's uuid to {redAlive::*}
+        else if {greenTeam::*} contains player's uuid:
+            add player's uuid to {greenAlive::*}
+        else if {blueTeam::*} contains player's uuid:
+            add player's uuid to {blueAlive::*}
+    set join message to ""
+    while player is online:
+        if player is in world "rc":
+            eventScoreboard(player)
+        wait 1 second
+
+on quit:
+    set quit message to ""
+    remove player's uuid from {redAlive::*}
+    remove player's uuid from {greenAlive::*}
+    remove player's uuid from {blueAlive::*}
+
+on region enter:
+    if gamemode of player is not spectator:
+        set {_maxTeamSize} to max(size of {redAlive::*}, size of {greenAlive::*}, size of {blueAlive::*})
+        if size of {redAlive::*} >= {_maxTeamSize} - 4:
+            if size of {greenAlive::*} >= {_maxTeamSize} - 4:
+                if size of {blueAlive::*} >= {_maxTeamSize} - 4:
+                    add 1 to {_maxTeamSize}
+        if "%region%" is "red_team in world rc":
+            if {redTeam::*} contains player's uuid:
+                if {eventStarted} = true:
+                    teleport player to redSpawn()
+                else:
+                    teleport player to redStartSpawn()
+            else if size of {redTeam::*} < {_maxTeamSize}:
+                add player's uuid to {redTeam::*}
+                add player's uuid to {redAlive::*}
+                execute console command "/luckperms user %player% parent set roman"
+                if {eventStarted} = true:
+                    teleport player to redSpawn()
+                else:
+                    teleport player to redStartSpawn()
+            else:
+                send "&c&lTeam Full" to player
+                teleport player to teamChoosingSpawn()
+        else if "%region%" is "green_team in world rc":
+            if {greenTeam::*} contains player's uuid:
+                teleport player to greenSpawn()
+                if {eventStarted} = true:
+                    teleport player to greenSpawn()
+                else:
+                    teleport player to greenStartSpawn()
+            else if size of {greenTeam::*} < {_maxTeamSize}:
+                add player's uuid to {greenTeam::*}
+                add player's uuid to {greenAlive::*}
+                execute console command "/luckperms user %player% parent set egyptians"
+                if {eventStarted} = true:
+                    teleport player to greenSpawn()
+                else:
+                    teleport player to greenStartSpawn()
+            else:
+                send "&c&lTeam Full" to player
+                teleport player to teamChoosingSpawn()
+        else if "%region%" is "blue_team in world rc":
+            if {blueTeam::*} contains player's uuid:
+                if {eventStarted} = true:
+                    teleport player to blueSpawn()
+                else:
+                    teleport player to blueStartSpawn()
+            else if size of {blueTeam::*} < {_maxTeamSize}:
+                add player's uuid to {blueTeam::*}
+                add player's uuid to {blueAlive::*}
+                execute console command "/luckperms user %player% parent set aztec"
+                if {eventStarted} = true:
+                    teleport player to blueSpawn()
+                else:
+                    teleport player to blueStartSpawn()
+            else:
+                send "&c&lTeam Full" to player
+                teleport player to teamChoosingSpawn()
+
+on death of player:
+    cancel event
+    send "&c&l%victim% has been lost in time." to all players
+    add victim's uuid to {dead::*}
+    add victim's uuid to {banned::*}
+    set {_p} to victim
+    loop all items in {_p}'s inventory:
+        drop loop-value at {_p}
+        set slot index of loop-value of {_p} to air
+    set gamemode of victim to spectator
+    remove victim's uuid from {redTeam::*}
+    remove victim's uuid from {greenTeam::*}
+    remove victim's uuid from {blueTeam::*}
+    remove victim's uuid from {redAlive::*}
+    remove victim's uuid from {greenAlive::*}
+    remove victim's uuid from {blueAlive::*}
+    strike lightning effect at the victim
+    send title "" with subtitle "&c&lYou Died" to victim
+    wait 5 seconds
+    send title "" with subtitle "&a&lThanks For Playing" to victim
+    wait 5 seconds
+    ban victim due to "You Died: Thanks For Playing :)"
+    kick the victim due to "You Died: Thanks For Playing :)"
+    remove victim's uuid from {banned::*}
+
+on damage of player:
+    if {redTeam::*} contains attacker's uuid:
+        if {redTeam::*} contains victim's uuid:
+            cancel event
+    else if {greenTeam::*} contains attacker's uuid:
+        if {greenTeam::*} contains victim's uuid:
+            cancel event
+    else if {blueTeam::*} contains attacker's uuid:
+        if {blueTeam::*} contains victim's uuid:
+            cancel event
+
+command /civsetphase <text> <number>:
+    permission: op
+    trigger:
+        set {phase} to arg-1
+        set {gameTime} to arg-2
+
+command /civsettime <number>:
+    permission: op
+    trigger:
+        set {gameTime} to arg-1
+
+command /civsetday <number>:
+    permission: op
+    trigger:
+        set {day} to arg-1
+
+command /civseteventphase <boolean>:
+    permission: op
+    trigger:
+        clear scoreboard of all players
+        set {eventIsPhase} to arg-1
+
+command /civsetcanjoin <boolean>:
+    permission: op
+    trigger:
+        set {eventCanJoin} to arg-1
+
+command /civreset:
+    permission: op
+    trigger:
+        set {eventIsPhase} to false
+        set {eventStarted} to false
+        set {eventCanJoin} to true
+        delete {redTeam::*}
+        delete {greenTeam::*}
+        delete {blueTeam::*}
+        delete {redAlive::*}
+        delete {greenAlive::*}
+        delete {blueAlive::*}
+        delete {dead::*}
+        delete {banned::*}
+        set {day} to 1
+        loop all players:
+            execute console command "/luckperms user %loop-player% parent set default"
+
+command /civsetteam <player> <text>:
+    permission: op
+    trigger:
+        give 16 of steak to arg-1
+        if arg-2 is "red":
+            remove arg-1's uuid from {redTeam::*}
+            remove arg-1's uuid from {greenTeam::*}
+            remove arg-1's uuid from {blueTeam::*}
+            remove arg-1's uuid from {redAlive::*}
+            remove arg-1's uuid from {greenAlive::*}
+            remove arg-1's uuid from {blueAlive::*}
+            remove arg-1's uuid from {dead::*}
+            execute console command "/luckperms user %arg-1% parent set roman"
+            add arg-1's uuid to {redTeam::*}
+            add arg-1's uuid to {redAlive::*}
+            set gamemode of arg-1 to survival
+            teleport arg-1 to arg-1
+        else if arg-2 is "green":
+            remove arg-1's uuid from {redTeam::*}
+            remove arg-1's uuid from {greenTeam::*}
+            remove arg-1's uuid from {blueTeam::*}
+            remove arg-1's uuid from {redAlive::*}
+            remove arg-1's uuid from {greenAlive::*}
+            remove arg-1's uuid from {blueAlive::*}
+            remove arg-1's uuid from {dead::*}
+            execute console command "/luckperms user %arg-1% parent set egyptians"
+            add arg-1's uuid to {greenTeam::*}
+            add arg-1's uuid to {greenAlive::*}
+            set gamemode of arg-1 to survival
+            teleport arg-1 to arg-1
+        else if arg-2 is "blue":
+            remove arg-1's uuid from {redTeam::*}
+            remove arg-1's uuid from {greenTeam::*}
+            remove arg-1's uuid from {blueTeam::*}
+            remove arg-1's uuid from {redAlive::*}
+            remove arg-1's uuid from {greenAlive::*}
+            remove arg-1's uuid from {blueAlive::*}
+            execute console command "/luckperms user %arg-1% parent set aztec"
+            remove arg-1's uuid from {dead::*}
+            add arg-1's uuid to {blueTeam::*}
+            add arg-1's uuid to {blueAlive::*}
+            set gamemode of arg-1 to survival
+            teleport arg-1 to arg-1
+
+command /civmuseumopen:
+    permission: op
+    trigger:
+        fill("overworld", -1440, 48, 1393, -1440, 43, 1398, "air")
+        send title "" with subtitle "&b&lMuseum has opened!" to all players
+
+command /civtptomuseum:
+    permission: op
+    trigger:
+        send title "" with subtitle "&b&lExhibits are about to open!" to all players
+        loop all players:
+            wait 1 tick
+            teleport loop-player to teamChoosingSpawn()
+
+command /civopenedexhibits:
+    permission: op
+    trigger:
+        fill("overworld", -1463, 53, 1419, -1481, 43, 1419, "air")
+        fill("overworld", -1488, 53, 1419, -1506, 43, 1419, "air")
+        fill("overworld", -1481, 53, 1372, -1463, 43, 1372, "air")
+        send title "" with subtitle "&b&lExhibits have opened!" to all players
+
+command /civstart:
+    permission: op
+    trigger:
+        set {eventStarted} to true
+        set {eventIsPhase} to false
+        send title "" with subtitle "&b&lTime Traveling!" to all players for 7 seconds
+        wait 8 seconds
+        loop all players:
+            if {redTeam::*} contains loop-player's uuid:
+                teleport loop-player to redSpawn()
+            else if {greenTeam::*} contains loop-player's uuid:
+                teleport loop-player to greenSpawn()
+            else if {blueTeam::*} contains loop-player's uuid:
+                teleport loop-player to blueSpawn()
+            wait 1 tick
+        set {day} to 1
+        send title "&a&lDay %{day}%" with subtitle "" to all players
+
+command /civday <number>:
+    permission: op
+    trigger:
+        execute console command "/gamerule doDaylightCycle true"
+        execute console command "/time set 22500"
+        wait 40 seconds
+        set {day} to arg-1
+        send title "&a&lDay %{day}%" with subtitle "" to all players
+        play sound "hg3.rooster1" at volume 0.5 at pitch 1 to all players
+        wait 50 seconds
+        execute console command "/gamerule doDaylightCycle false"
+        execute console command "/time set morning"
+
+command /civnight:
+    permission: op
+    trigger:
+        execute console command "/gamerule doDaylightCycle true"
+        execute console command "/time set sunset"
+        wait 90 seconds
+        execute console command "/gamerule doDaylightCycle false"
+        execute console command "/time set midnight"
+
+command /civleader:
+    permission: op
+    trigger:
+        set {eventIsPhase} to true
+        clear scoreboard of all players
+        send title "&6&lLeader Election" with subtitle "Group up with your civilization and elect a leader" to all players
+        set {phase} to "&e&lElection"
+        set {gameTime} to 1200
+
+command /civbuild:
+    permission: op
+    trigger:
+        set {eventIsPhase} to true
+        clear scoreboard of all players
+        send title "&9&lCivilization Building" with subtitle "All players of the team with the best builds will be rewarded" to all players for 8 seconds
+        set {phase} to "&9&lBuilding"
+        set {gameTime} to 1800
+
+command /civblood:
+    permission: op
+    trigger:
+        set {eventIsPhase} to true
+        clear scoreboard of all players
+        send title "&c&lRaid" with subtitle "" to all players
+        set {phase} to "&c&lRaid"
+        set {gameTime} to 600
+
+command /civwallsdown:
+    permission: op
+    trigger:
+        execute console command "/gamerule doDaylightCycle true"
+        execute console command "/time set 22500"
+        wait 40 seconds
+        add 1 to {day}
+        send title "&a&lDay %{day}%" with subtitle "&cThe walls between civilizations have dropped" to all players
+        play sound "hg3.rooster1" at volume 0.5 at pitch 1 to all players
+        set {eventIsPhase} to false
+        clear scoreboard of all players
+        set {_x1} to 999
+        set {_x2} to 936
+        loop 31 times:
+            fill("overworld", {_x1}, 200, -3, {_x2}, 31, -1, "air")
+            subtract 64 from {_x1}
+            subtract 64 from {_x2}
+            wait 2 ticks
+        fill("overworld", -985, 200, -3, -999, 31, -1, "air")
+        set {_x1} to 0
+        set {_x2} to 63
+        loop 15 times:
+            fill("overworld", -1, 200, {_x1}, 1, 31, {_x2}, "air")
+            add 64 to {_x1}
+            add 64 to {_x2}
+            wait 2 ticks
+        fill("overworld", -1, 200, 960, 1, 31, 999, "air")
+        wait 50 seconds
+        execute console command "/gamerule doDaylightCycle false"
+        execute console command "/time set morning"
+
+command /civwallsup:
+    permission: op
+    trigger:
+        set {_x1} to 999
+        set {_x2} to 936
+        loop 31 times:
+            fill("overworld", {_x1}, 200, -3, {_x2}, 31, -1, "barrier")
+            subtract 64 from {_x1}
+            subtract 64 from {_x2}
+            wait 2 ticks
+        fill("overworld", -985, 200, -3, -999, 31, -1, "barrier")
+        set {_x1} to 0
+        set {_x2} to 63
+        loop 15 times:
+            fill("overworld", -1, 200, {_x1}, 1, 31, {_x2}, "barrier")
+            add 64 to {_x1}
+            add 64 to {_x2}
+            wait 2 ticks
+        fill("overworld", -1, 200, 960, 1, 31, 999, "barrier")
+
+command /civshrinkborder:
+    permission: op
+    trigger:
+        send title "" with subtitle "&c&lBorders Shrinking to Center" to all players
+        execute console command "/worldborder set 2070"
+        execute console command "/worldborder set 400 700"
+        set {eventCanJoin} to false
+
+command /civtpall:
+    permission: op
+    trigger:
+        set {_l} to location of player
+        loop all players:
+            wait 1 tick
+            teleport loop-player to {_l}  
+
+every 1 second:
+    if {gameTime} >= 0:
+        subtract 1 from {gameTime}
+
+command /civclearscoreboard:
+    permission: op
+    trigger:
+        clear scoreboard of all players

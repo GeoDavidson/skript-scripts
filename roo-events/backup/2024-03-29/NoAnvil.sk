@@ -1,8 +1,0 @@
-on anvil prepare:
-    if custom model data of slot 0 of event-inventory is 1:
-        set {_ahhhh} to slot 0 of event-inventory
-        set slot 0 of event-inventory to air
-        wait 1 tick
-        give {_ahhhh} to player
-        play sound "entity.villager.no" with volume 3 with pitch 0.8 to player
-        send "&cYou can't use that here!"
