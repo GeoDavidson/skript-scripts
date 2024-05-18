@@ -1,0 +1,5 @@
+on command:
+    full command contains "msg @a", "w @a" or "whisper @a"
+    player is not op
+    cancel event
+    

@@ -1,0 +1,176 @@
+on right click:
+    player's held item is book
+    byte tag "revive" of nbt compound of player's held item is 1
+    set {_gui} to chest inventory with 3 rows named "&2Revive a player"
+    loop 27 times:
+        if loop-value is 13:
+            set slot 12 of {_gui} to campfire named "&6A teammate"
+        else if loop-value is 15:
+            set slot 14 of {_gui} to soul campfire named "&bSomeone Else"
+        else:
+            set slot (loop-value - 1) of {_gui} to black stained glass pane named " "
+    open {_gui} for player
+    play sound "minecraft:block.tripwire.click_on" at volume 1 at pitch 2 at player to player
+
+on inventory click:
+    name of event-inventory is "&2Revive a player"
+    cancel event
+    if index of event-slot is 12:
+        set {_id} to yaml value "players.%player's uuid%.team" in "players"
+        if {_id} is not "none":
+            set {_gui} to chest inventory with 3 rows named "&2Revive a teammate"
+            set {_m::*} to yaml list "teams.%{_id}%.members" in "teams"
+            loop 27 times:
+                if loop-value is 13:
+                    remove player's uuid from {_m::*}
+                    if size of {_m::*} is not greater than 0:
+                        set slot 12 of {_gui} to paper named "&cIt's just you..."
+                    size of {_m::*} is greater than 0
+                    set {_p} to 1st element of {_m::*} parsed as offline player
+                    if {_p} is set:
+                        if {_p} is banned:
+                            set {_i} to skull of {_p}
+                            set byte tag "rhead" of nbt compound of {_i} to 1
+                            set string tag "ruuid" of nbt compound of {_i} to "%{_p}'s uuid%"
+                            set slot 12 of {_gui} to {_i}
+                        else:
+                            set slot 12 of {_gui} to skull of {_p} named "&c%{_p}% is not dead!"
+                    else:
+                        set slot 12 of {_gui} to barrier named "&cEmpty Team Slot"
+                else if loop-value is 14:
+                    remove player's uuid from {_m::*}
+                    if size of {_m::*} is not greater than 0:
+                        set slot 13 of {_gui} to paper named "&cYou're all alone..."
+                    size of {_m::*} is greater than 0
+                    set {_p} to 2nd element of {_m::*} parsed as offline player
+                    if {_p} is set:
+                        if {_p} is banned:
+                            set {_i} to skull of {_p}
+                            set byte tag "rhead" of nbt compound of {_i} to 1
+                            set string tag "ruuid" of nbt compound of {_i} to {_p}'s uuid
+                            set slot 13 of {_gui} to {_i}
+                        else:
+                            set slot 13 of {_gui} to skull of {_p} named "&c%{_p}% is not dead!"
+                    else:
+                        set slot 13 of {_gui} to barrier named "&cEmpty Team Slot"
+                else if loop-value is 15:
+                    remove player's uuid from {_m::*}
+                    if size of {_m::*} is not greater than 0:
+                        set slot 14 of {_gui} to paper named "&c&oAll alone..."
+                    size of {_m::*} is greater than 0
+                    set {_p} to 3rd element of {_m::*} parsed as offline player
+                    if {_p} is set:
+                        if {_p} is banned:
+                            set {_i} to skull of {_p}
+                            set byte tag "rhead" of nbt compound of {_i} to 1
+                            set string tag "ruuid" of nbt compound of {_i} to {_p}'s uuid
+                            set slot 14 of {_gui} to {_i}
+                        else:
+                            set slot 14 of {_gui} to skull of {_p} named "&c%{_p}% is not dead!"
+                    else:
+                        set slot 13 of {_gui} to barrier named "&cEmpty Team Slot"
+                else:
+                    set slot (loop-value - 1) of {_gui} to black stained glass pane named " "
+            close player's inventory
+            open {_gui} for player
+            play sound "minecraft:block.tripwire.click_on" at volume 1 at pitch 2 at player to player
+        else:
+            close player's inventory
+            message "&cYou aren't in a team you idiotic moron"
+            play sound "minecraft:block.note_block.didgeridoo" at volume 1 at pitch 1 to player
+    else if index of event-slot is 14:
+        set metadata tag "searching" of player to true
+        message "&aPlease type in chat the name of the person you would like to revive! Or type ""cancel"" to cancel!"
+        close player's inventory
+        play sound "minecraft:block.tripwire.click_on" at volume 1 at pitch 2 at player to player
+
+on inventory click:
+    name of event-inventory is "&2Revive a teammate"
+    cancel event
+    index of event-slot is 12, 13 or 14
+    byte tag "rhead" of nbt compound of event-item is 1
+    set {_p} to string tag "ruuid" of nbt compound of event-item parsed as offline player
+    if {_p} is set:
+        if {_p} is banned:
+            loop player's inventory:
+                if byte tag "revive" of nbt compound of loop-value is 1:
+                    remove 1 of loop-value from player's inventory
+                    set {_e} to true
+                    exit this loop
+            if {_e} is true:
+                unban {_p}
+                add {_p}'s uuid to {revive::*}
+                set {revive::%{_p}'s uuid%::loc} to player's location
+                broadcast "&a%{_p}% &fhas been revived!"
+                message "&aYou have successfully revived %{_p}%! Once they rejoin they will be teleported to this location."
+                play sound "minecraft:block.beacon.power_select" at volume 1 at pitch 1 to player
+            else:
+                message "&cYou do not have a revive book on you anymore you dirty little cheater!"
+                play sound "minecraft:block.note_block.digeridoo" at volume 1 at pitch 1 to player
+        else:
+            message "&c%{_p}% is not dead!"
+            play sound "minecraft:block.note_block.digeridoo" at volume 1 at pitch 1 to player
+    else:
+        play sound "minecraft:block.note_block.digeridoo" at volume 1 at pitch 1 to player
+
+on chat:
+    metadata tag "searching" of player is true
+    set metadata tag "searching" of player to false
+    cancel event
+    if message is "cancel":
+        message "&cCancelled."
+        stop
+    set {_p} to message parsed as offline player
+    if {_p} is set:
+        if {_p} is banned:
+            loop player's inventory:
+                if byte tag "revive" of nbt compound of loop-value is 1:
+                    remove 1 of loop-value from player's inventory
+                    set {_e} to true
+                    exit this loop
+            if {_e} is true:
+                unban {_p}
+                add {_p}'s uuid to {revive::*}
+                set {revive::%{_p}'s uuid%::loc} to player's location
+                broadcast "&a%{_p}% &fhas been revived!"
+                message "&aYou have successfully revived %{_p}%! Once they rejoin they will be teleported to this location."
+                play sound "minecraft:block.beacon.power_select" at volume 1 at pitch 1 to player
+            else:
+                message "&cYou do not have a revive book on you anymore you dirty little cheater!"
+                set metadata tag "searching" of player to false
+        else:
+            message "&c%{_p}% is not dead!"
+            set metadata tag "searching" of player to false
+    else:
+        message "&cThat player does not exist!"
+        set metadata tag "searching" of player to false
+        play sound "minecraft:block.note_block.didgeridoo" at volume 1 at pitch 1 to player
+
+on quit:
+    metadata tag "searching" of player is true
+    set metadata tag "searching" of player to false
+
+on join:
+    if {revive::*} contains player's uuid:
+        wait 10 ticks
+        teleport player to {revive::%player's uuid%::loc}
+        remove player's uuid from {revive::*}
+        set player's gamemode to survival
+        heal player
+        message "&aYou have been revived! You have been teleported to the location you were revived to."
+        give player 16 cooked beef
+
+command /resetrevivelist:
+    permission: op
+    trigger:
+        delete {revive::*}
+        message "&aRevive list reset Successful!"
+        play sound "minecraft:block.note_block.bell" at volume 1 at pitch 1 to player
+
+#Ajos's way (aka the simple way without a gui)
+# on right click:
+#     if metadata tag "searching" of player is not true:
+#         set metadata tag "searching" of player to true
+#         message "&aPlease type in chat the name of the person you would like to revive! Or type ""cancel"" to cancel!"
+#     else:
+#         message "&cYou are already using a revive book!"

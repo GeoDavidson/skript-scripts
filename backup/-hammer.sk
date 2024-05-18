@@ -1,0 +1,30 @@
+on right click:
+    if byte tag "BPhammer" of nbt compound of event-item is 1:
+        if {hammerc::%player's uuid%} is not set:
+            set {hammerc::%player's uuid%} to now
+            set item cooldown of event-item for player to {hammer.cooldown}
+            hp(player)
+            play sound "entity.warden.sonic_boom" with volume 0.5 with pitch 0.8 at player
+            loop all entities in radius 7 around player where [input is not player]:
+                damage loop-entity by {hammer.dmg}
+                knock loop-entity (vector from player to loop-entity) with strength 1.5
+                push the loop-entity upwards at speed 0.4
+            stop
+        set {_hammert} to difference between {hammerc::%player's uuid%} and now
+        if {_hammert} is less than {hammer.cooldown}:
+            stop
+        else:
+            set {hammerc::%player's uuid%} to now
+            set item cooldown of event-item for player to {hammer.cooldown}
+            hp(player)
+            play sound "entity.warden.sonic_boom" with volume 0.5 with pitch 0.8 at player
+            loop all entities in radius 7 around player where [input is not player]:
+                damage loop-entity by {hammer.dmg}
+                knock loop-entity (vector from player to loop-entity) with strength 1.5
+                push the loop-entity upwards at speed 0.4
+            stop
+
+
+function hp(p: player):
+    draw 10 of sonic boom at {_p} with offset vector(1, 0.6, 1) with extra 0
+    draw 45 of sculk soul at {_p} with offset vector(3, 0, 3) with extra 0.05

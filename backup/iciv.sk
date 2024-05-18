@@ -18,34 +18,34 @@ variables:
     {day} = 0
 
 local function mainSpawn() :: object:
-    return location(-807, 37, 846, world "ic2", 70, 0)
+    return location(-807, 37, 846, world "ic", 70, 0)
 
 local function boardingSpawn() :: object:
-    return location(-885, 41, 842, world "ic2", 45, 0)
+    return location(-885, 41, 842, world "ic", 45, 0)
 
 local function redPlaneSpawn() :: object:
-    return location(-438, 142, -291, world "ic2", -90, 0)
+    return location(-438, 142, -291, world "ic", -90, 0)
 
 local function greenPlaneSpawn() :: object:
-    return location(-596, 107, 286, world "ic2", -90, 0)
+    return location(-596, 107, 286, world "ic", -90, 0)
 
 local function bluePlaneSpawn() :: object:
-    return location(125, 91, 511, world "ic2", 180, 0)
+    return location(125, 91, 511, world "ic", 180, 0)
 
 local function yellowPlaneSpawn() :: object:
-    return location(332, 101, -573, world "ic2", 0, 0)
+    return location(332, 101, -573, world "ic", 0, 0)
 
 local function redGroundSpawn() :: object:
-    return location(-461, 33, -514, world "ic2", -60, 0)
+    return location(-461, 33, -514, world "ic", -60, 0)
 
 local function greenGroundSpawn() :: object:
-    return location(-293, 34, 568, world "ic2", -140, 0)
+    return location(-293, 34, 568, world "ic", -140, 0) # done
 
 local function blueGroundSpawn() :: object:
-    return location(455, 34, 551, world "ic2", -140, 0)
+    return location(455, 34, 551, world "ic", -140, 0)
 
 local function yellowGroundSpawn() :: object:
-    return location(501, 33, -217, world "ic2", 120, 0)
+    return location(501, 33, -217, world "ic", 120, 0)
 
 local function removeFromTeam(player: player):
     remove {_player}'s uuid from {redTeam::*}
@@ -148,20 +148,21 @@ on join:
 
 on quit:
     removeFromAlive(player)
-    # if gamemode of player is spectator:
-    #     if player is not op:
-            # ban player due to "You Died: Thanks For Playing :)"
+    if gamemode of player is spectator:
+        if player is not op:
+            ban player due to "You Died: Thanks For Playing :)"
     set quit message to ""
 
 on region enter:
     if gamemode of player is not spectator:
+        # should you use alive team
         set {_maxTeamSize} to max(size of {redTeam::*}, size of {greenTeam::*}, size of {blueTeam::*}, size of {yellowTeam::*})
-        if size of {redTeam::*} >= {_maxTeamSize} - 50:
-            if size of {greenTeam::*} >= {_maxTeamSize} - 50:
-                if size of {blueTeam::*} >= {_maxTeamSize} - 50:
-                    if size of {yellowTeam::*} >= {_maxTeamSize} - 50:
+        if size of {redTeam::*} >= {_maxTeamSize} - 3:
+            if size of {greenTeam::*} >= {_maxTeamSize} - 3:
+                if size of {blueTeam::*} >= {_maxTeamSize} - 3:
+                    if size of {yellowTeam::*} >= {_maxTeamSize} - 3:
                         add 1 to {_maxTeamSize}
-        if "%region%" is "red in world ic2":
+        if "%region%" is "red in world ic":
             if {redTeam::*} contains player's uuid:
                 if {eventStarted} = true:
                     teleport player to redGroundSpawn()
@@ -169,7 +170,7 @@ on region enter:
                     teleport player to redPlaneSpawn()
             else if size of {redTeam::*} < {_maxTeamSize}:
                 give 16 of steak to player
-                execute console command "/luckperms user %player% parent set group.1"
+                execute console command "/luckperms user %player% parent set red"
                 add player's uuid to {redTeam::*}
                 add player's uuid to {redAlive::*}
                 if {eventStarted} = true:
@@ -178,7 +179,7 @@ on region enter:
                     teleport player to redPlaneSpawn()
             else:
                 teleport player to boardingSpawn()
-        else if "%region%" is "green in world ic2":
+        else if "%region%" is "green in world ic":
             if {greenTeam::*} contains player's uuid:
                 if {eventStarted} = true:
                     teleport player to greenGroundSpawn()
@@ -186,7 +187,7 @@ on region enter:
                     teleport player to greenPlaneSpawn()
             else if size of {greenTeam::*} < {_maxTeamSize}:
                 give 16 of steak to player
-                execute console command "/luckperms user %player% parent set group.2"
+                execute console command "/luckperms user %player% parent set green"
                 add player's uuid to {greenTeam::*}
                 add player's uuid to {greenAlive::*}
                 if {eventStarted} = true:
@@ -195,7 +196,7 @@ on region enter:
                     teleport player to greenPlaneSpawn()
             else:
                 teleport player to boardingSpawn()
-        else if "%region%" is "blue in world ic2":
+        else if "%region%" is "blue in world ic":
             if {blueTeam::*} contains player's uuid:
                 if {eventStarted} = true:
                     teleport player to blueGroundSpawn()
@@ -203,7 +204,7 @@ on region enter:
                     teleport player to bluePlaneSpawn()
             else if size of {blueTeam::*} < {_maxTeamSize}:
                 give 16 of steak to player
-                execute console command "/luckperms user %player% parent set group.3"
+                execute console command "/luckperms user %player% parent set blue"
                 add player's uuid to {blueTeam::*}
                 add player's uuid to {blueAlive::*}
                 if {eventStarted} = true:
@@ -212,7 +213,7 @@ on region enter:
                     teleport player to bluePlaneSpawn()
             else:
                 teleport player to boardingSpawn()
-        else if "%region%" is "yellow in world ic2":
+        else if "%region%" is "yellow in world ic":
             if {yellowTeam::*} contains player's uuid:
                 if {eventStarted} = true:
                     teleport player to yellowGroundSpawn()
@@ -220,7 +221,7 @@ on region enter:
                     teleport player to yellowPlaneSpawn()
             else if size of {yellowTeam::*} < {_maxTeamSize}:
                 give 16 of steak to player
-                execute console command "/luckperms user %player% parent set group.4"
+                execute console command "/luckperms user %player% parent set yellow"
                 add player's uuid to {yellowTeam::*}
                 add player's uuid to {yellowAlive::*}
                 if {eventStarted} = true:
@@ -230,24 +231,24 @@ on region enter:
             else:
                 teleport player to boardingSpawn()
 
-# on death:
-#     if {eventStarted} = true:
-#         cancel event
-#         execute console command "/luckperms user %victim% parent set default"
-#         set {_p} to victim
-#         loop all items in {_p}'s inventory:
-#             drop loop-value at {_p}
-#             set slot index of loop-value of {_p} to air
-#         set gamemode of victim to spectator
-#         removeFromTeam(victim)
-#         removeFromAlive(victim)
-#         strike lightning effect at the victim
-#         send title "" with subtitle "&4&lYou Died" to victim
-#         wait 5 seconds
-#         send title "" with subtitle "&a&lThanks For Playing" to victim
-#         wait 5 seconds
-        # ban victim due to "You Died: Thanks For Playing :)"
-        # kick the victim due to "You Died: Thanks For Playing :)"
+on death of player with priority highest:
+    if {eventStarted} = true:
+        cancel event
+        execute console command "/luckperms user %victim% parent set default"
+        set {_p} to victim
+        loop all items in {_p}'s inventory:
+            drop loop-value at {_p}
+            set slot index of loop-value of {_p} to air
+        set gamemode of victim to spectator
+        removeFromTeam(victim)
+        removeFromAlive(victim)
+        strike lightning effect at the victim
+        send title "" with subtitle "&4&lYou Died" to victim
+        wait 5 seconds
+        send title "" with subtitle "&a&lThanks For Playing" to victim
+        wait 5 seconds
+        ban victim due to "You Died: Thanks For Playing :)"
+        kick the victim due to "You Died: Thanks For Playing :)"
 
 on damage of player with priority highest:
     if {redTeam::*} contains attacker's uuid:
@@ -315,7 +316,7 @@ command /civday <number>:
         execute console command "/minecraft:kill @e[type=minecraft:skeleton_horse]"
         execute console command "/minecraft:kill @e[type=minecraft:skeleton]"
         execute console command "/minecraft:kill @e[type=minecraft:husk]"
-        execute console command "/killall hostile ic2"
+        execute console command "/killall hostile ic"
         set {day} to arg-1
         send title "&a&lDay %{day}%" with subtitle "" to all players
         wait 50 seconds
@@ -361,7 +362,7 @@ command /civsetteam <player> <text>:
             teleport arg-1 to redGroundSpawn()
             give 16 of steak to arg-1
             set gamemode of arg-1 to survival
-            execute console command "/luckperms user %arg-1% parent set group.1"
+            execute console command "/luckperms user %arg-1% parent set red"
             add arg-1's uuid to {redTeam::*}
             add arg-1's uuid to {redAlive::*}
         else if arg-2 is "green":
@@ -370,7 +371,7 @@ command /civsetteam <player> <text>:
             teleport arg-1 to greenGroundSpawn()
             give 16 of steak to arg-1
             set gamemode of arg-1 to survival
-            execute console command "/luckperms user %arg-1% parent set group.2"
+            execute console command "/luckperms user %arg-1% parent set green"
             add arg-1's uuid to {greenTeam::*}
             add arg-1's uuid to {greenAlive::*}
         else if arg-2 is "blue":
@@ -379,7 +380,7 @@ command /civsetteam <player> <text>:
             teleport arg-1 to blueGroundSpawn()
             give 16 of steak to arg-1
             set gamemode of arg-1 to survival
-            execute console command "/luckperms user %arg-1% parent set group.3"
+            execute console command "/luckperms user %arg-1% parent set blue"
             add arg-1's uuid to {blueTeam::*}
             add arg-1's uuid to {blueAlive::*}
         else if arg-2 is "yellow":
@@ -388,7 +389,7 @@ command /civsetteam <player> <text>:
             teleport arg-1 to yellowGroundSpawn()
             give 16 of steak to arg-1
             set gamemode of arg-1 to survival
-            execute console command "/luckperms user %arg-1% parent set group.4"
+            execute console command "/luckperms user %arg-1% parent set yellow"
             add arg-1's uuid to {yellowTeam::*}
             add arg-1's uuid to {yellowAlive::*}
 
@@ -751,23 +752,3 @@ command /civwallsdown:
         fill("overworld", -335, 27, 1, -555, 30, -1, "water")
         wait 5 ticks        
         fill("overworld", -556, 27, 1, -750, 30, -1, "water")
-
-command /civtpteam <text>:
-    permission: op
-    trigger:
-        if arg-1 is "red":
-            loop {redTeam::*}:
-                set {_player} to loop-value parsed as player
-                teleport {_player} to player
-        else if arg-1 is "green":
-            loop {greenTeam::*}:
-                set {_player} to loop-value parsed as player
-                teleport {_player} to player
-        else if arg-1 is "blue":
-            loop {blueTeam::*}:
-                set {_player} to loop-value parsed as player
-                teleport {_player} to player
-        else if arg-1 is "yellow":
-            loop {yellowTeam::*}:
-                set {_player} to loop-value parsed as player
-                teleport {_player} to player

@@ -1,0 +1,4 @@
+on command "/antiscythers":
+    player is not op
+    cancel event
+    message "&cNOOOOO"

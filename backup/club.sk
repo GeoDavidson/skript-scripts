@@ -1,0 +1,69 @@
+on rightclick:
+    byte tag "club" of nbt compound of player's held item is 1
+    if difference between now and {club::cooldownplayers::%player's uuid%} is greater than {club::cooldown}:
+        set {club::cooldownplayers::%player's uuid%} to now
+        if target entity is set:
+            if distance between player and target entity <= 15:
+                set {_v} to vector from player to target entity
+                set vector length of {_v} to 0.1
+                set {_loc} to location of player
+                add 1 to y-coord of {_loc}
+                loop (distance between {_loc} and target entity) / 0.1 times:
+                    draw 1 dust_color_transition using dustTransition(green, green, 2) at {_loc} with force
+                    set {_loc} to {_loc} ~ {_v}
+                set {_ploc} to location of player
+                add 1 to y-coord of {_ploc}
+                push target entity (direction from location of target entity to {_ploc}) at speed 1.5
+            else:
+                set {_v} to vector from player to block 15 blocks in front of player
+                set vector length of {_v} to 0.1
+                set {_loc} to location of player
+                add 1 to y-coord of {_loc}
+                loop (distance between {_loc} and block 15 blocks in front of player) / 0.1 times:
+                    draw 1 dust_color_transition using dustTransition(green, green, 2) at {_loc} with force
+                    set {_loc} to {_loc} ~ {_v}
+        else:
+            set {_v} to vector from player to block 15 blocks in front of player
+            set vector length of {_v} to 0.1
+            set {_loc} to location of player
+            add 1 to y-coord of {_loc}
+            loop (distance between {_loc} and block 15 blocks in front of player) / 0.1 times:
+                draw 1 dust_color_transition using dustTransition(green, green, 2) at {_loc} with force
+                set {_loc} to {_loc} ~ {_v}
+    else if {club::cooldownplayers::%player's uuid%} is not set:
+        target entity is set
+        set {club::cooldownplayers::%player's uuid%} to now
+        set {_v} to vector from player to target entity
+        set vector length of {_v} to 0.1
+        set {_loc} to location of player
+        add 1 to y-coord of {_loc}
+        loop (distance between {_loc} and target entity) / 0.1 times:
+            draw 1 dust_color_transition using dustTransition(green, green, 2) at {_loc} with force
+            set {_loc} to {_loc} ~ {_v}
+        push target entity (direction from location of target entity to {_ploc}) at speed 1.5
+    else:
+        set {_t} to difference between {club::cooldown} and difference between {club::cooldownplayers::%player's uuid%} and now
+        send "&cThe Aztec Club's Pull Ability Will Recharge in %rounded seconds of {_t}% Seconds!" to player
+
+on damage:
+    attacker is a player
+    byte tag "club" of nbt compound of attacker's weapon is 1
+    chance of {club::chance}%
+    set damage to (damage * 1.5)
+    draw 250 of block using emerald block at location of block above location of victim
+
+command /club <string> <integer>:
+    permission: op
+    trigger:
+        if arg-1 is "damage":
+            set {club::damage} to arg-2
+            message "&aYou set the club damage to %arg-2%"
+            play sound "block.note_block.bell" at volume 1 at pitch 1 to player
+        if arg-1 is "cooldown":
+            set {club::cooldown} to "%arg-2% seconds" parsed as timespan
+            message "&aYou set the club cooldown to %arg-2%"
+            play sound "block.note_block.bell" at volume 1 at pitch 1 to player
+        if arg-1 is "chance":
+            set {club::chance} to arg-2
+            message "&aYou set the club crit chance to %arg-2%"
+            play sound "block.note_block.bell" at volume 1 at pitch 1 to player

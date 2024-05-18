@@ -1,0 +1,106 @@
+#------------------------------- Global Mute Chat -------------------------------#
+command /mutechat:
+    permission: chat.mute
+    permission message: &cYou don't have the permission.
+    trigger:
+        if {Globalchat} is not set:
+            set {Globalchat} to true
+            broadcast "&c&lChat muted by &r&f%player%"
+            stop trigger
+        if {Globalchat} is set:
+            clear {Globalchat}
+            broadcast "&a&lChat unmuted by &r&f%player%"
+
+on chat:
+    if {Globalchat} is true:
+        if player has permission "chat.mute.bypass":
+            stop trigger
+        else:
+            cancel event
+            send "&cChat is currently muted."
+#------------------------------- Team Chats -------------------------------#
+options:
+    rtprefix:&c&lROMAN TEAM
+    gtprefix:&a&lAZTEC TEAM
+    ytprefix:&e&lEGYPTIAN TEAM
+   
+command /teamchat [<text>]:
+    trigger:
+        if player has permission "team.red":
+            if arg-1 is set:
+                if arg-1 is "toggle":
+                    if {rt.%player%} is "false":
+                        set {rt.%player%} to "true"
+                        send "{@rtprefix} chat enabled." to player
+                    if {rt.%player%} is "true":
+                        set {rt.%player%} to "false"
+                        send "{@rtprefix} chat disabled." to player
+                else:
+                    loop all players:
+                        if loop-player has permission "team.red":
+                            send "{@rtprefix} &d%player's display name%&f: &d%arg-1%" to loop-players
+        if player has permission "team.green":
+            if arg-1 is set:
+                if arg-1 is "toggle":
+                    if {gt.%player%} is "false":
+                        set {gt.%player%} to "true"
+                        send "{@gtprefix} chat enabled." to player
+                    if {gt.%player%} is "true":
+                        set {gt.%player%} to "false"
+                        send "{@gtprefix} chat disabled." to player
+                else:
+                    loop all players:
+                        if loop-player has permission "team.green":
+                            send "{@gtprefix} &d%player's display name%&f: &d%arg-1%" to loop-players
+        if player has permission "team.yellow":
+            if arg-1 is set:
+                if arg-1 is "toggle":
+                    if {yt.%player%} is "false":
+                        set {yt.%player%} to "true"
+                        send "{@ytprefix} chat enabled." to player
+                    if {yt.%player%} is "true":
+                        set {yt.%player%} to "false"
+                        send "{@ytprefix} chat disabled." to player
+                else:
+                    loop all players:
+                        if loop-player has permission "team.yellow":
+                            send "{@ytprefix} &d%player's display name%&f: &d%arg-1%" to loop-players
+   
+on chat:
+    if {rt.%player%} is "true":
+        loop all players:
+            if loop-player has permission "team.red":
+                send "{@rtprefix} &d%player's display name%&f: &d%message%"
+    if {gt.%player%} is "true":
+        loop all players:
+            if loop-player has permission "team.green":
+                send "{@gtprefix} &d%player's display name%&f: &d%message%"
+    if {yt.%player%} is "true":
+        loop all players:
+            if loop-player has permission "team.yellow":
+                send "{@ytprefix} &d%player's display name%&f: &d%message%"
+                
+on command "/me":
+    cancel event
+#------------------------------- plugin list -------------------------------#
+on command "/pl":
+    if player is not op:
+        cancel event 
+        send "&cYou don't have permission!" to player 
+on command "/bukkit:plugins":
+    if player is not op:
+        cancel event 
+        send "&cYou don't have permission!" to player 
+on command "/bukkit:pl":
+    if player is not op:
+        cancel event 
+        send "&cYou don't have permission!" to player 
+on command "/plugins":
+    if player is not op:
+        cancel event 
+        send "&cYou don't have permission!" to player
+on command "/bukkit:?":
+    if player is not op:
+        cancel event 
+        send "&cYou don't have permission!" to player
+#------------------------------- end -------------------------------#

@@ -1,0 +1,298 @@
+# command /crafts:
+    # aliases: craft, recipes, recipe
+    # trigger:
+        # set {_gui} to new chest inventory named "&2Recipes" with 5 rows
+        # loop 45 times:
+            # set {_e::*} to "13", "14", "15", "22", "23", "24", "26", "31", "32", "33", "37" and "45"
+            # if {_e::*} does not contain "%loop-value%":
+                # set slot (loop-value - 1) of {_gui} to black stained glass pane named ""
+        # set slot (37 - 1) of {_gui} to black stained glass pane named ""
+        # close player's inventory
+        # open {_gui} for player
+
+on script load:
+    # register new shaped recipe for {dashitem} using diamond, gold block, diamond, iron block, diamond sword, iron block, diamond, gold block and diamond with id "dash_sword"
+    # register new shaped recipe for {quakeitem} using iron block, iron block, iron block, gold block, diamond axe, gold block, gold block, diamond block and gold block with id "quake_hammer"
+    # register new shaped recipe for {lightningbowitem} using lapis block, diamond block, lapis block, gold block, bow, gold block, gold ingot, gold ingot and gold ingot with id "lightning_bow"
+    # register new shaped recipe for {boombowitem} using redstone block, diamond, redstone block, gold block, crossbow, gold block, diamond block, gold block and diamond block with id "blast_bow"
+    # register new shaped recipe for {revivebookitem} using air, diamond, air, diamond, gold ingot, diamond, air, diamond and air with id "revive_book"
+    loop {recipes::items::*}:
+        set {_id} to loop-value
+        {recipes::items::%loop-value%::recipe::*} is set
+        set {_r::*} to {recipes::items::%loop-value%::recipe::*}
+        loop 10 times:
+            set {_i%loop-value-2%} to (loop-value-2)th element of {_r::*}
+        register new shaped recipe for {_i10} using {_i1}, {_i2}, {_i3}, {_i4}, {_i5}, {_i6}, {_i7}, {_i8} and {_i9} with id {_id}
+
+on craft:
+    wait 1 tick
+    event is not cancelled
+    if event-item is {dashitem}:
+        broadcast "&a%player% &fHas crafted the &6Dash Sword&f!"
+        stop
+    if event-item is {quakeitem}:
+        broadcast "&a%player% &fHas crafted the &x&0&3&4&0&5&1Sculk Hammer&f!"
+        stop
+    if event-item is {lightningbowitem}:
+        broadcast "&a%player% &fHas crafted the &x&F&F&F&8&0&0&fThunder Bow!"
+        stop
+    if event-item is {boombowitem}:
+        broadcast "&a%player% &fHas crafted the &x&F&B&0&0&0&0Blast Bow&f!"
+        stop
+    # if event-item is {revivebookitem}:
+    #     broadcast "&a%player% &fHas crafted the &6Revive Book&f!"
+    #     stop
+
+command /recipes [<string>] [<string>] [<string>]:
+    aliases: /recipe, /craft, /crafts
+    trigger:
+        if arg-1 is "create":
+            if arg-2 is not set:
+                message "&cYou need to provide the item ID! idiot"
+                play sound "minecraft:block.note_block.didgeridoo" at volume 1 at pitch 1 to player
+                stop
+            if arg-3 is not set:
+                message "&cYou need to provide the GUI slot number! moron"
+                play sound "minecraft:block.note_block.didgeridoo" at volume 1 at pitch 1 to player
+                stop
+            set {_s} to arg-3 parsed as integer
+            if {_s} is not set:
+                message "&cThe slot number needs to be a number! idiot"
+                play sound "minecraft:block.note_block.didgeridoo" at volume 1 at pitch 1 to player
+                stop
+            set {_id} to arg-2
+            if {recipes::items::*} contains {_id}:
+                message "&cAn item with this ID already exists! idiot"
+                play sound "minecraft:block.note_block.didgeridoo" at volume 1 at pitch 1 to player
+                stop
+            if player's held item is air:
+                message "&cPlease hold the item you would like to add! moron"
+                play sound "minecraft:block.note_block.didgeridoo" at volume 1 at pitch 1 to player
+                stop
+            set {_i} to player's held item
+            add {_id} to {recipes::items::*}
+            set {recipes::items::%{_id}%::item} to {_i}
+            set {recipes::items::%{_id}%::slot} to ({_s} + 8)
+            message "&aSuccessfully added item to the GUI! Make sure to add a recipe to it!"
+            play sound "minecraft:block.note_block.bell" at volume 1 at pitch 1 to player
+        else if arg-1 is "setrecipe":
+            if arg-2 is not set:
+                message "&cYou need to provide the item ID! idiot"
+                play sound "minecraft:block.note_block.didgeridoo" at volume 1 at pitch 1 to player
+                stop
+            set {_id} to arg-2
+            if {recipes::items::*} does not contain {_id}:
+                message "&cAn item with this ID doesn't exist moron"
+                play sound "minecraft:block.note_block.didgeridoo" at volume 1 at pitch 1 to player
+                stop
+            add item in slot 9 of player's inventory to {_r::*}
+            add item in slot 10 of player's inventory to {_r::*}
+            add item in slot 11 of player's inventory to {_r::*}
+            add item in slot 18 of player's inventory to {_r::*}
+            add item in slot 19 of player's inventory to {_r::*}
+            add item in slot 20 of player's inventory to {_r::*}
+            add item in slot 27 of player's inventory to {_r::*}
+            add item in slot 28 of player's inventory to {_r::*}
+            add item in slot 29 of player's inventory to {_r::*}
+            add item in slot 21 of player's inventory to {_r::*} #Recipe item
+            loop {_r::*}:
+                loop size of lore of loop-value times:
+                    set {_c} to loop-value-2
+                    set {_l} to line {_c} of lore of loop-value-1
+                    {_l} contains "recipe:"
+                    remove "recipe: " from {_l}
+                    set {_r::%loop-value-1%::rlink} to {_l}
+                    remove line {_c} of lore of loop-value-1 from lore of {_r::%loop-value-1%}
+            if size of {_r::*} is not 10:
+                message "&c&l[ERROR] &cSize of list is not 10! Make sure every item needed for the recipe is in the correct slots."
+                play sound "minecraft:block.note_block.didgeridoo" at volume 1 at pitch 1 to player
+                stop
+            set {recipes::items::%{_id}%::recipe::*} to {_r::*}
+            message "&aSuccessfully set the recipe of %{_id}%"
+            play sound "minecraft:block.note_block.bell" at volume 1 at pitch 1 to player
+        else if arg-1 is "remove":
+            if arg-2 is not set:
+                message "&cYou need to provide the item ID! idiottttttttttttttttttttttttttttttt"
+                play sound "minecraft:block.note_block.didgeridoo" at volume 1 at pitch 1 to player
+                stop
+            set {_id} to arg-2
+            if {recipes::items::*} does not contain {_id}:
+                message "&cHow am I gonna remove something that doesn't exist? Come on tell me"
+                play sound "minecraft:block.note_block.didgeridoo" at volume 1 at pitch 1 to player
+                stop
+            remove {_id} from {recipes::items::*}
+            if {recipes::items::%{_id}%} is not set:
+                remove custom recipe {_id}
+                message "&aSuccessfully removed recipe %{_id}%!"
+                play sound "minecraft:block.note_block.bell" at volume 1 at pitch 1 to player
+            else:
+                message "&cFailed to remove recipe %{_id}%!"
+                play sound "minecraft:block.note_block.didgeridoo" at volume 1 at pitch 1 to player
+                stop
+        else if arg-1 is "clear":
+            loop {recipes::items::*}:
+                remove custom recipe loop-value
+            clear {recipes::items::*}
+            message "&aSuccessfully cleared recipes!"
+            play sound "minecraft:block.note_block.bell" at volume 1 at pitch 1 to player
+        else if arg-1 is "setgroup":
+            if arg-2 is not set:
+                message "&cYou need to provide the item ID! idiot"
+                play sound "minecraft:block.note_block.didgeridoo" at volume 1 at pitch 1 to player
+                stop
+            if arg-3 is not set:
+                message "&cYou need to provide the Luckperms Group Name! moron"
+                play sound "minecraft:block.note_block.didgeridoo" at volume 1 at pitch 1 to player
+                stop
+            set {_id} to arg-2
+            if {recipes::items::*} does not contain {_id}:
+                message "&cAn item with this ID doesn't exist moron"
+                play sound "minecraft:block.note_block.didgeridoo" at volume 1 at pitch 1 to player
+                stop
+            set {recipes::items::%{_id}%::group} to "group.%arg-3%"
+            message "&aYou set the luckperms group for %{_id}% to %{recipes::items::%{_id}%::group}%!"
+            play sound "minecraft:block.note_block.bell" at volume 1 at pitch 1 to player
+        else:
+            openmaingui(player)
+
+on tab complete for "/recipe", "/recipes", "/craft" and "/crafts":
+    set tab completions for position 1 to "create", "setrecipe", "remove", "clear" and "setgroup"
+    if tab arg-1 is "create":
+        set tab completions for position 2 to "<Item ID>"
+        set tab completions for position 3 to "<GUI Slot Number>"
+    if tab arg-1 is "setrecipe":
+        set tab completions for position 2 to {recipes::items::*}
+    if tab arg-1 is "remove":
+        set tab completions for position 2 to {recipes::items::*}
+    if tab arg-1 is "setgroup":
+        set tab completions for position 2 to {recipes::items::*}
+        set tab completions for position 3 to "<LP Group Name>"
+
+on inventory click:
+    if name of event-inventory is "&2Recipes":
+        cancel event
+        index of event-slot >= 9
+        index of event-slot <= 35
+        item in event-slot is not air
+        loop {recipes::items::*}:
+            {recipes::items::%loop-value%::slot} = index of event-slot
+            {recipes::items::%loop-value%::recipe::*} is set
+            set {_id} to loop-value
+            exit loop
+        if {_id} is set:
+            close player's inventory
+            openrecipe({_id}, player)
+            play sound "minecraft:block.tripwire.click_on" at volume 1 at pitch 2 at player to player
+        else:
+            play sound "block.note_block.didgeridoo" at volume 1 at pitch 1 to player
+    else if name of event-inventory is "&2Recipe":
+        cancel event
+        if event-slot is {recipegui::backhead}:
+            close player's inventory
+            openmaingui(player)
+            play sound "minecraft:block.tripwire.click_on" at volume 1 at pitch 2 at player to player
+        if string tag "rlink" of nbt compound of event-item is set:
+            close player's inventory
+            openrecipe(string tag "rlink" of nbt compound of event-item, player)
+            play sound "minecraft:block.tripwire.click_on" at volume 1 at pitch 2 at player to player
+
+function openmaingui(p: player):
+    set {_gui} to chest inventory with 6 rows named "&2Recipes"
+    set {_slot} to 0
+    loop 9 times:
+        set slot {_slot} of {_gui} to purple stained glass pane named ""
+        add 1 to {_slot}
+    set {_slot} to 45
+    loop 9 times:
+        set slot {_slot} of {_gui} to purple stained glass pane named ""
+        add 1 to {_slot}
+    set slot 36 of {_gui} to {recipegui::backhead}
+    set slot 44 of {_gui} to {recipegui::forwardhead}
+    set slot 40 of {_gui} to paper of mending named "&aPage: 1" with enchants flag hidden
+    set {_c} to 1
+    loop {recipes::items::*}:
+        set slot {recipes::items::%loop-value%::slot} of {_gui} to {recipes::items::%loop-value%::item}
+        add 1 to {_c}
+    open {_gui} for {_p}
+
+function openrecipe(item: string, p: player):
+    if {recipes::items::*} contains {_item}:
+        if {recipes::items::%{_item}%::group} is set:
+            if {_p} does not have permission {recipes::items::%{_item}%::group}:
+                play sound "minecraft:block.note_block.didgeridoo" at volume 1 at pitch 1 to {_p}
+                stop
+        set {_r::*} to {recipes::items::%{_item}%::recipe::*}
+        loop {_r::*}:
+            {_r::%loop-value%::rlink} is set
+            set string tag "rlink" of nbt compound of {_r::%{_item}%} to {_r::%{_item}%::rlink}
+        recipebase({_p})
+        set slot 0 of metadata tag "recipegui" of {_p} to {recipegui::backhead}
+        set slot 19 of metadata tag "recipegui" of {_p} to crafting table named "&fShaped Crafting"
+        set slot 12 of metadata tag "recipegui" of {_p} to 1st element of {_r::*}
+        set slot 13 of metadata tag "recipegui" of {_p} to 2nd element of {_r::*}
+        set slot 14 of metadata tag "recipegui" of {_p} to 3rd element of {_r::*}
+        set slot 21 of metadata tag "recipegui" of {_p} to 4th element of {_r::*}
+        set slot 22 of metadata tag "recipegui" of {_p} to 5th element of {_r::*}
+        set slot 23 of metadata tag "recipegui" of {_p} to 6th element of {_r::*}
+        set slot 30 of metadata tag "recipegui" of {_p} to 7th element of {_r::*}
+        set slot 31 of metadata tag "recipegui" of {_p} to 8th element of {_r::*}
+        set slot 32 of metadata tag "recipegui" of {_p} to 9th element of {_r::*}
+        set slot 25 of metadata tag "recipegui" of {_p} to 10th element of {_r::*}
+        open metadata tag "recipegui" of {_p} for {_p}
+    else:
+        send "&ceee" to {_p}
+        play sound "minecraft:block.note_block.didgeridoo" at volume 1 at pitch 1 to {_p}
+
+function recipebase(p: player):
+    set metadata tag "recipegui" of {_p} to chest inventory with 5 rows named "&2Recipe"
+    set slot 1 of metadata tag "recipegui" of {_p} to black stained glass pane named ""
+    set slot 2 of metadata tag "recipegui" of {_p} to black stained glass pane named ""
+    set slot 3 of metadata tag "recipegui" of {_p} to black stained glass pane named ""
+    set slot 4 of metadata tag "recipegui" of {_p} to black stained glass pane named ""
+    set slot 5 of metadata tag "recipegui" of {_p} to black stained glass pane named ""
+    set slot 6 of metadata tag "recipegui" of {_p} to black stained glass pane named ""
+    set slot 7 of metadata tag "recipegui" of {_p} to black stained glass pane named ""
+    set slot 8 of metadata tag "recipegui" of {_p} to black stained glass pane named ""
+    set slot 9 of metadata tag "recipegui" of {_p} to black stained glass pane named ""
+    set slot 10 of metadata tag "recipegui" of {_p} to black stained glass pane named ""
+    set slot 11 of metadata tag "recipegui" of {_p} to black stained glass pane named ""
+    set slot 15 of metadata tag "recipegui" of {_p} to black stained glass pane named ""
+    set slot 16 of metadata tag "recipegui" of {_p} to black stained glass pane named ""
+    set slot 17 of metadata tag "recipegui" of {_p} to black stained glass pane named ""
+    set slot 18 of metadata tag "recipegui" of {_p} to black stained glass pane named ""
+    set slot 20 of metadata tag "recipegui" of {_p} to black stained glass pane named ""
+    set slot 24 of metadata tag "recipegui" of {_p} to black stained glass pane named ""
+    set slot 26 of metadata tag "recipegui" of {_p} to black stained glass pane named ""
+    set slot 27 of metadata tag "recipegui" of {_p} to black stained glass pane named ""
+    set slot 28 of metadata tag "recipegui" of {_p} to black stained glass pane named ""
+    set slot 29 of metadata tag "recipegui" of {_p} to black stained glass pane named ""
+    set slot 33 of metadata tag "recipegui" of {_p} to black stained glass pane named ""
+    set slot 34 of metadata tag "recipegui" of {_p} to black stained glass pane named ""
+    set slot 35 of metadata tag "recipegui" of {_p} to black stained glass pane named ""
+    set slot 36 of metadata tag "recipegui" of {_p} to black stained glass pane named ""
+    set slot 37 of metadata tag "recipegui" of {_p} to black stained glass pane named ""
+    set slot 38 of metadata tag "recipegui" of {_p} to black stained glass pane named ""
+    set slot 39 of metadata tag "recipegui" of {_p} to black stained glass pane named ""
+    set slot 40 of metadata tag "recipegui" of {_p} to black stained glass pane named ""
+    set slot 41 of metadata tag "recipegui" of {_p} to black stained glass pane named ""
+    set slot 42 of metadata tag "recipegui" of {_p} to black stained glass pane named ""
+    set slot 43 of metadata tag "recipegui" of {_p} to black stained glass pane named ""
+    set slot 44 of metadata tag "recipegui" of {_p} to black stained glass pane named ""
+
+command /setheaditemforgui <string>:
+    permission: op
+    trigger:
+        if arg-1 is "back":
+            set {recipegui::backhead} to player's held item
+            message "&aSet Back Button Item"
+        else if arg-1 is "forward":
+            set {recipegui::forwardhead} to player's held item
+            message "&aSet Forward Button Item"
+
+command /giveitemtolpgroup <string>:
+    permission: op
+    trigger:
+        set {_i} to player's held item
+        loop all players:
+            loop-player has permission "group.%arg-1%"
+            give {_i} to loop-player

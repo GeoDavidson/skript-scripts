@@ -1,0 +1,11 @@
+on mount:
+    wait 5 ticks
+    if event-entity is riding a saddled pig:
+        play sound "bad_piggies" with volume 100 to event-entity
+
+on dismount:
+    stop sound "bad_piggies" for the event-entity
+
+on damage of pig:
+    if victim's passenger is a player:
+        cancel event

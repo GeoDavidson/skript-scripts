@@ -1,0 +1,500 @@
+command /hgsendtogulag <player>:
+    permission: op
+    trigger:
+        message "&aSending %arg-1% to the gulag..."
+        broadcast "%arg-1% has been sent to the &4Gulag&r..."
+        play sound "block.note_block.bell" at volume 1 at pitch 1 to player
+        if {hasdied::*} does not contain arg-1's uuid:
+            add arg-1's uuid to {hasdied::*}
+        set arg-1's gamemode to spectator
+        send title "&4&lYou Died!" with subtitle "&fBut you have another chance!" to arg-1
+        wait 5 seconds
+        send title "&4&lThe Gulag" with subtitle "&fSending you to the gulag..." to arg-1
+        wait 5 seconds
+        if {gulag::queue::*} does not contain arg-1's uuid:
+            add arg-1's uuid to {gulag::queue::*}
+        teleport arg-1 to {gulag::location}
+        set arg-1's gamemode to survival
+        wait 0.25 seconds
+        send "&8------------------------------" to arg-1
+        send "&4&lThe Gulag!" to arg-1
+        send "&cYou died but you have another chance to continue playing." to arg-1
+        send "&c1v1 someone else, loser gets banned, winner survives..." to arg-1
+        send "&cIf you leave the game, you will be banned!" to arg-1
+        send "&8------------------------------" to arg-1
+        play sound "block.note_block.didgeridoo" at volume 1 at pitch 1 to arg-1
+        message "&a%arg-1% has been sent to the gulag successfully!"
+        play sound "block.note_block.bell" at volume 1 at pitch 1 to player
+
+on death of player:
+    victim is not {gulag::p1} or {gulag::p2}
+    cancel event
+    strike lightning effect at location of victim
+    dyingkillsyou(victim)
+
+every 10 seconds:
+    {gulagroundhappening} is not true
+    size of {gulag::queue::*} is greater than 1
+    set {_p1} to first element of {gulag::queue::*} parsed as player
+    if yaml value "players.%{_p1}'s uuid%.team" in "players" is set:
+        set {_id} to yaml value "players.%{_p1}'s uuid%.team" in "players"
+        set {_m::*} to yaml list "teams.%{_id}%.members" in "teams"
+    set {_p2} to 2nd element of {gulag::queue::*} parsed as player
+    if {_m::*} contains {_p2}'s uuid:
+        set {_n} to 2
+        while {_m::*} contains {_p2}'s uuid:
+            if {_n}th element of {gulag::queue::*} is not last element of {gulag::queue::*}:
+                add 1 to {_n}
+                set {_p2} to {_n}th element of {gulag::queue::*} parsed as player
+            else:
+                stop
+    set {gulag::p1} to {_p1}
+    set {gulag::p2} to {_p2}
+    startround()
+
+function startround():
+    set {gulagroundhappening} to true
+    gmsg("&aMatch started with players %{gulag::p1}% and %{gulag::p2}%!")
+    remove uuid of {gulag::p1} from {gulag::queue::*}
+    remove uuid of {gulag::p2} from {gulag::queue::*}
+    givegulagkit({gulag::p1})
+    givegulagkit({gulag::p2})
+    teleport {gulag::p1} to {gulag::p1spawn}
+    teleport {gulag::p2} to {gulag::p2spawn}
+
+function gmsg(m: string):
+    loop {gulag::queue::*}:
+        set {_p} to loop-value parsed as player
+        send colored {_m} to {_p}
+
+function dyingkillsyou(p: player, g: boolean = false):
+    if {_g} is not true:
+        if {finallife} is true:
+            set {_p}'s gamemode to spectator
+            drop items in {_p}'s inventory at location of {_p}
+            clear {_p}'s inventory
+            heal {_p}
+            feed {_p}
+            broadcast "&c%{_p}% ran out of chances!"
+            send title "&4&lYou Died!" with subtitle "&fAnd have run out of chances..." to {_p}
+            wait 3 seconds
+            send title "&aThanks for playing!" with subtitle "" to {_p}
+            wait 3 seconds
+            send title "&4&lGoodbye" with subtitle "&f5" to {_p}
+            wait 1 second
+            send title "&4&lGoodbye" with subtitle "&f4" to {_p}
+            wait 1 second
+            send title "&4&lGoodbye" with subtitle "&f3" to {_p}
+            wait 1 second
+            send title "&4&lGoodbye" with subtitle "&f2" to {_p}
+            wait 1 second
+            send title "&4&lGoodbye" with subtitle "&f1" to {_p}
+            wait 1 second
+            ban {_p} due to "&4You Died!: &fYou ran out of chances!"
+            kick {_p} due to "&4You Died!: &fYou ran out of chances!"
+            stop
+        if {hasdied::*} does not contain {_p}'s uuid:
+            add {_p}'s uuid to {hasdied::*}
+            set {_p}'s gamemode to spectator
+            drop items in {_p}'s inventory at location of {_p}
+            clear {_p}'s inventory
+            broadcast "%{_p}% has been sent to the &4Gulag&r..."
+            send title "&4&lYou Died!" with subtitle "&fBut you have another chance!" to {_p}
+            wait 3 seconds
+            send title "&4&lThe Gulag" with subtitle "&fSending you to the gulag..." to {_p}
+            wait 3 seconds
+            if {_p} is online:
+                if {gulag::queue::*} does not contain {_p}'s uuid:
+                    add {_p}'s uuid to {gulag::queue::*}
+                teleport {_p} to {gulag::location}
+                set {_p}'s gamemode to survival
+                wait 0.25 seconds
+                send "&8------------------------------" to {_p}
+                send "&4&lThe Gulag!" to {_p}
+                send "&cYou died but you have another chance to continue playing." to {_p}
+                send "&c1v1 someone else, loser gets banned, winner survives..." to {_p}
+                send "&cIf you leave the game, you will be banned!" to {_p}
+                send "&8------------------------------" to {_p}
+                play sound "block.note_block.didgeridoo" at volume 1 at pitch 1 to {_p}
+            else:
+                ban {_p} due to "&4You Died!: &fYou left while being sent to the gulag!"
+        else:
+            set {_p}'s gamemode to spectator
+            drop items in {_p}'s inventory at location of {_p}
+            clear {_p}'s inventory
+            heal {_p}
+            feed {_p}
+            broadcast "&c%{_p}% ran out of chances!"
+            send title "&4&lYou Died!" with subtitle "&fAnd have run out of chances..." to {_p}
+            wait 3 seconds
+            send title "&aThanks for playing!" with subtitle "" to {_p}
+            wait 3 seconds
+            send title "&4&lGoodbye" with subtitle "&f5" to {_p}
+            wait 1 second
+            send title "&4&lGoodbye" with subtitle "&f4" to {_p}
+            wait 1 second
+            send title "&4&lGoodbye" with subtitle "&f3" to {_p}
+            wait 1 second
+            send title "&4&lGoodbye" with subtitle "&f2" to {_p}
+            wait 1 second
+            send title "&4&lGoodbye" with subtitle "&f1" to {_p}
+            wait 1 second
+            ban {_p} due to "&4You Died!: &fYou ran out of chances!"
+            kick {_p} due to "&4You Died!: &fYou ran out of chances!"
+    else:
+        set {_p}'s gamemode to spectator
+        heal {_p}
+        feed {_p}
+        send title "&4&lYou Died!" with subtitle "&fYou lost the gulag!" to {_p}
+        wait 3 seconds
+        send title "&aThanks for playing!" with subtitle "" to {_p}
+        wait 3 seconds
+        send title "&4&lGoodbye" with subtitle "&f5" to {_p}
+        wait 1 second
+        send title "&4&lGoodbye" with subtitle "&f4" to {_p}
+        wait 1 second
+        send title "&4&lGoodbye" with subtitle "&f3" to {_p}
+        wait 1 second
+        send title "&4&lGoodbye" with subtitle "&f2" to {_p}
+        wait 1 second
+        send title "&4&lGoodbye" with subtitle "&f1" to {_p}
+        wait 1 second
+        ban {_p} due to "&4You Died!: &fYou lost the gulag!"
+        kick {_p} due to "&4You Died!: &fYou lost the gulag!"
+
+function winningwinsyou(p: player):
+    send title "&aYou won!" with subtitle "&fYou will respawn shortly..." to {_p}
+    wait 5 seconds
+    set {_rp} to rrt({_p})
+    set {_gui} to new chest inventory with 3 rows named "&2How would you like to respawn?"
+    set slot 0 of {_gui} to black stained glass pane named ""
+    set slot 1 of {_gui} to gray stained glass pane named ""
+    set slot 2 of {_gui} to gray stained glass pane named ""
+    set slot 3 of {_gui} to gray stained glass pane named ""
+    set slot 4 of {_gui} to lime stained glass pane named ""
+    set slot 5 of {_gui} to gray stained glass pane named ""
+    set slot 6 of {_gui} to gray stained glass pane named ""
+    set slot 7 of {_gui} to gray stained glass pane named ""
+    set slot 8 of {_gui} to black stained glass pane named ""
+    set slot 9 of {_gui} to black stained glass pane named ""
+    set slot 10 of {_gui} to gray stained glass pane named ""
+    if {_rp} is set:
+        set slot 11 of {_gui} to skull of {_rp} named "&bSpawn on a teammate"
+    else:
+        set slot 11 of {_gui} to barrier named "&cSpawn on a teammate" with lore "&cNo valid teammate found!"
+    set slot 12 of {_gui} to gray stained glass pane named ""
+    set slot 13 of {_gui} to lime stained glass pane named ""
+    set slot 14 of {_gui} to gray stained glass pane named ""
+    set slot 15 of {_gui} to elytra named "&6Fall from a random location"
+    set slot 16 of {_gui} to gray stained glass pane named ""
+    set slot 17 of {_gui} to black stained glass pane named ""
+    set slot 18 of {_gui} to black stained glass pane named ""
+    set slot 19 of {_gui} to gray stained glass pane named ""
+    set slot 20 of {_gui} to gray stained glass pane named ""
+    set slot 21 of {_gui} to gray stained glass pane named ""
+    set slot 22 of {_gui} to lime stained glass pane named ""
+    set slot 23 of {_gui} to gray stained glass pane named ""
+    set slot 24 of {_gui} to gray stained glass pane named ""
+    set slot 25 of {_gui} to gray stained glass pane named ""
+    set slot 26 of {_gui} to black stained glass pane named ""
+    add {_p}'s uuid to {reviving::*}
+    wait 1 tick
+    close {_p}'s inventory
+    open {_gui} for {_p}
+    play sound "block.note_block.bell" at volume 1 at pitch 1 to {_p}
+
+on inventory click:
+    {reviving::*} contains player's uuid
+    cancel event
+    if index of event-slot is 11:
+        set {_rp} to rrt(player)
+        {_rp} is set
+        set {_loc} to location of {_rp}
+        remove player's uuid from {reviving::*}
+        close player's inventory
+        giverespawnkit(player)
+        teleport player to {_loc}
+        send "&aYour teammate %player% has been revived and has spawned on you!" to {_rp}
+        send "&aYou have been revived at your teammate %{_rp}%!" to player
+        play sound "block.note_block.bell" at volume 1 at pitch 1 to {_rp}
+        wait 1 tick
+        play sound "block.note_block.bell" at volume 1 at pitch 1 to player
+    else if index of event-slot is 15: #{gulag::respawnpoints::*}
+        set {_loc} to random element out of {gulag::respawnpoints::*}
+        remove player's uuid from {reviving::*}
+        close player's inventory
+        giverespawnkit(player)
+        apply potion of slow falling to player for 20 seconds
+        teleport player to {_loc}
+        message "You have been revived at &c%x-coord of {_loc}%&r, &a%y-coord of {_loc}%&r, <##7c7cfc>%z-coord of {_loc}% &rand are falling slowly!"
+
+on inventory close:
+    {reviving::*} contains player's uuid
+    set {_rp} to rrt(player)
+    set {_gui} to new chest inventory with 3 rows named "&2How would you like to respawn?"
+    set slot 0 of {_gui} to black stained glass pane named ""
+    set slot 1 of {_gui} to gray stained glass pane named ""
+    set slot 2 of {_gui} to gray stained glass pane named ""
+    set slot 3 of {_gui} to gray stained glass pane named ""
+    set slot 4 of {_gui} to lime stained glass pane named ""
+    set slot 5 of {_gui} to gray stained glass pane named ""
+    set slot 6 of {_gui} to gray stained glass pane named ""
+    set slot 7 of {_gui} to gray stained glass pane named ""
+    set slot 8 of {_gui} to black stained glass pane named ""
+    set slot 9 of {_gui} to black stained glass pane named ""
+    set slot 10 of {_gui} to gray stained glass pane named ""
+    if {_rp} is set:
+        set slot 11 of {_gui} to skull of {_rp} named "&bSpawn on a teammate"
+    else:
+        set slot 11 of {_gui} to barrier named "&cSpawn on a teammate" with lore "&cNo valid teammate found!"
+    set slot 12 of {_gui} to gray stained glass pane named ""
+    set slot 13 of {_gui} to lime stained glass pane named ""
+    set slot 14 of {_gui} to gray stained glass pane named ""
+    set slot 15 of {_gui} to elytra named "&6Fall from a random location"
+    set slot 16 of {_gui} to gray stained glass pane named ""
+    set slot 17 of {_gui} to black stained glass pane named ""
+    set slot 18 of {_gui} to black stained glass pane named ""
+    set slot 19 of {_gui} to gray stained glass pane named ""
+    set slot 20 of {_gui} to gray stained glass pane named ""
+    set slot 21 of {_gui} to gray stained glass pane named ""
+    set slot 22 of {_gui} to lime stained glass pane named ""
+    set slot 23 of {_gui} to gray stained glass pane named ""
+    set slot 24 of {_gui} to gray stained glass pane named ""
+    set slot 25 of {_gui} to gray stained glass pane named ""
+    set slot 26 of {_gui} to black stained glass pane named ""
+    close player's inventory
+    open {_gui} for player
+
+on death of player:
+    victim is {gulag::p1} or {gulag::p2}
+    cancel event
+    heal victim
+    heal attacker
+    feed victim
+    feed attacker
+    clear victim
+    clear attacker
+    set victim's gamemode to spectator
+    if victim is {gulag::p1}:
+        broadcast "&c%victim% died in the gulag!"
+        play sound "entity.generic.explode" at volume 5 at pitch 1 at event-location
+        clear {gulag::p1}'s inventory
+        clear {gulag::p2}'s inventory
+        clear {gulag::p1}
+        dyingkillsyou(victim, true)
+        winningwinsyou({gulag::p2})
+        wait 5 seconds
+        teleport victim to {gulag::location}
+        teleport {gulag::p2} to {gulag::winlocation}
+    else if victim is {gulag::p2}:
+        broadcast "&c%victim% died in the gulag!"
+        play sound "entity.generic.explode" at volume 5 at pitch 1 at event-location
+        clear {gulag::p1}'s inventory
+        clear {gulag::p2}'s inventory
+        clear {gulag::p2}
+        dyingkillsyou(victim, true)
+        winningwinsyou({gulag::p1})
+        wait 5 seconds
+        teleport {gulag::p1} to {gulag::winlocation}
+        teleport {gulag::p2} to {gulag::location}
+    clear {gulag::p1}
+    clear {gulag::p2}
+    set {gulagroundhappening} to false
+
+on disconnect:
+    set {_loc} to location of player
+    if {gulag::p1} is player:
+        clear {gulag::p1}
+        set player's gamemode to spectator
+        ban player due to "&4You Died!: &fYou left while in the gulag!"
+        kick player due to "&4You Died!: &fYou left while in the gulag!"
+        # 1
+        broadcast "&c%player% has died in the gulag!"
+        play sound "entity.generic.explode" at volume 5 at pitch 1 at {_loc}
+        wait 5 seconds
+        teleport {gulag::p2} to {gulag::winlocation}
+        # 2
+        clear {gulag::p1}
+        clear {gulag::p2}
+        set {gulagroundhappening} to false
+    if {gulag::p2} is player:
+        clear {gulag::p2}
+        set player's gamemode to spectator
+        ban player due to "&4You Died!: &fYou left while in the gulag!"
+        kick player due to "&4You Died!: &fYou left while in the gulag!"
+        # 1
+        broadcast "&c%player% has died in the gulag!"
+        play sound "entity.generic.explode" at volume 5 at pitch 1 at {_loc}
+        wait 5 seconds
+        teleport {gulag::p1} to {gulag::winlocation}
+        # 2
+        clear {gulag::p1}
+        clear {gulag::p2}
+        set {gulagroundhappening} to false
+    if {gulag::queue::*} contains player's uuid:
+        remove player's uuid from {gulag::queue::*}
+        set player's gamemode to spectator
+        ban player due to "&4You Died!: &fYou left while waiting in the gulag!"
+        kick player due to "&4You Died!: &fYou left while waiting in the gulag!"
+
+function givegulagkit(p: player):
+    clear {_p}'s inventory
+    set slot 0 of {_p}'s inventory to iron sword
+    set slot 1 of {_p}'s inventory to iron axe
+    set slot 2 of {_p}'s inventory to 16 bread
+    set slot 36 of {_p}'s inventory to iron boots
+    set slot 37 of {_p}'s inventory to iron leggings
+    set slot 38 of {_p}'s inventory to iron chestplate
+    set slot 39 of {_p}'s inventory to iron helmet
+
+function giverespawnkit(p: player):
+    clear {_p}'s inventory
+    set slot 0 of {_p}'s inventory to stone sword
+    set slot 1 of {_p}'s inventory to stone axe
+    set slot 2 of {_p}'s inventory to stone pickaxe
+    set slot 3 of {_p}'s inventory to 16 cooked beef
+    set slot 36 of {_p}'s inventory to iron boots
+    set slot 37 of {_p}'s inventory to iron leggings
+    set slot 38 of {_p}'s inventory to iron chestplate
+    set slot 39 of {_p}'s inventory to iron helmet
+
+# command /hgrevive <offline player>:
+#     permission: op
+#     trigger:
+#         execute console command "unban %arg-1%"
+#         set {revive::%arg-1's uuid%::loc} to location of player
+#         message "&aSuccessfully revived %arg-1%! They will be tped to this location."
+#         play sound "block.note_block.bell" at volume 1 at pitch 1 to player
+
+# on join:
+#     wait 10 ticks
+#     set {_p} to player
+#     {revive::*} contains {_p}'s uuid
+#     set {_loc} to {revive::%{_p}'s uuid%::loc}
+#     remove {_p}'s uuid from {revive::*}
+#     wait 1 tick
+#     teleport {_p} to {_loc}
+#     set {_p}'s gamemode to survival
+#     send "&aYou have been revived by an admin!" to {_p}
+
+command /hgrespawngui <player> <boolean>:
+    permission: op
+    trigger:
+        if arg-2 is true:
+            if {reviving::*} does not contain arg-1's uuid:
+                add arg-1's uuid to {reviving::*}
+            message "&aOpened the gui for %arg-1%!"
+        else:
+            remove arg-1's uuid from {reviving::*}
+            message "&aClosed the gui for %arg-1%!"
+
+command /hglistrevive:
+    permission: op
+    trigger:
+        message {revive::*}
+
+command /hgcleargulagqueue:
+    permission: op
+    trigger:
+        clear {gulag::queue::*}
+        message "&aSuccessfully cleared the gulag!"
+        play sound "block.note_block.bell" at volume 1 at pitch 1 to player
+
+command /hgendround:
+    permission: op
+    trigger:
+        set {gulagroundhappening} to false
+        teleport {gulag::p1} to {gulag::location}
+        teleport {gulag::p2} to {gulag::location}
+        clear {gulag::p1}
+        clear {gulag::p2}
+        message "&aSuccessfully stopped the round!"
+        play sound "block.note_block.bell" at volume 1 at pitch 1 to player
+
+command /hgrespawnpoint <string>:
+    permission: op
+    trigger:
+        if arg-1 is "add":
+            set {_loc} to player's location
+            add {_loc} to {gulag::respawnpoints::*}
+            message "&aSuccessfully created a respawn point at %x-coord of {_loc}%, %y-coord of {_loc}%, %z-coord of {_loc}%!"
+            play sound "block.note_block.bell" at volume 1 at pitch 1 to player
+        else if arg-1 is "clear":
+            clear {gulag::respawnpoints::*}
+            message "&aSuccessfully cleared all respawn points!"
+            play sound "block.note_block.bell" at volume 1 at pitch 1 to player
+
+# command /hgsetgulagkit:
+#     permission: op
+#     trigger:
+#         set {gulag::kit::*} to items in player's inventory
+#         message "&aYou set the gulag kit to %{gulag::kit::*}%!"
+#         play sound "block.note_block.bell" at volume 1 at pitch 1 to player
+
+command /hggivegulagkit:
+    permission: op
+    trigger:
+        clear player's inventory
+        set slot 0 of player's inventory to iron sword
+        set slot 1 of player's inventory to iron axe
+        set slot 2 of player's inventory to 16 bread
+        set slot 36 of player's inventory to iron boots
+        set slot 37 of player's inventory to iron leggings
+        set slot 38 of player's inventory to iron chestplate
+        set slot 39 of player's inventory to iron helmet
+        message "&aYou have been given the gulag kit!"
+        play sound "block.note_block.bell" at volume 1 at pitch 1 to player
+
+command /hgsetgulaglocation:
+    permission: op
+    trigger:
+        set {gulag::location} to location of player
+        message "&aSuccessfully set the gulag location!"
+        play sound "block.note_block.bell" at volume 1 at pitch 1 to player
+
+command /hgcleardeathstuff:
+    permission: op
+    trigger:
+        clear {hasdied::*}
+        clear {reviving::*}
+        message "&aSuccessfully cleared the death stuff!"
+        play sound "block.note_block.bell" at volume 1 at pitch 1 to player
+
+command /hghasdiedbefore <offline player> [<boolean>]:
+    permission: op
+    trigger:
+        if arg-2 is set:
+            if arg-2 is true:
+                if {hasdied::*} does not contain arg-1's uuid:
+                    add arg-1's uuid to {hasdied::*}
+                message "&a%arg-1% has now died before!"
+            else:
+                remove arg-1's uuid from {hasdied::*}
+                message "&a%arg-1% has no longer died before!"
+        else:
+            if {hasdied::*} contains arg-1's uuid:
+                message "&fHas %arg-1% Died?: &aYes"
+            else:
+                message "&fHas %arg-1% Died?: &cNo"
+        play sound "block.note_block.bell" at volume 1 at pitch 1 to player
+
+command /hgsetgulagp1spawn:
+    permission: op
+    trigger:
+        set {gulag::p1spawn} to location of player
+        message "&aSuccessfully set the gulag player 1 spawn!"
+        play sound "block.note_block.bell" at volume 1 at pitch 1 to player
+
+command /hgsetgulagp2spawn:
+    permission: op
+    trigger:
+        set {gulag::p2spawn} to location of player
+        message "&aSuccessfully set the gulag player 2 spawn!"
+        play sound "block.note_block.bell" at volume 1 at pitch 1 to player
+
+command /hgsetgulagwinlocation:
+    permission: op
+    trigger:
+        set {gulag::winlocation} to location of player
+        message "&aSuccessfully set the gulag win location!"
+        play sound "block.note_block.bell" at volume 1 at pitch 1 to player

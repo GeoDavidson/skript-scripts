@@ -1,0 +1,836 @@
+#=======================================================================================================================================
+# Custom items made by bean_pants & AidanSkye under RooEvents.com for Civilization Wars - 5/18/2024
+#=======================================================================================================================================
+on right click:
+    if byte tag "BPdash" of nbt compound of event-item is 1:
+        if {dashc::%player's uuid%} is not set:
+            set {dashc::%player's uuid%} to now
+            set item cooldown of event-item for player to {dashsword.cooldown}
+            fallblanket(player)
+            push player forwards with force 0.6
+            push player upwards with force 0.3
+            play sound "block.beacon.power_select" with volume 0.4 with pitch 2 at player to all players
+            loop 25 times:
+                if the pitch of player is above -35:
+                    wait 2 ticks
+                    push player forwards with force 0.11
+                    push player upwards with force 0.12
+                    draw 1 of dust using dustOption(yellow, 1) at player with offset vector(0.2, 0, 0.2)
+                    draw 5 of enchant at player with offset vector(0.3, 0.3, 0.3)
+                    if loop-value is above 10:
+                        if player is on ground:
+                            stop
+                    if player is sneaking:
+                        stop
+                else:
+                    wait 2 ticks
+                    push player forwards with force 0.07
+                    push player upwards with force 0.01
+                    draw 1 of dust using dustOption(yellow, 1) at player with offset vector(0.2, 0, 0.2)
+                    draw 5 of enchant at player with offset vector(0.3, 0.3, 0.3)
+                    if loop-value is above 10:
+                        if player is on ground:
+                            stop
+                    if player is sneaking:
+                        stop
+            stop
+        set {_dasht} to difference between {dashc::%player's uuid%} and now
+        if {_dasht} is less than {dashsword.cooldown}:
+            stop
+        else:
+            set {dashc::%player's uuid%} to now
+            set item cooldown of event-item for player to {dashsword.cooldown}
+            fallblanket(player)
+            push player forwards with force 0.6
+            push player upwards with force 0.3
+            play sound "block.beacon.power_select" with volume 0.4 with pitch 2 at player to all players
+            loop 25 times:
+                if the pitch of player is above -35:
+                    wait 2 ticks
+                    push player forwards with force 0.11
+                    push player upwards with force 0.12
+                    draw 1 of dust using dustOption(yellow, 1) at player with offset vector(0.2, 0, 0.2)
+                    draw 5 of enchant at player with offset vector(0.3, 0.3, 0.3)
+                    if loop-value is above 10:
+                        if player is on ground:
+                            stop
+                    if player is sneaking:
+                        stop
+                else:
+                    wait 2 ticks
+                    push player forwards with force 0.07
+                    push player upwards with force 0.01
+                    draw 1 of dust using dustOption(yellow, 1) at player with offset vector(0.2, 0, 0.2)
+                    draw 5 of enchant at player with offset vector(0.3, 0.3, 0.3)
+                    if loop-value is above 10:
+                        if player is on ground:
+                            stop
+                    if player is sneaking:
+                        stop
+            stop
+
+function fallblanket(p: player):
+    set metadata value "fallblanket" of {_p} to true
+    wait 7 seconds
+    set metadata value "fallblanket" of {_p} to false
+
+on damage of player:
+    damage cause is fall:
+        if metadata value "fallblanket" of victim is true:
+            cancel event
+#=======================================================================================================================================
+command /bec <string> <string> <number>:
+    permission: op
+    permission message: &x&7&2&F&F&8&1&lB.E.C &r&f> &cYou don't have permission to run this command!
+    usage: &x&7&2&F&F&8&1&lB.E.C &r&f> &c/bec <item> <type> <number>
+    trigger:
+        if arg-1 is "dashsword":
+            if arg-2 is "cooldown":
+                if arg-3 is below 0:
+                    send "&x&7&2&F&F&8&1&lB.E.C &r&f> &cThe cooldown of the dash sword can't go below 0!"
+                    stop
+                else:
+                    set {dashsword.cooldown} to "%arg-3% seconds" parsed as timespan
+                    send "&x&7&2&F&F&8&1&lB.E.C &r&f> &aThe cooldown of the dash sword has been set to %arg-3% seconds!"
+                    stop
+        if arg-1 is "blossomblade":
+            if arg-2 is "cooldown":
+                if arg-3 is below 0:
+                    send "&x&7&2&F&F&8&1&lB.E.C &r&f> &cThe cooldown of the blossom blade can't go below 0!"
+                    stop
+                else:
+                    set {blossomblade.cooldown} to "%arg-3% seconds" parsed as timespan
+                    send "&x&7&2&F&F&8&1&lB.E.C &r&f> &aThe cooldown of the blossom blade has been set to %arg-3% seconds!"
+                    stop
+            if arg-2 is "chance":
+                if arg-3 is below 0:
+                    send "&x&7&2&F&F&8&1&lB.E.C &r&f> &cThe chance of the blossom blade can't go below 0!"
+                    stop
+                else:
+                    set {blossom.chance} to arg-3
+                    send "&x&7&2&F&F&8&1&lB.E.C &r&f> &aThe chance of the blossom blade has been set to %arg-3%!"
+                    stop
+        if arg-1 is "healing":
+            if arg-2 is "cooldown":
+                if arg-3 is below 0:
+                    send "&x&7&2&F&F&8&1&lB.E.C &r&f> &cThe cooldown of the healing staff can't go below 0!"
+                    stop
+                else:
+                    set {healing.cooldown} to "%arg-3% seconds" parsed as timespan
+                    send "&x&7&2&F&F&8&1&lB.E.C &r&f> &aThe cooldown of the healing staff has been set to %arg-3% seconds!"
+                    stop
+            if arg-2 is "triggers":
+                if arg-3 is below 0:
+                    send "&x&7&2&F&F&8&1&lB.E.C &r&f> &cThe triggers of the healing staff can't go below 0!"
+                    stop
+                else:
+                    set {healing.triggers} to arg-3
+                    send "&x&7&2&F&F&8&1&lB.E.C &r&f> &aThe triggers of the healing staff has been set to %arg-3%!"
+                    stop
+            if arg-2 is "health":
+                if arg-3 is below 0:
+                    send "&x&7&2&F&F&8&1&lB.E.C &r&f> &cThe health of the healing staff can't go below 0!"
+                    stop
+                else:
+                    set {healing.amount} to arg-3
+                    send "&x&7&2&F&F&8&1&lB.E.C &r&f> &aThe health of the healing staff has been set to %arg-3%!"
+                    stop
+        if arg-1 is "hammer":
+            if arg-2 is "cooldown":
+                if arg-3 is below 0:
+                    send "&x&7&2&F&F&8&1&lB.E.C &r&f> &cThe cooldown of the hammer can't go below 0!"
+                    stop
+                else:
+                    set {hammer.cooldown} to "%arg-3% seconds" parsed as timespan
+                    send "&x&7&2&F&F&8&1&lB.E.C &r&f> &aThe cooldown of the hammer has been set to %arg-3% seconds!"
+                    stop
+        if arg-1 is "celestial":
+            if arg-2 is "cooldown":
+                if arg-3 is below 0:
+                    send "&x&7&2&F&F&8&1&lB.E.C &r&f> &cThe cooldown of the celestial staff can't go below 0!"
+                    stop
+                else:
+                    set {stick.cooldown} to "%arg-3% seconds" parsed as timespan
+                    send "&x&7&2&F&F&8&1&lB.E.C &r&f> &aThe cooldown of the celestial staff has been set to %arg-3% seconds!"
+                    stop
+            if arg-2 is "damage":
+                if arg-3 is below 0:
+                    send "&x&7&2&F&F&8&1&lB.E.C &r&f> &cThe damage of the celestial staff can't go below 0!"
+                    stop
+                else:
+                    set {stick.dmg} to arg-3
+                    send "&x&7&2&F&F&8&1&lB.E.C &r&f> &aThe damage of the celestial staff has been set to %arg-3%!"
+                    stop
+
+on tab complete of "/bec":
+    set tab completions for position 1 to "blossomblade" and "dashsword" and "healing" and "hammer" and "celestial"
+    if tab arg-1 = "dashsword":
+        set tab completions for position 2 to "cooldown"
+    if tab arg-1 = "blossomblade":
+        set tab completions for position 2 to "cooldown" and "chance"
+    if tab arg-1 = "healing":
+        set tab completions for position 2 to "cooldown" and "health" and "triggers"
+    if tab arg-1 = "hammer":
+        set tab completions for position 2 to "cooldown"
+    if tab arg-1 = "celestial":
+        set tab completions for position 2 to "cooldown" and "damage"
+
+#=======================================================================================================================================
+
+on flight toggle:
+    if byte tag "BPblossom" of nbt compound of player's tool is 1:
+        cancel event
+        if {blossc::%player's uuid%} is not set:
+            set {blossc::%player's uuid%} to now
+            set item cooldown of player's tool for player to {blossomblade.cooldown}
+            disable flight for player
+            add player's uuid to {BPbactive::*}
+            play sound "block.cherry_leaves.step" with volume 0.4 with pitch 0 at player to all players
+            part(player)
+            fallblanket(player)
+            push player upwards with force 0.3
+            push player forwards with force 1
+            wait {blossomblade.cooldown}
+            remove player's uuid from {BPbactive::*}
+            if byte tag "BPblossom" of nbt compound of player's tool is 1:
+                allow flight for player
+            stop
+        set {_blosst} to difference between {blossc::%player's uuid%} and now
+        if {_blosst} is less than {blossomblade.cooldown}:
+            stop
+        else:
+            set {blossc::%player's uuid%} to now
+            set item cooldown of player's tool for player to {blossomblade.cooldown}
+            disable flight for player
+            add player's uuid to {BPbactive::*}
+            play sound "block.cherry_leaves.step" with volume 0.4 with pitch 0 at player to all players
+            part(player)
+            fallblanket(player)
+            push player upwards with force 0.3
+            push player forwards with force 1
+            wait {blossomblade.cooldown}
+            remove player's uuid from {BPbactive::*}
+            if byte tag "BPblossom" of nbt compound of player's tool is 1:
+                allow flight for player
+            stop
+
+on item held change:
+    if byte tag "BPblossom" of nbt compound of player's tool is 1:
+        if {BPbactive::*} does not contain player's uuid:
+            allow flight for player
+            stop
+    else:
+        if player's gamemode is not creative:
+            disable flight for player
+
+on inventory slot change:
+    if event-slot is 0 or 1 or 2 or 3 or 4 or 5 or 6 or 7 or 8:
+        if byte tag "BPblossom" of nbt compound of player's tool is 1:
+            if {BPbactive::*} does not contain player's uuid:
+                allow flight for player
+                stop
+        else:
+            if player's gamemode is not creative:
+                disable flight for player
+
+function part(p: player):
+    loop 30 times:
+        if {_p} is not on ground:
+            draw 5 of cherry leaves at {_p} with offset vector(0.2, 1, 0.2)
+        else:
+            stop
+        wait 0.1 seconds
+
+
+on damage:
+    if victim is player:
+        if byte tag "BPblossom" of nbt compound of attacker's tool is 1:
+            chance of {blossom.chance}%:
+                apply potion of speed 1 without particles to attacker for 3 seconds
+                draw 20 of cherry leaves at attacker with offset vector(0.6, 1.5, 0.6)
+                draw 6 of dust using dustOption(white, 2) at attacker with offset vector(0.6, 1.5, 0.6) with extra 0
+                play sound "block.bell.resonate" with volume 0.4 with pitch 2 at attacker to all players
+
+
+
+#=======================================================================================================================================
+
+on right click:
+    if byte tag "BPhealing" of nbt compound of event-item is 1:
+        if {healc::%player's uuid%} is not set:
+            set {healc::%player's uuid%} to now
+            set item cooldown of event-item for player to {healing.cooldown}
+            loop {healing.triggers} times:
+                HealThoseMfs(player)
+                wait 2 seconds
+            stop
+        set {_healt} to difference between {healc::%player's uuid%} and now
+        if {_healt} is less than {healing.cooldown}:
+            stop
+        else:
+            set {healc::%player's uuid%} to now
+            set item cooldown of event-item for player to {healing.cooldown}
+            loop {healing.triggers} times:
+                HealThoseMfs(player)
+                wait 2 seconds
+            stop
+
+function HealThoseMfs(p: player):
+    loop 36 times:
+        if loop-value is 2,4,6,8,10,12,14,16,18,20,22,24,26,28,30,32,34 or 36:
+            set {_v} to spherical vector radius 2, yaw loop-value*10, pitch 0
+            lerp 0 end rod 1.2 meter above {_p} with offset {_v} with extra 0.3
+        else:
+            set {_v} to spherical vector radius 1, yaw loop-value*10, pitch 0
+            lerp 0 end rod 1.2 meter above {_p} with offset {_v} with extra 0.3
+    play sound "block.beacon.activate" with volume 1 with pitch 2 to all players at {_p}
+    if {_p} has permission "group.1":
+        heal {_p} by {healing.amount} heart
+        loop all players in radius 7 around {_p} where [input is not {_p}]:
+            if loop-player has permission "group.1":
+                heal loop-player by {healing.amount} heart
+                draw 10 of end rod at loop-player with offset vector(0.3, 1, 0.3) with extra 0.05
+                draw 10 of happy villager at loop-player with offset vector(0.3, 1, 0.3) with extra 0.1
+        stop
+    if {_p} has permission "group.2":
+        heal {_p} by {healing.amount} heart
+        loop all players in radius 7 around {_p} where [input is not {_p}]:
+            if loop-player has permission "group.2":
+                heal loop-player by {healing.amount} heart
+                draw 10 of end rod at loop-player with offset vector(0.3, 1, 0.3) with extra 0.05
+                draw 10 of happy villager at loop-player with offset vector(0.3, 1, 0.3) with extra 0.1
+        stop
+    if {_p} has permission "group.3":
+        heal {_p} by {healing.amount} heart
+        loop all players in radius 7 around {_p} where [input is not {_p}]:
+            if loop-player has permission "group.3":
+                heal loop-player by {healing.amount} heart
+                draw 10 of end rod at loop-player with offset vector(0.3, 1, 0.3) with extra 0.05
+                draw 10 of happy villager at loop-player with offset vector(0.3, 1, 0.3) with extra 0.1
+        stop
+    if {_p} has permission "group.4":
+        heal {_p} by {healing.amount} heart
+        loop all players in radius 7 around {_p} where [input is not {_p}]:
+            if loop-player has permission "group.4":
+                heal loop-player by {healing.amount} heart
+                draw 10 of end rod at loop-player with offset vector(0.3, 1, 0.3) with extra 0.05
+                draw 10 of happy villager at loop-player with offset vector(0.3, 1, 0.3) with extra 0.1
+        stop
+    if {_p} has permission "group.5":
+        heal {_p} by {healing.amount} heart
+        loop all players in radius 7 around {_p} where [input is not {_p}]:
+            if loop-player has permission "group.5":
+                heal loop-player by {healing.amount} heart
+                draw 10 of end rod at loop-player with offset vector(0.3, 1, 0.3) with extra 0.05
+                draw 10 of happy villager at loop-player with offset vector(0.3, 1, 0.3) with extra 0.1
+        stop
+
+#=======================================================================================================================================
+
+on right click:
+    if byte tag "BPstick" of nbt compound of event-item is 1:
+        if {stickc::%player's uuid%} is not set:
+            set {stickc::%player's uuid%} to now
+            set item cooldown of event-item for player to {stick.cooldown}
+            play sound "entity.evoker.cast_spell" with volume 0.4 with pitch 1 at player to all players
+            if target entity is set:
+                if distance between target entity and player <= 55:
+                    set {_v} to vector from player to target entity
+                    set vector length of {_v} to 0.1
+                    set {_loc} to location of player
+                    add 1 to y-coord of {_loc}
+                    loop (distance between {_loc} and target entity) / 0.1 times:
+                        draw 1 of dust using dustOption(yellow, 1) at {_loc} with offset vector(0.2, 0.2, 0.2) with extra 0.01 with force
+                        draw 1 of dust using dustOption(red, 0.5) at {_loc} with offset vector(0.1, 0.1, 0.1) with extra 0 with force
+                        set {_loc} to {_loc} ~ {_v}
+                    set {_endtarget} to location of target entity
+                    draw 250 of dust using dustOption(yellow, 6) at {_endtarget} with offset vector(2.5, 2.5, 2.5) with extra 0.02 with force
+                    draw 80 of dust using dustOption(red, 6) at {_endtarget} with offset vector(2.5, 2.5, 2.5) with extra 0 with force
+                    play sound "entity.warden.attack_impact" with volume 1 with pitch 1 at {_endtarget} to all players
+                    if player has permission "group.1":
+                        loop all entities in radius 7 around {_endtarget} where [input is not player]:
+                            if loop-entity does not have permission "group.1":
+                                damage loop-entity by {stick.dmg}
+                                knock loop-entity (vector from {_endtarget} to loop-entity) with strength 1.1
+                                push the loop-entity upwards at speed 0.4
+                        stop
+                    if player has permission "group.2":
+                        loop all entities in radius 7 around {_endtarget} where [input is not player]:
+                            if loop-entity does not have permission "group.2":
+                                damage loop-entity by {stick.dmg}
+                                knock loop-entity (vector from {_endtarget} to loop-entity) with strength 1.1
+                                push the loop-entity upwards at speed 0.4
+                        stop
+                    if player has permission "group.3":
+                        loop all entities in radius 7 around {_endtarget} where [input is not player]:
+                            if loop-entity does not have permission "group.3":
+                                damage loop-entity by {stick.dmg}
+                                knock loop-entity (vector from {_endtarget} to loop-entity) with strength 1.1
+                                push the loop-entity upwards at speed 0.4
+                        stop
+                    if player has permission "group.4":
+                        loop all entities in radius 7 around {_endtarget} where [input is not player]:
+                            if loop-entity does not have permission "group.4":
+                                damage loop-entity by {stick.dmg}
+                                knock loop-entity (vector from {_endtarget} to loop-entity) with strength 1.1
+                                push the loop-entity upwards at speed 0.4
+                        stop
+                    if player has permission "group.5":
+                        loop all entities in radius 7 around {_endtarget} where [input is not player]:
+                            if loop-entity does not have permission "group.5":
+                                damage loop-entity by {stick.dmg}
+                                knock loop-entity (vector from {_endtarget} to loop-entity) with strength 1.1
+                                push the loop-entity upwards at speed 0.4
+                        stop
+                    stop
+                else:
+                    set {_v} to vector from player to block 55 blocks in front of player
+                    set vector length of {_v} to 0.1
+                    set {_loc} to location of player
+                    add 1 to y-coord of {_loc}
+                    loop (distance between {_loc} and block 55 blocks in front of player) / 0.1 times:
+                        draw 1 of dust using dustOption(yellow, 1) at {_loc} with offset vector(0.2, 0.2, 0.2) with extra 0.01 with force
+                        draw 1 of dust using dustOption(red, 0.5) at {_loc} with offset vector(0.1, 0.1, 0.1) with extra 0 with force
+                        set {_loc} to {_loc} ~ {_v}
+                    set {_endtarget} to location of block 55 blocks in front of player
+                    draw 250 of dust using dustOption(yellow, 6) at {_endtarget} with offset vector(2.5, 2.5, 2.5) with extra 0.02 with force
+                    draw 80 of dust using dustOption(red, 6) at {_endtarget} with offset vector(2.5, 2.5, 2.5) with extra 0 with force
+                    play sound "entity.warden.attack_impact" with volume 1 with pitch 1 at {_endtarget} to all players
+                    if player has permission "group.1":
+                        loop all entities in radius 7 around {_endtarget} where [input is not player]:
+                            if loop-entity does not have permission "group.1":
+                                damage loop-entity by {stick.dmg}
+                                knock loop-entity (vector from {_endtarget} to loop-entity) with strength 1.1
+                                push the loop-entity upwards at speed 0.4
+                        stop
+                    if player has permission "group.2":
+                        loop all entities in radius 7 around {_endtarget} where [input is not player]:
+                            if loop-entity does not have permission "group.2":
+                                damage loop-entity by {stick.dmg}
+                                knock loop-entity (vector from {_endtarget} to loop-entity) with strength 1.1
+                                push the loop-entity upwards at speed 0.4
+                        stop
+                    if player has permission "group.3":
+                        loop all entities in radius 7 around {_endtarget} where [input is not player]:
+                            if loop-entity does not have permission "group.3":
+                                damage loop-entity by {stick.dmg}
+                                knock loop-entity (vector from {_endtarget} to loop-entity) with strength 1.5
+                                push the loop-entity upwards at speed 0.4
+                        stop
+                    if player has permission "group.4":
+                        loop all entities in radius 7 around {_endtarget} where [input is not player]:
+                            if loop-entity does not have permission "group.4":
+                                damage loop-entity by {stick.dmg}
+                                knock loop-entity (vector from {_endtarget} to loop-entity) with strength 1.1
+                                push the loop-entity upwards at speed 0.4
+                        stop
+                    if player has permission "group.5":
+                        loop all entities in radius 7 around {_endtarget} where [input is not player]:
+                            if loop-entity does not have permission "group.5":
+                                damage loop-entity by {stick.dmg}
+                                knock loop-entity (vector from {_endtarget} to loop-entity) with strength 1.1
+                                push the loop-entity upwards at speed 0.4
+                        stop
+                    stop
+            else:
+                if distance between player's target block and player <= 55:
+                    set {_v} to vector from player to target block
+                    set vector length of {_v} to 0.1
+                    set {_loc} to location of player
+                    add 1 to y-coord of {_loc}
+                    loop (distance between {_loc} and target block) / 0.1 times:
+                        draw 1 of dust using dustOption(yellow, 1) at {_loc} with offset vector(0.2, 0.2, 0.2) with extra 0.01 with force
+                        draw 1 of dust using dustOption(red, 0.5) at {_loc} with offset vector(0.1, 0.1, 0.1) with extra 0 with force
+                        set {_loc} to {_loc} ~ {_v}
+                    set {_endtarget} to player's target block
+                    draw 250 of dust using dustOption(yellow, 6) at {_endtarget} with offset vector(2.5, 2.5, 2.5) with extra 0.02 with force
+                    draw 80 of dust using dustOption(red, 6) at {_endtarget} with offset vector(2.5, 2.5, 2.5) with extra 0 with force
+                    play sound "entity.warden.attack_impact" with volume 1 with pitch 1 at {_endtarget} to all players
+                    if player has permission "group.1":
+                        loop all entities in radius 7 around {_endtarget} where [input is not player]:
+                            if loop-entity does not have permission "group.1":
+                                damage loop-entity by {stick.dmg}
+                                knock loop-entity (vector from {_endtarget} to loop-entity) with strength 1.1
+                                push the loop-entity upwards at speed 0.4
+                        stop
+                    if player has permission "group.2":
+                        loop all entities in radius 7 around {_endtarget} where [input is not player]:
+                            if loop-entity does not have permission "group.2":
+                                damage loop-entity by {stick.dmg}
+                                knock loop-entity (vector from {_endtarget} to loop-entity) with strength 1.1
+                                push the loop-entity upwards at speed 0.4
+                        stop
+                    if player has permission "group.3":
+                        loop all entities in radius 7 around {_endtarget} where [input is not player]:
+                            if loop-entity does not have permission "group.3":
+                                damage loop-entity by {stick.dmg}
+                                knock loop-entity (vector from {_endtarget} to loop-entity) with strength 1.1
+                                push the loop-entity upwards at speed 0.4
+                        stop
+                    if player has permission "group.4":
+                        loop all entities in radius 7 around {_endtarget} where [input is not player]:
+                            if loop-entity does not have permission "group.4":
+                                damage loop-entity by {stick.dmg}
+                                knock loop-entity (vector from {_endtarget} to loop-entity) with strength 1.1
+                                push the loop-entity upwards at speed 0.4
+                        stop
+                    if player has permission "group.5":
+                        loop all entities in radius 7 around {_endtarget} where [input is not player]:
+                            if loop-entity does not have permission "group.5":
+                                damage loop-entity by {stick.dmg}
+                                knock loop-entity (vector from {_endtarget} to loop-entity) with strength 1.1
+                                push the loop-entity upwards at speed 0.4
+                        stop
+                    stop
+                else:
+                    set {_v} to vector from player to block 55 blocks in front of player
+                    set vector length of {_v} to 0.1
+                    set {_loc} to location of player
+                    add 1 to y-coord of {_loc}
+                    loop (distance between {_loc} and block 55 blocks in front of player) / 0.1 times:
+                        draw 1 of dust using dustOption(yellow, 1) at {_loc} with offset vector(0.2, 0.2, 0.2) with extra 0.01 with force
+                        draw 1 of dust using dustOption(red, 0.5) at {_loc} with offset vector(0.1, 0.1, 0.1) with extra 0 with force
+                        set {_loc} to {_loc} ~ {_v}
+                    set {_endtarget} to location of block 55 blocks in front of player
+                    draw 250 of dust using dustOption(yellow, 6) at {_endtarget} with offset vector(2.5, 2.5, 2.5) with extra 0.02 with force
+                    draw 80 of dust using dustOption(red, 6) at {_endtarget} with offset vector(2.5, 2.5, 2.5) with extra 0 with force
+                    play sound "entity.warden.attack_impact" with volume 1 with pitch 1 at {_endtarget} to all players
+                    if player has permission "group.1":
+                        loop all entities in radius 7 around {_endtarget} where [input is not player]:
+                            if loop-entity does not have permission "group.1":
+                                damage loop-entity by {stick.dmg}
+                                knock loop-entity (vector from {_endtarget} to loop-entity) with strength 1.1
+                                push the loop-entity upwards at speed 0.4
+                        stop
+                    if player has permission "group.2":
+                        loop all entities in radius 7 around {_endtarget} where [input is not player]:
+                            if loop-entity does not have permission "group.2":
+                                damage loop-entity by {stick.dmg}
+                                knock loop-entity (vector from {_endtarget} to loop-entity) with strength 1.1
+                                push the loop-entity upwards at speed 0.4
+                        stop
+                    if player has permission "group.3":
+                        loop all entities in radius 7 around {_endtarget} where [input is not player]:
+                            if loop-entity does not have permission "group.3":
+                                damage loop-entity by {stick.dmg}
+                                knock loop-entity (vector from {_endtarget} to loop-entity) with strength 1.1
+                                push the loop-entity upwards at speed 0.4
+                        stop
+                    if player has permission "group.4":
+                        loop all entities in radius 7 around {_endtarget} where [input is not player]:
+                            if loop-entity does not have permission "group.4":
+                                damage loop-entity by {stick.dmg}
+                                knock loop-entity (vector from {_endtarget} to loop-entity) with strength 1.1
+                                push the loop-entity upwards at speed 0.4
+                        stop
+                    if player has permission "group.5":
+                        loop all entities in radius 7 around {_endtarget} where [input is not player]:
+                            if loop-entity does not have permission "group.5":
+                                damage loop-entity by {stick.dmg}
+                                knock loop-entity (vector from {_endtarget} to loop-entity) with strength 1.1
+                                push the loop-entity upwards at speed 0.4
+                        stop
+                    stop
+        set {_stickt} to difference between {stickc::%player's uuid%} and now
+        if {_stickt} is less than {stick.cooldown}:
+            stop
+        else:
+            set {stickc::%player's uuid%} to now
+            set item cooldown of event-item for player to {stick.cooldown}
+            play sound "entity.evoker.cast_spell" with volume 0.4 with pitch 1 at player to all players
+            if target entity is set:
+                if distance between target entity and player <= 55:
+                    set {_v} to vector from player to target entity
+                    set vector length of {_v} to 0.1
+                    set {_loc} to location of player
+                    add 1 to y-coord of {_loc}
+                    loop (distance between {_loc} and target entity) / 0.1 times:
+                        draw 1 of dust using dustOption(yellow, 1) at {_loc} with offset vector(0.2, 0.2, 0.2) with extra 0.01 with force
+                        draw 1 of dust using dustOption(red, 0.5) at {_loc} with offset vector(0.1, 0.1, 0.1) with extra 0 with force
+                        set {_loc} to {_loc} ~ {_v}
+                    set {_endtarget} to location of target entity
+                    draw 250 of dust using dustOption(yellow, 6) at {_endtarget} with offset vector(2.5, 2.5, 2.5) with extra 0.02 with force
+                    draw 80 of dust using dustOption(red, 6) at {_endtarget} with offset vector(2.5, 2.5, 2.5) with extra 0 with force
+                    play sound "entity.warden.attack_impact" with volume 1 with pitch 1 at {_endtarget} to all players
+                    if player has permission "group.1":
+                        loop all entities in radius 7 around {_endtarget} where [input is not player]:
+                            if loop-entity does not have permission "group.1":
+                                damage loop-entity by {stick.dmg}
+                                knock loop-entity (vector from {_endtarget} to loop-entity) with strength 1.1
+                                push the loop-entity upwards at speed 0.4
+                        stop
+                    if player has permission "group.2":
+                        loop all entities in radius 7 around {_endtarget} where [input is not player]:
+                            if loop-entity does not have permission "group.2":
+                                damage loop-entity by {stick.dmg}
+                                knock loop-entity (vector from {_endtarget} to loop-entity) with strength 1.1
+                                push the loop-entity upwards at speed 0.4
+                        stop
+                    if player has permission "group.3":
+                        loop all entities in radius 7 around {_endtarget} where [input is not player]:
+                            if loop-entity does not have permission "group.3":
+                                damage loop-entity by {stick.dmg}
+                                knock loop-entity (vector from {_endtarget} to loop-entity) with strength 1.1
+                                push the loop-entity upwards at speed 0.4
+                        stop
+                    if player has permission "group.4":
+                        loop all entities in radius 7 around {_endtarget} where [input is not player]:
+                            if loop-entity does not have permission "group.4":
+                                damage loop-entity by {stick.dmg}
+                                knock loop-entity (vector from {_endtarget} to loop-entity) with strength 1.1
+                                push the loop-entity upwards at speed 0.4
+                        stop
+                    if player has permission "group.5":
+                        loop all entities in radius 7 around {_endtarget} where [input is not player]:
+                            if loop-entity does not have permission "group.5":
+                                damage loop-entity by {stick.dmg}
+                                knock loop-entity (vector from {_endtarget} to loop-entity) with strength 1.1
+                                push the loop-entity upwards at speed 0.4
+                        stop
+                    stop
+                else:
+                    set {_v} to vector from player to block 55 blocks in front of player
+                    set vector length of {_v} to 0.1
+                    set {_loc} to location of player
+                    add 1 to y-coord of {_loc}
+                    loop (distance between {_loc} and block 55 blocks in front of player) / 0.1 times:
+                        draw 1 of dust using dustOption(yellow, 1) at {_loc} with offset vector(0.2, 0.2, 0.2) with extra 0.01 with force
+                        draw 1 of dust using dustOption(red, 0.5) at {_loc} with offset vector(0.1, 0.1, 0.1) with extra 0 with force
+                        set {_loc} to {_loc} ~ {_v}
+                    set {_endtarget} to location of block 55 blocks in front of player
+                    draw 250 of dust using dustOption(yellow, 6) at {_endtarget} with offset vector(2.5, 2.5, 2.5) with extra 0.02 with force
+                    draw 80 of dust using dustOption(red, 6) at {_endtarget} with offset vector(2.5, 2.5, 2.5) with extra 0 with force
+                    play sound "entity.warden.attack_impact" with volume 1 with pitch 1 at {_endtarget} to all players
+                    if player has permission "group.1":
+                        loop all entities in radius 7 around {_endtarget} where [input is not player]:
+                            if loop-entity does not have permission "group.1":
+                                damage loop-entity by {stick.dmg}
+                                knock loop-entity (vector from {_endtarget} to loop-entity) with strength 1.1
+                                push the loop-entity upwards at speed 0.4
+                        stop
+                    if player has permission "group.2":
+                        loop all entities in radius 7 around {_endtarget} where [input is not player]:
+                            if loop-entity does not have permission "group.2":
+                                damage loop-entity by {stick.dmg}
+                                knock loop-entity (vector from {_endtarget} to loop-entity) with strength 1.1
+                                push the loop-entity upwards at speed 0.4
+                        stop
+                    if player has permission "group.3":
+                        loop all entities in radius 7 around {_endtarget} where [input is not player]:
+                            if loop-entity does not have permission "group.3":
+                                damage loop-entity by {stick.dmg}
+                                knock loop-entity (vector from {_endtarget} to loop-entity) with strength 1.1
+                                push the loop-entity upwards at speed 0.4
+                        stop
+                    if player has permission "group.4":
+                        loop all entities in radius 7 around {_endtarget} where [input is not player]:
+                            if loop-entity does not have permission "group.4":
+                                damage loop-entity by {stick.dmg}
+                                knock loop-entity (vector from {_endtarget} to loop-entity) with strength 1.1
+                                push the loop-entity upwards at speed 0.4
+                        stop
+                    if player has permission "group.5":
+                        loop all entities in radius 7 around {_endtarget} where [input is not player]:
+                            if loop-entity does not have permission "group.5":
+                                damage loop-entity by {stick.dmg}
+                                knock loop-entity (vector from {_endtarget} to loop-entity) with strength 1.1
+                                push the loop-entity upwards at speed 0.4
+                        stop
+                    stop
+            else:
+                if distance between player's target block and player <= 55:
+                    set {_v} to vector from player to target block
+                    set vector length of {_v} to 0.1
+                    set {_loc} to location of player
+                    add 1 to y-coord of {_loc}
+                    loop (distance between {_loc} and target block) / 0.1 times:
+                        draw 1 of dust using dustOption(yellow, 1) at {_loc} with offset vector(0.2, 0.2, 0.2) with extra 0.01 with force
+                        draw 1 of dust using dustOption(red, 0.5) at {_loc} with offset vector(0.1, 0.1, 0.1) with extra 0 with force
+                        set {_loc} to {_loc} ~ {_v}
+                    set {_endtarget} to player's target block
+                    draw 250 of dust using dustOption(yellow, 6) at {_endtarget} with offset vector(2.5, 2.5, 2.5) with extra 0.02 with force
+                    draw 80 of dust using dustOption(red, 6) at {_endtarget} with offset vector(2.5, 2.5, 2.5) with extra 0 with force
+                    play sound "entity.warden.attack_impact" with volume 1 with pitch 1 at {_endtarget} to all players
+                    if player has permission "group.1":
+                        loop all entities in radius 7 around {_endtarget} where [input is not player]:
+                            if loop-entity does not have permission "group.1":
+                                damage loop-entity by {stick.dmg}
+                                knock loop-entity (vector from {_endtarget} to loop-entity) with strength 1.1
+                                push the loop-entity upwards at speed 0.4
+                        stop
+                    if player has permission "group.2":
+                        loop all entities in radius 7 around {_endtarget} where [input is not player]:
+                            if loop-entity does not have permission "group.2":
+                                damage loop-entity by {stick.dmg}
+                                knock loop-entity (vector from {_endtarget} to loop-entity) with strength 1.1
+                                push the loop-entity upwards at speed 0.4
+                        stop
+                    if player has permission "group.3":
+                        loop all entities in radius 7 around {_endtarget} where [input is not player]:
+                            if loop-entity does not have permission "group.3":
+                                damage loop-entity by {stick.dmg}
+                                knock loop-entity (vector from {_endtarget} to loop-entity) with strength 1.1
+                                push the loop-entity upwards at speed 0.4
+                        stop
+                    if player has permission "group.4":
+                        loop all entities in radius 7 around {_endtarget} where [input is not player]:
+                            if loop-entity does not have permission "group.4":
+                                damage loop-entity by {stick.dmg}
+                                knock loop-entity (vector from {_endtarget} to loop-entity) with strength 1.1
+                                push the loop-entity upwards at speed 0.4
+                        stop
+                    if player has permission "group.5":
+                        loop all entities in radius 7 around {_endtarget} where [input is not player]:
+                            if loop-entity does not have permission "group.5":
+                                damage loop-entity by {stick.dmg}
+                                knock loop-entity (vector from {_endtarget} to loop-entity) with strength 1.1
+                                push the loop-entity upwards at speed 0.4
+                        stop
+                    stop
+                else:
+                    set {_v} to vector from player to block 55 blocks in front of player
+                    set vector length of {_v} to 0.1
+                    set {_loc} to location of player
+                    add 1 to y-coord of {_loc}
+                    loop (distance between {_loc} and block 55 blocks in front of player) / 0.1 times:
+                        draw 1 of dust using dustOption(yellow, 1) at {_loc} with offset vector(0.2, 0.2, 0.2) with extra 0.01 with force
+                        draw 1 of dust using dustOption(red, 0.5) at {_loc} with offset vector(0.1, 0.1, 0.1) with extra 0 with force
+                        set {_loc} to {_loc} ~ {_v}
+                    set {_endtarget} to location of block 55 blocks in front of player
+                    draw 250 of dust using dustOption(yellow, 6) at {_endtarget} with offset vector(2.5, 2.5, 2.5) with extra 0.02 with force
+                    draw 80 of dust using dustOption(red, 6) at {_endtarget} with offset vector(2.5, 2.5, 2.5) with extra 0 with force
+                    play sound "entity.warden.attack_impact" with volume 1 with pitch 1 at {_endtarget} to all players
+                    if player has permission "group.1":
+                        loop all entities in radius 7 around {_endtarget} where [input is not player]:
+                            if loop-entity does not have permission "group.1":
+                                damage loop-entity by {stick.dmg}
+                                knock loop-entity (vector from {_endtarget} to loop-entity) with strength 1.1
+                                push the loop-entity upwards at speed 0.4
+                        stop
+                    if player has permission "group.2":
+                        loop all entities in radius 7 around {_endtarget} where [input is not player]:
+                            if loop-entity does not have permission "group.2":
+                                damage loop-entity by {stick.dmg}
+                                knock loop-entity (vector from {_endtarget} to loop-entity) with strength 1.1
+                                push the loop-entity upwards at speed 0.4
+                        stop
+                    if player has permission "group.3":
+                        loop all entities in radius 7 around {_endtarget} where [input is not player]:
+                            if loop-entity does not have permission "group.3":
+                                damage loop-entity by {stick.dmg}
+                                knock loop-entity (vector from {_endtarget} to loop-entity) with strength 1.1
+                                push the loop-entity upwards at speed 0.4
+                        stop
+                    if player has permission "group.4":
+                        loop all entities in radius 7 around {_endtarget} where [input is not player]:
+                            if loop-entity does not have permission "group.4":
+                                damage loop-entity by {stick.dmg}
+                                knock loop-entity (vector from {_endtarget} to loop-entity) with strength 1.1
+                                push the loop-entity upwards at speed 0.4
+                        stop
+                    if player has permission "group.5":
+                        loop all entities in radius 7 around {_endtarget} where [input is not player]:
+                            if loop-entity does not have permission "group.5":
+                                damage loop-entity by {stick.dmg}
+                                knock loop-entity (vector from {_endtarget} to loop-entity) with strength 1.1
+                                push the loop-entity upwards at speed 0.4
+                        stop
+            stop
+
+#=======================================================================================================================================
+
+on right click:
+    if byte tag "BPhammer" of nbt compound of event-item is 1:
+        if {hammerc::%player's uuid%} is not set:
+            set {hammerc::%player's uuid%} to now
+            set item cooldown of event-item for player to {hammer.cooldown}
+            hp(player)
+            play sound "item.firecharge.use" with volume 0.5 with pitch 0.6 at player
+            if player has permission "group.1":
+                loop all entities in radius 7 around player where [input is not player]:
+                    if loop-entity does not have permission "group.1":
+                        ignite loop-entity
+                        knock loop-entity (vector from player to loop-entity) with strength 1.5
+                        push the loop-entity upwards at speed 0.4
+                stop
+            if player has permission "group.2":
+                loop all entities in radius 7 around player where [input is not player]:
+                    if loop-entity does not have permission "group.2":
+                        ignite loop-entity
+                        knock loop-entity (vector from player to loop-entity) with strength 1.5
+                        push the loop-entity upwards at speed 0.4
+                stop
+            if player has permission "group.3":
+                loop all entities in radius 7 around player where [input is not player]:
+                    if loop-entity does not have permission "group.3":
+                        ignite loop-entity
+                        knock loop-entity (vector from player to loop-entity) with strength 1.5
+                        push the loop-entity upwards at speed 0.4
+                stop
+            if player has permission "group.4":
+                loop all entities in radius 7 around player where [input is not player]:
+                    if loop-entity does not have permission "group.4":
+                        ignite loop-entity
+                        knock loop-entity (vector from player to loop-entity) with strength 1.5
+                        push the loop-entity upwards at speed 0.4
+                stop
+            if player has permission "group.5":
+                loop all entities in radius 7 around player where [input is not player]:
+                    if loop-entity does not have permission "group.5":
+                        ignite loop-entity
+                        knock loop-entity (vector from player to loop-entity) with strength 1.5
+                        push the loop-entity upwards at speed 0.4
+                stop
+            send "&cok so you seem to not be on a team... report this to an admin ASAP!!! -bean" to player
+            stop
+        set {_hammert} to difference between {hammerc::%player's uuid%} and now
+        if {_hammert} is less than {hammer.cooldown}:
+            stop
+        else:
+            set {hammerc::%player's uuid%} to now
+            set item cooldown of event-item for player to {hammer.cooldown}
+            hp(player)
+            play sound "item.firecharge.use" with volume 0.5 with pitch 0.6 at player
+            if player has permission "group.1":
+                loop all entities in radius 7 around player where [input is not player]:
+                    if loop-entity does not have permission "group.1":
+                        ignite loop-entity
+                        knock loop-entity (vector from player to loop-entity) with strength 1.5
+                        push the loop-entity upwards at speed 0.4
+                stop
+            if player has permission "group.2":
+                loop all entities in radius 7 around player where [input is not player]:
+                    if loop-entity does not have permission "group.2":
+                        ignite loop-entity
+                        knock loop-entity (vector from player to loop-entity) with strength 1.5
+                        push the loop-entity upwards at speed 0.4
+                stop
+            if player has permission "group.3":
+                loop all entities in radius 7 around player where [input is not player]:
+                    if loop-entity does not have permission "group.3":
+                        ignite loop-entity
+                        knock loop-entity (vector from player to loop-entity) with strength 1.5
+                        push the loop-entity upwards at speed 0.4
+                stop
+            if player has permission "group.4":
+                loop all entities in radius 7 around player where [input is not player]:
+                    if loop-entity does not have permission "group.4":
+                        ignite loop-entity
+                        knock loop-entity (vector from player to loop-entity) with strength 1.5
+                        push the loop-entity upwards at speed 0.4
+                stop
+            if player has permission "group.5":
+                loop all entities in radius 7 around player where [input is not player]:
+                    if loop-entity does not have permission "group.5":
+                        ignite loop-entity
+                        knock loop-entity (vector from player to loop-entity) with strength 1.5
+                        push the loop-entity upwards at speed 0.4
+                stop
+            stop
+
+function hp(p: player):
+    set {_loc} to location of {_p}
+    add 1 to y-coord of {_loc}
+    draw 80 of dust using dustOption(dark gray, 3) at {_loc} with offset vector(1.5, 2, 1.5) with extra 0
+    draw 150 of flame at {_loc} with offset vector(1, 1, 1) with extra 0.5
+    draw 50 of lava at {_loc} with offset vector(1, 1, 1)

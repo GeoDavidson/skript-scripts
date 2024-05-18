@@ -1,0 +1,29 @@
+on right click holding book:
+    if byte tag "BPtestitem" of nbt compound of event-item is 1:
+        remove 1 of event-item from player's inventory
+        chance of 8%:
+            give player enchanted book of sharpness 2
+            play sound "block.enchantment_table.use" with volume 7 to player
+            stop
+        chance of 13%:
+            give player enchanted book of sharpness 1
+            play sound "block.enchantment_table.use" with volume 7 to player
+            stop
+        chance of 15%:
+            give player enchanted book of protection 1
+            play sound "block.enchantment_table.use" with volume 7 to player
+            stop
+        chance of 8%:
+            give player enchanted book of protection 2
+            play sound "block.enchantment_table.use" with volume 7 to player
+            stop
+        chance of 17%:
+            give player enchanted book of efficiency 1
+            play sound "block.enchantment_table.use" with volume 7 to player
+            stop
+        chance of 10%:
+            give player enchanted book of efficiency 2
+            play sound "block.enchantment_table.use" with volume 7 to player
+            stop
+        else:
+            send "&cUnlucky! Looks like you got nothing!"

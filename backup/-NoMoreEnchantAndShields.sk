@@ -1,0 +1,18 @@
+on craft:
+    if item is shield:
+        cancel event
+        send " &7> &cShields are disabled in this event! &7<" to player
+    if item is enchanting table:
+        cancel event
+        send " &7> &cEnchanting tables are disabled in this event! &7<" to player
+
+
+on right click on enchanting table:
+    cancel event
+    send "&cSorry, I can't let you do that. &7-bean"
+    break event-block
+
+on right click holding shield:
+    cancel event
+    remove all event-item from player's inventory
+    send "&cI got hungry, so I ate your shield. &7-bean"

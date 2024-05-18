@@ -1,0 +1,88 @@
+on rightclick:
+    byte tag "spear" of nbt compound of player's held item is 1
+    if difference between now and {spear::cooldownplayers::%player's uuid%} is greater than {spear::cooldown}:
+        set {spear::cooldownplayers::%player's uuid%} to now
+        if target entity is set:
+            if distance between player and target entity <= 15:
+                set {_v} to vector from player to target entity
+                set vector length of {_v} to 0.1
+                set {_loc} to location of player
+                add 1 to y-coord of {_loc}
+                loop (distance between {_loc} and target entity) / 0.1 times:
+                    draw 1 dust_color_transition using dustTransition(red, red, 2) at {_loc} with force
+                    set {_loc} to {_loc} ~ {_v}
+                if player has permission "group.roman":
+                    target entity has permission "group.roman"
+                    send "&cThat's not very nice of you!" to player
+                    stop
+                if player has permission "group.egyptians":
+                    target entity has permission "group.egyptians"
+                    send "&cThat's not very nice of you!" to player
+                    stop
+                if player has permission "group.aztec":
+                    target entity has permission "group.aztec"
+                    send "&cThat's not very nice of you!" to player
+                    stop
+                damage target entity by {spear::damage}
+            else:
+                set {_v} to vector from player to block 15 blocks in front of player
+                set vector length of {_v} to 0.1
+                set {_loc} to location of player
+                add 1 to y-coord of {_loc}
+                loop (distance between {_loc} and block 15 blocks in front of player) / 0.1 times:
+                    draw 1 dust_color_transition using dustTransition(red, red, 2) at {_loc} with force
+                    set {_loc} to {_loc} ~ {_v}
+                damage target entity by {spear::damage}
+        else:
+            set {_v} to vector from player to block 15 blocks in front of player
+            set vector length of {_v} to 0.1
+            set {_loc} to location of player
+            add 1 to y-coord of {_loc}
+            loop (distance between {_loc} and block 15 blocks in front of player) / 0.1 times:
+                draw 1 dust_color_transition using dustTransition(red, red, 2) at {_loc} with force
+                set {_loc} to {_loc} ~ {_v}
+            if player has permission "group.roman":
+                target entity has permission "group.roman"
+                send "&cThat's not very nice of you!" to player
+                stop
+            if player has permission "group.egyptians":
+                target entity has permission "group.egyptians"
+                send "&cThat's not very nice of you!" to player
+                stop
+            if player has permission "group.aztec":
+                target entity has permission "group.aztec"
+                send "&cThat's not very nice of you!" to player
+                stop
+            damage target entity by {spear::damage}
+    else if {spear::cooldownplayers::%player's uuid%} is not set:
+        target entity is set
+        set {spear::cooldownplayers::%player's uuid%} to now
+        set {_v} to vector from player to target entity
+        set vector length of {_v} to 0.1
+        set {_loc} to location of player
+        add 1 to y-coord of {_loc}
+        loop (distance between {_loc} and target entity) / 0.1 times:
+            draw 1 dust_color_transition using dustTransition(red, red, 2) at {_loc} with force
+            set {_loc} to {_loc} ~ {_v}
+        damage target entity by {spear::damage}
+    else:
+        set {_t} to difference between {spear::cooldown} and difference between {spear::cooldownplayers::%player's uuid%} and now
+        send "&cThe Roman Spear Will Recharge in %rounded seconds of {_t}% Seconds!" to player
+
+command /spear <string> [<integer>]:
+    permission: op
+    trigger:
+        if arg-1 is "damage":
+            if arg-2 is set:
+                set {spear::damage} to arg-2
+                message "&aYou set the spear damage to %arg-2%"
+                play sound "block.note_block.bell" at volume 1 at pitch 1 to player
+            else:
+                message {spear::damage}
+        if arg-1 is "cooldown":
+            if arg-2 is set:
+                set {spear::cooldown} to "%arg-2% seconds" parsed as timespan
+                message "&aYou set the spear cooldown to %arg-2%"
+                play sound "block.note_block.bell" at volume 1 at pitch 1 to player
+            else:
+                message {spear::cooldown}

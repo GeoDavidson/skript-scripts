@@ -1,0 +1,113 @@
+on script load:
+    load yaml "plugins/HungerGamesYAMLStuff/Locations.yml" as "loc"
+
+command /sethgspawnloc:
+    permission: op
+    executable by: players
+    trigger:
+        set {_loc} to location of player
+        set {_spawnlocs::*} to yaml list "HungerGamesSpawnLocations.locations" from "loc"
+        add {_loc} to {_spawnlocs::*}
+        set yaml list "HungerGamesSpawnLocations.locations" from "loc" to {_spawnlocs::*}
+        message "&aYou created spawn location &9##%size of {_spawnlocs::*}% &aat location &c%x-coord of {_loc}%, %y-coord of {_loc}%, %z-coord of {_loc}%, &b%pitch of {_loc}%, &6%yaw of {_loc}%"
+        set {hgspawnlocs::*} to yaml list "HungerGamesSpawnLocations.locations" from "loc"
+        save yaml "loc" with an indentation of 4
+
+command /restsethgspawnlocstodefault:
+    permission: op
+    trigger:
+        delete {hgspawnlocs::*}
+        set {hgspawnlocs::*} to yaml list "HungerGamesSpawnLocations.locations" from "loc"
+        message "&8------------------------------"
+        loop size of {hgspawnlocs::*} times:
+            set {_loc} to (loop-value)th element of {hgspawnlocs::*}
+            message "&f- &9##%loop-value% &c%x-coord of {_loc}%, %y-coord of {_loc}%, %z-coord of {_loc}%, &b%pitch of {_loc}%, &6%yaw of {_loc}%"
+        message "&8------------------------------"
+        save yaml "loc" with an indentation of 4
+
+command /clearhgspawnlocs:
+    permission: op
+    trigger:
+        delete yaml "loc"
+        delete {hgspawnlocs::*}
+        load yaml "plugins/HungerGamesYAMLStuff/Locations.yml" as "loc"
+        play sound "block.note_block.bell" at volume 1 at pitch 1 to player
+        message "&aSuccessfully deleted and reloaded yaml file and spawn list!"
+        save yaml "loc" with an indentation of 4
+
+command /listhgspawnlocs [<string>]:
+    permission: op
+    trigger:
+        if arg-1 is "total":
+            set {_spawnlocs::*} to yaml list "HungerGamesSpawnLocations.locations" from "loc"
+            if {_spawnlocs::*} is not set:
+                message "&cI WANT TO DIE YOU IDIOTIC MORON"
+                stop
+            message "&8------------------------------"
+            loop size of {_spawnlocs::*} times:
+                set {_loc} to (loop-value)th element of {_spawnlocs::*}
+                message "&f- &9##%loop-value% &c%x-coord of {_loc}%, %y-coord of {_loc}%, %z-coord of {_loc}%, &b%pitch of {_loc}%, &6%yaw of {_loc}%"
+            message "&8------------------------------"
+        else if arg-1 is "used":
+            if {hgspawnlocs::*} is not set:
+                message "&cKILL MEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE"
+                stop
+            message "&8------------------------------"
+            loop size of {hgspawnlocs::*} times:
+                set {_loc} to (loop-value)th element of {hgspawnlocs::*}
+                message "&f- &9##%loop-value% &c%x-coord of {_loc}%, %y-coord of {_loc}%, %z-coord of {_loc}%, &b%pitch of {_loc}%, &6%yaw of {_loc}%"
+            message "&8------------------------------"
+
+on tab complete of "/listhgspawnlocs":
+    set tab completions for position 1 to "used" and "total"
+
+on first join:
+    sortplayer(player)
+
+function sortplayer(p: player):
+    {hgtpnewplayers} is true
+    {hgspawnlocs::*} is set
+    {_p} is not op
+    set {_loc} to first element of {hgspawnlocs::*}
+    remove first element of {hgspawnlocs::*} from {hgspawnlocs::*}
+    wait 10 ticks
+    teleport {_p} to {_loc}
+    play sound "block.note_block.bell" at volume 1 at pitch 1 to {_p}
+
+command /hgtppeopletotheeventnowplease [<boolean>]:
+    permission: op
+    cooldown: 35 seconds
+    trigger:
+        if arg-1 is set:
+            if arg-1 is true:
+                set {hgtpnewplayers} to true
+                set {_p::*} to all players
+                message "&aTeleporting players. This should take roughly &c%(size of {_p::*}) * 0.25% seconds&a!"
+                loop all players:
+                    loop-player is not op
+                    sortplayer(loop-player)
+                    wait 0.5 seconds
+                message "&aTeleportation successful!"
+                play sound "block.note_block.bell" at volume 1 at pitch 1 to player
+                wait 15 seconds
+                execute console command "multiverse-core:mvunload temp"
+                send "&cLobby unloaded."
+            else if arg-1 is false:
+                execute console command "multiverse-core:mvload temp"
+                send "&aLobby loaded."
+                wait 15 seconds
+                clear {hgtpnewplayers}
+                message "&cNew players will no longer be sorted."
+                play sound "block.note_block.bell" at volume 1 at pitch 1 to player
+        else:
+            set {hgtpnewplayers} to true
+            set {_p::*} to all players
+            message "&aTeleporting players. This should take roughly &c%(size of {_p::*}) * 0.25% seconds&a!"
+            loop all players:
+                sortplayer(loop-player)
+                wait 0.25 seconds
+            message "&aTeleportation successful!"
+            play sound "block.note_block.bell" at volume 1 at pitch 1 to player
+            wait 15 seconds
+            execute console command "multiverse-core:mvunload temp"
+            send "&cLobby unloaded."

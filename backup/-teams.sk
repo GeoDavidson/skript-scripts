@@ -1,0 +1,308 @@
+on script load:
+    load yaml "plugins/SkyeTeams/teams.yml" as "teams"
+    load yaml "plugins/SkyeTeams/players.yml" as "players"
+    delete {event::outinvites::*}
+    delete {event::ininvites::*}
+
+on join:
+    if yaml value "players.%player's uuid%.team" in "players" does not exist:
+        set yaml value "players.%player's uuid%.team" in "players" to "none"
+        save yaml "players" with an indentation of 4
+
+command /team [<string>] [<string>]:
+    aliases: /teams
+    trigger:
+        if arg-1 is not set:
+            if yaml value "players.%player's uuid%.team" in "players" is "none":
+                message "&cYou do not have a team! Do ""/team create"" to create one!"
+                play sound "minecraft:block.note_block.didgeridoo" at volume 1 at pitch 1 to player
+            else:
+                openteamgui(player)
+                play sound "minecraft:block.tripwire.click_on" at volume 1 at pitch 2 at player to player
+                stop
+        else:
+            if arg-1 is "invite":
+                if arg-2 is set:
+                    set {_p} to arg-2 parsed as player
+                    if {_p} is set:
+                        invite(player, {_p})
+                    else:
+                        message "&cPlease provide a valid player by using your eyes!"
+                else:
+                    message "&cPlease provide the player you wish to invite!"
+            else if arg-1 is "create":
+                if yaml value "players.%player's uuid%.team" in "players" is "none":
+                    set {_id} to random integer from 100 to 999
+                    if yaml path "teams.%{_id}%" from "teams" exists:
+                        while yaml path "teams.%{_id}%" from "teams" exists:
+                            set {_id} to random integer from 100 to 999
+                    set {_colors::*} to "2", "3", "5", "6", "7", "8", "9", "a", "b", "c", "d" and "e"
+                    set {_c} to random element out of {_colors::*}
+                    set {_prefix} to "&%{_c}%[%{_id}%] &r"
+                    set yaml value "players.%player's uuid%.team" in "players" to {_id}
+                    set yaml list "teams.%{_id}%.members" in "teams" to player's uuid
+                    set yaml value "teams.%{_id}%.leader" in "teams" to player's uuid
+                    set yaml value "teams.%{_id}%.color" in "teams" to {_c}
+                    set yaml value "teams.%{_id}%.prefix" in "teams" to {_prefix}
+                    message colored "&aYou have created the team &%{_c}%[%{_id}%]&a!"
+                    play sound "block.note_block.bell" at volume 1 at pitch 1 to player
+                    execute console command "lp creategroup %{_id}%"
+                    execute console command "lp group %{_id}% parent add default"
+                    execute console command "lp group %{_id}% permission set ""prefix.1.%{_prefix}%"""
+                    execute console command "lp user %player% parent set %{_id}%"
+                else:
+                    message "&cYou already have a team! moron"
+            else if arg-1 is "join":
+                arg-2 is set
+                set {_id} to arg-2 parsed as integer
+                {_id} is set
+                if {event::ininvites::%player's uuid%::*} contains {_id}:
+                    if yaml value "players.%player's uuid%.team" in "players" is "none":
+                        set {_m::*} to yaml list "teams.%{_id}%.members" in "teams"
+                        add player's uuid to {_m::*}
+                        set yaml list "teams.%{_id}%.members" in "teams" to {_m::*}
+                        set yaml value "players.%player's uuid%.team" in "players" to {_id}
+                        set {_c} to yaml value "teams.%{_id}%.color" in "teams"
+                        message colored "&aYou have joined the team &%{_c}%[%{_id}%]&a!"
+                        play sound "block.note_block.bell" at volume 1 at pitch 1 to player
+                        execute console command "lp user %player% parent set %{_id}%"
+                        loop {_m::*} where [input is not uuid of player]:
+                            set {_p} to loop-value parsed as player
+                            send "&a%player% &fhas joined the team!" to {_p}
+                            play sound "block.note_block.bell" at volume 1 at pitch 1 to {_p}
+                    else:
+                        message "&cYou're already in a team you moron!"
+                        play sound "minecraft:block.note_block.didgeridoo" at volume 1 at pitch 1 to player
+                else:
+                    message "&cThat invite has expired!"
+                    play sound "minecraft:block.note_block.didgeridoo" at volume 1 at pitch 1 to player
+            else if arg-1 is "chat":
+                set {_id} to yaml value "players.%player's uuid%.team" in "players"
+                if {_id} is set:
+                    if {teams::chatters::*} contains player's uuid:
+                        remove player's uuid from {teams::chatters::*}
+                        message "&cYou have disabled team chat!"
+                        play sound "block.note_block.bell" at volume 1 at pitch 1 to player
+                    else:
+                        add player's uuid to {teams::chatters::*}
+                        message "&aYou have enabled team chat!"
+                        play sound "block.note_block.bell" at volume 1 at pitch 1 to player
+                else:
+                    message "&cWho are you gonnna talk to? you fucking idiotic moron"
+                    play sound "minecraft:block.note_block.didgeridoo" at volume 1 at pitch 1 to player
+            else if arg-1 is "leave":
+                if yaml value "players.%player's uuid%.team" in "players" is not "none":
+                    set {_id} to yaml value "players.%player's uuid%.team" in "players"
+                    {_id} is set
+                    if yaml value "teams.%{_id}%.leader" in "teams" is not player's uuid:
+                        set {_m::*} to yaml list "teams.%{_id}%.members" in "teams"
+                        remove player's uuid from {_m::*}
+                        set yaml list "teams.%{_id}%.members" in "teams" to {_m::*}
+                        set yaml value "players.%player's uuid%.team" in "players" to "none"
+                        set {_c} to yaml value "teams.%{_id}%.color" in "teams"
+                        message colored "&fYou have successfully left the team &%{_c}%[%{_id}%]&f!"
+                        play sound "minecraft:block.wooden_door.close" at volume 1 at pitch 1 to player
+                        execute console command "lp user %player% parent set default"
+                        loop {_m::*}:
+                            send "&a%player% &fhas left the team." to (loop-value parsed as player)
+                            play sound "minecraft:block.wooden_door.close" at volume 1 at pitch 1 to (loop-value parsed as player)
+                    else:
+                        message "&cYou can't leave a team you're the leader in! Do ""/team disband"" to disband the team."
+                        play sound "minecraft:block.note_block.didgeridoo" at volume 1 at pitch 1 to player
+                else:
+                    message "&cYou aren't in a team dumbass!"
+                    play sound "minecraft:block.note_block.didgeridoo" at volume 1 at pitch 1 to player
+            else if arg-1 is "disband":
+                if yaml value "players.%player's uuid%.team" in "players" is not "none":
+                    set {_id} to yaml value "players.%player's uuid%.team" in "players"
+                    {_id} is set
+                    if yaml value "teams.%{_id}%.leader" in "teams" is player's uuid:
+                        set {_m::*} to yaml list "teams.%{_id}%.members" in "teams"
+                        set {_c} to yaml value "teams.%{_id}%.color" in "teams"
+                        set {_l} to yaml value "teams.%{_id}%.leader" in "teams" parsed as offline player
+                        set yaml list "teams.%{_id}%.members" in "teams" to {_litterally nothing}
+                        loop {_m::*}:
+                            set yaml value "players.%loop-value%.team" in "players" to "none"
+                            send colored "&fThe team &%{_c}%[%{_id}%] &fhas been disbanded by &a%{_l}% &fand you have been removed from the team." to (loop-value parsed as player)
+                            play sound "minecraft:block.note_block.didgeridoo" at volume 1 at pitch 1 to (loop-value parsed as player)
+                            execute console command "lp user %loop-value parsed as offline player% parent set default"
+                        execute console command "lp deletegroup %{_id}%"
+                    else:
+                        message "&cYou can't disband a team you aren't the owner of!"
+                        play sound "minecraft:block.note_block.didgeridoo" at volume 1 at pitch 1 to player
+                else:
+                    message "&cYou aren't in a team dumbass!"
+                    play sound "minecraft:block.note_block.didgeridoo" at volume 1 at pitch 1 to player
+            else if arg-1 is "kick":
+                if yaml value "players.%player's uuid%.team" in "players" is not "none":
+                    set {_id} to yaml value "players.%player's uuid%.team" in "players"
+                    {_id} is set
+                    if yaml value "teams.%{_id}%.leader" in "teams" is player's uuid:
+                        if arg-2 is set:
+                            set {_p} to arg-2 parsed as player
+                            set {_op} to arg-2 parsed as offline player
+                            set {_m::*} to yaml list "teams.%{_id}%.members" in "teams"
+                            {_p} is not player
+                            if {_m::*} contains uuid of {_op}:
+                                remove {_op}'s uuid from {_m::*}
+                                set yaml list "teams.%{_id}%.members" in "teams" to {_m::*}
+                                set yaml value "players.%{_op}'s uuid%.team" in "players" to "none"
+                                set {_c} to yaml value "teams.%{_id}%.color" in "teams"
+                                send colored "&fYou have been kicked from the team &%{_c}%[%{_id}%]&f!" to {_p}
+                                play sound "minecraft:block.wooden_door.close" at volume 1 at pitch 1 to {_p}
+                                execute console command "lp user %{_op}% parent set default"
+                                loop {_m::*}:
+                                    send "&a%{_op}% &fhas been kicked from the team." to (loop-value parsed as player)
+                                    play sound "minecraft:block.wooden_door.close" at volume 1 at pitch 1 to (loop-value parsed as player)
+                            else:
+                                message "&c%arg-2% does not exist..?"
+                                play sound "minecraft:entity.elder_guardian.curse" at volume 1 at pitch 0.5 to player
+                        else:
+                            message "&cYou can't kick nobody dumbass"
+                            play sound "minecraft:block.note_block.didgeridoo" at volume 1 at pitch 1 to player
+                    else:
+                        message "&cI'm going to murder everyone you love"
+                        play sound "minecraft:block.note_block.didgeridoo" at volume 1 at pitch 1 to player
+                else:
+                    message "&cCome back to me when you have a team you absoulte idiotic moron"
+                    play sound "minecraft:block.note_block.didgeridoo" at volume 1 at pitch 1 to player
+            else if arg-1 is "info":
+                openteamgui(player)
+                play sound "minecraft:block.tripwire.click_on" at volume 1 at pitch 2 at player to player
+            else:
+                message "&cInvalid sub-command! Please you your eyes and read the tab completions and not try random garbage and hoping it works."
+                play sound "minecraft:block.note_block.didgeridoo" at volume 1 at pitch 0.5 to player
+        save yaml "teams" with an indentation of 4
+        save yaml "players" with an indentation of 4
+
+on chat:
+    {teams::chatters::*} contains player's uuid
+    cancel event
+    set {_id} to yaml value "players.%player's uuid%.team" in "players"
+    set {_m::*} to yaml list "teams.%{_id}%.members" in "teams"
+    loop {_m::*}:
+        set {_p} to loop-value parsed as player
+        send "&6[Team Chat] &f%player%: %message%" to {_p}
+
+command /teamtp <integer>:
+    permission: op
+    trigger:
+        set {_id} to arg-1
+        if yaml path "teams.%{_id}%" from "teams" exists:
+            set {_m::*} to yaml list "teams.%{_id}%.members" in "teams"
+            loop {_m::*}:
+                set {_p} to loop-value parsed as offline player
+                if {_p} is online:
+                    teleport {_p} to location of player
+                    send "&fYour team was teleported by &a%player%&f!" to {_p}
+                    play sound "minecraft:entity.enderman.teleport" at volume 1 at pitch 1 to {_p}
+                    send "&a%{_p}% teleported successfully" to player
+                else:
+                    send "&c%{_p}% was offline!" to player
+            message "&aEveryone has been teleported!"
+            play sound "block.note_block.bell" at volume 1 at pitch 1 to player
+        else:
+            message "&cThat team doesn't exist you idiot"
+            play sound "minecraft:block.note_block.didgeridoo" at volume 1 at pitch 1 to player
+
+on tab complete for "/team" and "/teams":
+    if yaml value "players.%player's uuid%.team" in "players" is set:
+        if yaml value "players.%player's uuid%.team" in "players" is not "none":
+            add "invite" to {_tc1::*}
+            add "info" to {_tc1::*}
+            add "chat" to {_tc1::*}
+            set {_id} to yaml value "players.%player's uuid%.team" in "players"
+            if yaml value "teams.%{_id}%.leader" in "teams" is player's uuid:
+                add "disband" to {_tc1::*}
+                add "kick" to {_tc1::*}
+            else:
+                add "leave" to {_tc1::*}
+        else:
+            add "create" to {_tc1::*}
+    else:
+        add "create" to {_tc1::*}
+    if tab arg-1 is "invite":
+        set tab completions for position 2 to all players
+    if tab arg-1 is "kick":
+        set {_id} to yaml value "players.%player's uuid%.team" in "players"
+        {_id} is set
+        set {_m::*} to yaml list "teams.%{_id}%.members" in "teams"
+        loop {_m::*}:
+            remove loop-value from {_m::*}
+            add (loop-value parsed as offline player) to {_m::*}
+        set tab completions for position 2 to {_m::*}
+    set tab completions for position 1 to {_tc1::*}
+
+command /clearteamsstuff:
+    permission: op
+    trigger:
+        delete yaml "teams"
+        delete yaml "players"
+        load yaml "plugins/SkyeTeams/teams.yml" as "teams"
+        load yaml "plugins/SkyeTeams/players.yml" as "players"
+        play sound "block.note_block.bell" at volume 1 at pitch 1 to player
+        message "&aYAML successfully cleared."
+        loop all players:
+            set yaml value "players.%loop-player's uuid%.team" in "players" to "none"
+        save yaml "players" with an indentation of 4
+
+on damage of player by player:
+    set {_id} to yaml value "players.%attacker's uuid%.team" in "players"
+    {_id} is not "none"
+    set {_id2} to yaml value "players.%victim's uuid%.team" in "players"
+    {_id2} is not "none"
+    {_id} is {_id2}
+    cancel event
+
+function rrt(p: offline player) :: player:
+    set {_id} to yaml value "players.%{_p}'s uuid%.team" in "players"
+    {_id} is not "none"
+    set {_m::*} to yaml list "teams.%{_id}%.members" in "teams"
+    remove {_p}'s uuid from {_m::*}
+    loop {_m::*}:
+        set {_op} to loop-value parsed as offline player
+        if {_op} is not online:
+            remove {_op}'s uuid from {_m::*}
+            {_op} is online
+        if {gulag::queue::*} contains {_op}'s uuid:
+            remove {_op}'s uuid from {_m::*}
+            {gulag::queue::*} does not contain {_op}'s uuid
+        if {_op} is {gulag::p1} or {gulag::p2}:
+            remove {_op}'s uuid from {_m::*}
+            {_op} is not {gulag::p1} or {gulag::p2}
+    size of {_m::*} is greater than 0
+    set {_rp} to random element out of {_m::*}
+    return {_rp} parsed as player
+
+function openteamgui(p: player):
+    send "&cfubacolotomasho fubacolotomasho fubacolotomasho fubacolotomasho fubacolotomasho fubacolotomasho fubacolotomasho fubacolotomasho (I didn't finish this and I probably forgot to lmao -Skye)" to {_p}
+
+function invite(p: player, i: player):
+    if {event::outinvites::%uuid of {_p}%::*} does not contain uuid of {_i}:
+        if yaml value "players.%uuid of {_p}%.team" in "players" is set:
+            if yaml value "players.%uuid of {_p}%.team" in "players" is not "none":
+                set {_id} to yaml value "players.%uuid of {_p}%.team" in "players"
+                set {_team::*} to yaml list "teams.%{_id}%.members" in "teams"
+                if size of {_team::*} is not greater than 3:
+                    if {_team::*} does not contain uuid of {_i}:
+                        if {event::ininvites::%uuid of {_i}%::*} does not contain {_id}:
+                            add {_id} to {event::ininvites::%uuid of {_i}%::*}
+                        add uuid of {_i} to {event::outinvites::%uuid of {_p}%::*}
+                        send formatted "&a%{_p}% &fhas invited you to join team &a[%{_id}%]&f. Do you wish to accept? <command:/team join %{_id}%>&a&l[ACCEPT]<reset>" to {_i}
+                        play sound "block.note_block.bell" at volume 1 at pitch 2 to {_i}
+                        send "&fYou invited &a%{_i}% &fto join team &a[%{_id}%]" to {_p}
+                        wait 15 seconds
+                        remove {_id} from {event::ininvites::%uuid of {_i}%::*}
+                        remove uuid of {_i} from {event::outinvites::%uuid of {_p}%::*}
+                        yaml value "players.%uuid of {_i}%.team" in "players" is not {_id}
+                        send "&fYour invite to &a%{_i}% &fhas expired!" to {_p}
+                    else:
+                        send "&c%{_i}% is on your team moron!" to {_p}
+                else:
+                    send "&cYour team is full!" to {_p}
+            else:
+                send "&cYou do not have a team! Would you like to create one? &a&l<command:/team create>[Create Team]<reset>" to {_p}
+        else:
+            send "&cCritical Error! Please leave and rejoin or contact Skye, Ajos, or any other Event Team member to fix this." to {_p}
+    else:
+        send "&cYou already sent an invite to %{_i}%! You must wait before sending another." to {_p}
